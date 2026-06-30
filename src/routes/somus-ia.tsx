@@ -8,7 +8,7 @@ import {
   listSomusConversations,
   deleteSomusConversation,
 } from '@/lib/somus-ia.functions';
-import { Plus, MessageSquare, Trash2, Settings2 } from 'lucide-react';
+import { Plus, MessageSquare, Trash2, Settings2, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfile } from '@/hooks/use-profile';
 import { toast } from 'sonner';
@@ -44,36 +44,38 @@ function SomusIaLayout() {
 
   return (
     <MainLayout>
-      <div className="h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-[#0a0a0a]">
+      <div className="h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-background border-t border-border">
         {/* Sidebar */}
-        <aside className="w-[260px] shrink-0 flex flex-col bg-[#0f0f0f] border-r border-white/5">
+        <aside className="w-[260px] shrink-0 flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
           <div className="p-3 space-y-3">
             <div className="flex items-center gap-2.5 px-2 py-2">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] flex items-center justify-center shadow-[0_0_20px_-4px_rgba(212,167,44,0.5)]">
-                <span className="text-[#1a1305] font-bold text-sm tracking-tight">S</span>
+              <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+                <Bot className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold leading-none text-white tracking-tight">SOMUS IA</p>
-                <p className="text-[10px] text-white/40 mt-1">by OpenAI</p>
+                <p className="text-sm font-semibold leading-none tracking-tight">SOMUS IA</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Powered by OpenAI</p>
               </div>
             </div>
 
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => navigate({ to: '/somus-ia' })}
-              className="w-full flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] px-3 py-2.5 text-[13px] font-medium text-white/90 transition-colors"
+              className="w-full justify-start gap-2"
             >
               <Plus className="h-4 w-4" /> Nova conversa
-            </button>
+            </Button>
           </div>
 
-          <div className="px-3 pb-1 text-[10px] uppercase tracking-wider text-white/30 font-medium">
+          <div className="px-4 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
             Histórico
           </div>
 
           <ScrollArea className="flex-1">
             <div className="px-2 pb-2 space-y-0.5">
               {conversations.length === 0 && (
-                <p className="text-xs text-white/30 px-3 py-6 text-center">
+                <p className="text-xs text-muted-foreground px-3 py-6 text-center">
                   Sem conversas ainda
                 </p>
               )}
@@ -81,20 +83,20 @@ function SomusIaLayout() {
                 <div
                   key={c.id}
                   className={cn(
-                    'group flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] cursor-pointer transition-colors',
+                    'group flex items-center gap-2 rounded-md px-2.5 py-2 text-sm cursor-pointer transition-colors',
                     activeId === c.id
-                      ? 'bg-white/[0.08] text-white'
-                      : 'text-white/70 hover:bg-white/[0.04] hover:text-white',
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'hover:bg-sidebar-accent/60',
                   )}
                   onClick={() =>
                     navigate({ to: '/somus-ia/$conversationId', params: { conversationId: c.id } })
                   }
                 >
                   <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                  <span className="flex-1 truncate">{c.title}</span>
+                  <span className="flex-1 truncate text-[13px]">{c.title}</span>
                   <button
                     type="button"
-                    className="opacity-0 group-hover:opacity-100 text-white/40 hover:text-red-400 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (confirm('Excluir esta conversa?')) del.mutate(c.id);
@@ -108,12 +110,12 @@ function SomusIaLayout() {
           </ScrollArea>
 
           {role === 'master' && (
-            <div className="p-2 border-t border-white/5">
+            <div className="p-2 border-t border-sidebar-border">
               <Button
                 size="sm"
                 variant="ghost"
                 asChild
-                className="w-full justify-start gap-2 text-xs text-white/60 hover:text-white hover:bg-white/[0.04]"
+                className="w-full justify-start gap-2 text-xs"
               >
                 <Link to="/somus-ia/agentes">
                   <Settings2 className="h-3.5 w-3.5" /> Gerenciar agentes
@@ -123,7 +125,7 @@ function SomusIaLayout() {
           )}
         </aside>
 
-        <main className="flex-1 min-w-0 flex flex-col bg-[#0a0a0a]">
+        <main className="flex-1 min-w-0 flex flex-col bg-background">
           <Outlet />
         </main>
       </div>

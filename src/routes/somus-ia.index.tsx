@@ -60,24 +60,24 @@ function NewChatPage() {
     <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto">
       <div className="w-full max-w-2xl space-y-10 py-12">
         <div className="text-center space-y-4">
-          <div className="inline-flex h-16 w-16 rounded-2xl bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] items-center justify-center mx-auto shadow-[0_0_40px_-8px_rgba(212,167,44,0.6)]">
-            <span className="text-[#1a1305] font-bold text-2xl">S</span>
+          <div className="inline-flex h-14 w-14 rounded-2xl bg-primary text-primary-foreground items-center justify-center mx-auto">
+            <Bot className="h-7 w-7" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
               Como posso ajudar?
             </h1>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-muted-foreground">
               Escolha um agente e comece a conversar
             </p>
           </div>
         </div>
 
         {activeAgents.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
-            <Bot className="h-8 w-8 mx-auto text-white/30 mb-3" />
-            <p className="text-sm font-medium text-white/80">Nenhum agente disponível</p>
-            <p className="text-xs text-white/40 mt-1">
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-8 text-center">
+            <Bot className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+            <p className="text-sm font-medium text-foreground">Nenhum agente disponível</p>
+            <p className="text-xs text-muted-foreground mt-1">
               Peça a um administrador para cadastrar um agente.
             </p>
           </div>
@@ -92,16 +92,16 @@ function NewChatPage() {
                   className={cn(
                     'rounded-xl border p-3.5 text-left transition-all',
                     selectedAgent === a.id
-                      ? 'border-[#d4a72c]/50 bg-[#d4a72c]/[0.08] shadow-[0_0_0_1px_rgba(212,167,44,0.3)]'
-                      : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/15',
+                      ? 'border-primary bg-accent'
+                      : 'border-border bg-card hover:bg-accent/50',
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <Bot className={cn('h-4 w-4', selectedAgent === a.id ? 'text-[#f7d774]' : 'text-white/50')} />
-                    <span className="font-medium text-[13px] truncate text-white">{a.name}</span>
+                    <Bot className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium text-[13px] truncate text-foreground">{a.name}</span>
                   </div>
                   {a.description && (
-                    <p className="text-[11px] text-white/40 mt-1.5 line-clamp-2">
+                    <p className="text-[11px] text-muted-foreground mt-1.5 line-clamp-2">
                       {a.description}
                     </p>
                   )}
@@ -109,7 +109,7 @@ function NewChatPage() {
               ))}
             </div>
 
-            <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] focus-within:border-white/20 transition-colors">
+            <div className="relative rounded-2xl border border-border bg-card focus-within:border-ring shadow-sm transition-colors">
               <Textarea
                 ref={taRef}
                 value={input}
@@ -122,12 +122,12 @@ function NewChatPage() {
                 }}
                 placeholder="Envie uma mensagem..."
                 disabled={send.isPending}
-                className="min-h-[60px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent text-white placeholder:text-white/30 pr-14 py-4"
+                className="min-h-[60px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent pr-14 py-4"
               />
               <button
                 onClick={handleSubmit}
                 disabled={!input.trim() || send.isPending}
-                className="absolute right-3 bottom-3 h-9 w-9 rounded-lg bg-gradient-to-br from-[#f7d774] to-[#d4a72c] text-[#1a1305] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_20px_-4px_rgba(212,167,44,0.6)] transition-all"
+                className="absolute right-2.5 bottom-2.5 h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
               >
                 {send.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
