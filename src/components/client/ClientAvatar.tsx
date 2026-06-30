@@ -1,13 +1,13 @@
 import { cn } from '@/lib/utils';
 
 const GRADIENTS = [
-  'from-sky-500 to-indigo-600',
-  'from-emerald-500 to-teal-600',
-  'from-rose-500 to-pink-600',
-  'from-amber-500 to-orange-600',
-  'from-violet-500 to-fuchsia-600',
-  'from-cyan-500 to-blue-600',
-  'from-lime-500 to-emerald-600',
+  'from-muted-foreground/20 to-muted-foreground/5',
+  'from-primary/15 to-primary/5',
+  'from-muted-foreground/15 to-muted-foreground/30',
+  'from-primary/10 to-muted-foreground/10',
+  'from-secondary-foreground/15 to-muted-foreground/10',
+  'from-muted-foreground/25 to-muted-foreground/10',
+  'from-primary/20 to-muted-foreground/5',
 ];
 
 const SIZE: Record<string, string> = {
