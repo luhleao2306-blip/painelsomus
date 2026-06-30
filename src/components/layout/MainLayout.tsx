@@ -476,7 +476,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <div className="mx-auto w-full max-w-[1400px]">
-              {role !== 'client' && <MindsetBanner />}
+              {role !== 'client' && !location.pathname.startsWith('/somus-ia') && <MindsetBanner />}
               {children}
             </div>
           </main>
