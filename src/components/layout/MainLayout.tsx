@@ -38,6 +38,7 @@ import {
   Star,
   Bot,
   Target,
+  Sparkles,
 } from 'lucide-react';
 
 
