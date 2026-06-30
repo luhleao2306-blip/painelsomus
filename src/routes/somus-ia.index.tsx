@@ -4,9 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { listSomusAgents, sendSomusMessage } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Sparkles, Send, Bot, Loader2 } from 'lucide-react';
+import { Bot, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -59,47 +57,51 @@ function NewChatPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-y-auto">
-      <div className="w-full max-w-2xl space-y-8">
-        <div className="text-center space-y-3">
-          <div className="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 items-center justify-center mx-auto">
-            <Sparkles className="h-7 w-7" />
+    <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto">
+      <div className="w-full max-w-2xl space-y-10 py-12">
+        <div className="text-center space-y-4">
+          <div className="inline-flex h-16 w-16 rounded-2xl bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] items-center justify-center mx-auto shadow-[0_0_40px_-8px_rgba(212,167,44,0.6)]">
+            <span className="text-[#1a1305] font-bold text-2xl">S</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight">Como posso ajudar?</h1>
-          <p className="text-sm text-muted-foreground">
-            Escolha um agente e comece a conversar.
-          </p>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Como posso ajudar?
+            </h1>
+            <p className="text-sm text-white/50">
+              Escolha um agente e comece a conversar
+            </p>
+          </div>
         </div>
 
         {activeAgents.length === 0 ? (
-          <Card className="p-6 text-center border-dashed">
-            <Bot className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-sm font-medium">Nenhum agente disponível</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Peça a um administrador para cadastrar um agente em "Gerenciar agentes".
+          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+            <Bot className="h-8 w-8 mx-auto text-white/30 mb-3" />
+            <p className="text-sm font-medium text-white/80">Nenhum agente disponível</p>
+            <p className="text-xs text-white/40 mt-1">
+              Peça a um administrador para cadastrar um agente.
             </p>
-          </Card>
+          </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
               {activeAgents.map((a) => (
                 <button
                   key={a.id}
                   type="button"
                   onClick={() => setSelectedAgent(a.id)}
                   className={cn(
-                    'rounded-xl border p-3 text-left transition-all hover:bg-accent/50',
+                    'rounded-xl border p-3.5 text-left transition-all',
                     selectedAgent === a.id
-                      ? 'border-amber-500/60 bg-amber-50/50 dark:bg-amber-950/20'
-                      : 'border-border',
+                      ? 'border-[#d4a72c]/50 bg-[#d4a72c]/[0.08] shadow-[0_0_0_1px_rgba(212,167,44,0.3)]'
+                      : 'border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/15',
                   )}
                 >
                   <div className="flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-amber-600" />
-                    <span className="font-medium text-sm truncate">{a.name}</span>
+                    <Bot className={cn('h-4 w-4', selectedAgent === a.id ? 'text-[#f7d774]' : 'text-white/50')} />
+                    <span className="font-medium text-[13px] truncate text-white">{a.name}</span>
                   </div>
                   {a.description && (
-                    <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
+                    <p className="text-[11px] text-white/40 mt-1.5 line-clamp-2">
                       {a.description}
                     </p>
                   )}
@@ -107,36 +109,33 @@ function NewChatPage() {
               ))}
             </div>
 
-            <Card className="p-2 shadow-lg border-border/60">
-              <div className="flex items-end gap-2">
-                <Textarea
-                  ref={taRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmit();
-                    }
-                  }}
-                  placeholder="Envie uma mensagem..."
-                  disabled={send.isPending}
-                  className="min-h-[52px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent"
-                />
-                <Button
-                  size="icon"
-                  onClick={handleSubmit}
-                  disabled={!input.trim() || send.isPending}
-                  className="bg-foreground text-background hover:bg-foreground/90"
-                >
-                  {send.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </Card>
+            <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] focus-within:border-white/20 transition-colors">
+              <Textarea
+                ref={taRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                placeholder="Envie uma mensagem..."
+                disabled={send.isPending}
+                className="min-h-[60px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent text-white placeholder:text-white/30 pr-14 py-4"
+              />
+              <button
+                onClick={handleSubmit}
+                disabled={!input.trim() || send.isPending}
+                className="absolute right-3 bottom-3 h-9 w-9 rounded-lg bg-gradient-to-br from-[#f7d774] to-[#d4a72c] text-[#1a1305] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_20px_-4px_rgba(212,167,44,0.6)] transition-all"
+              >
+                {send.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </>
         )}
       </div>

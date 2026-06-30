@@ -5,8 +5,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { getSomusConversation, sendSomusMessage, listSomusAgents } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Send, Loader2, Sparkles, User as UserIcon } from 'lucide-react';
+import { Send, Loader2, User as UserIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
@@ -65,16 +64,16 @@ function ChatPage() {
   if (error) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
-        <Card className="p-6 text-center max-w-md">
-          <p className="text-sm font-medium">Conversa não encontrada</p>
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6 text-center max-w-md">
+          <p className="text-sm font-medium text-white">Conversa não encontrada</p>
           <Button
             variant="link"
-            className="mt-2"
+            className="mt-2 text-[#f7d774]"
             onClick={() => navigate({ to: '/somus-ia' })}
           >
             Iniciar nova conversa
           </Button>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -82,7 +81,7 @@ function ChatPage() {
   if (isLoading || !data) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loader2 className="h-5 w-5 animate-spin text-white/40" />
       </div>
     );
   }
@@ -98,47 +97,47 @@ function ChatPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <header className="px-6 py-3 border-b border-border/40 flex items-center gap-3">
-        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 flex items-center justify-center">
-          <Sparkles className="h-4 w-4" />
+      <header className="px-6 py-4 border-b border-white/5 flex items-center gap-3 bg-[#0a0a0a]/80 backdrop-blur">
+        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] flex items-center justify-center shadow-[0_0_20px_-4px_rgba(212,167,44,0.4)]">
+          <span className="text-[#1a1305] font-bold text-sm">S</span>
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold truncate">{data.conversation.title}</p>
-          <p className="text-[11px] text-muted-foreground">{agent?.name ?? 'Agente'}</p>
+          <p className="text-[13px] font-semibold text-white truncate">{data.conversation.title}</p>
+          <p className="text-[11px] text-white/40">{agent?.name ?? 'Agente'}</p>
         </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-6 py-6 space-y-6">
+        <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
           {data.messages.map((m) => (
             <div
               key={m.id}
               className={cn('flex gap-3', m.role === 'user' ? 'justify-end' : 'justify-start')}
             >
               {m.role === 'assistant' && (
-                <div className="h-7 w-7 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 flex items-center justify-center shrink-0">
-                  <Sparkles className="h-3.5 w-3.5" />
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_15px_-4px_rgba(212,167,44,0.4)]">
+                  <span className="text-[#1a1305] font-bold text-[11px]">S</span>
                 </div>
               )}
               <div
                 className={cn(
-                  'rounded-2xl px-4 py-2.5 max-w-[85%]',
+                  'max-w-[80%]',
                   m.role === 'user'
-                    ? 'bg-foreground text-background'
-                    : 'bg-transparent text-foreground',
+                    ? 'rounded-2xl rounded-tr-md px-4 py-2.5 bg-gradient-to-br from-[#d4a72c] to-[#b8901f] text-[#1a1305]'
+                    : 'text-white/90',
                 )}
               >
                 {m.role === 'assistant' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-pre:my-2">
+                  <div className="prose prose-sm prose-invert max-w-none prose-p:my-2 prose-pre:my-2 prose-pre:bg-white/[0.04] prose-pre:border prose-pre:border-white/10 prose-code:text-[#f7d774] prose-a:text-[#f7d774] prose-strong:text-white prose-headings:text-white">
                     <ReactMarkdown>{m.content}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">{m.content}</p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed font-medium">{m.content}</p>
                 )}
               </div>
               {m.role === 'user' && (
-                <div className="h-7 w-7 rounded-md bg-muted flex items-center justify-center shrink-0">
-                  <UserIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                <div className="h-8 w-8 rounded-lg bg-white/[0.06] border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <UserIcon className="h-3.5 w-3.5 text-white/60" />
                 </div>
               )}
             </div>
@@ -146,13 +145,13 @@ function ChatPage() {
 
           {send.isPending && (
             <div className="flex gap-3 justify-start">
-              <div className="h-7 w-7 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 text-amber-950 flex items-center justify-center shrink-0">
-                <Sparkles className="h-3.5 w-3.5" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#f7d774] via-[#d4a72c] to-[#8a6a14] flex items-center justify-center shrink-0 shadow-[0_0_15px_-4px_rgba(212,167,44,0.4)]">
+                <span className="text-[#1a1305] font-bold text-[11px]">S</span>
               </div>
-              <div className="flex items-center gap-1.5 px-4 py-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce" />
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0.15s]" />
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0.3s]" />
+              <div className="flex items-center gap-1.5 px-2 py-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#d4a72c] animate-bounce" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#d4a72c] animate-bounce [animation-delay:0.15s]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#d4a72c] animate-bounce [animation-delay:0.3s]" />
               </div>
             </div>
           )}
@@ -160,38 +159,35 @@ function ChatPage() {
         </div>
       </div>
 
-      <div className="border-t border-border/40 p-4">
+      <div className="p-4 bg-gradient-to-t from-[#0a0a0a] to-transparent">
         <div className="max-w-3xl mx-auto">
-          <Card className="p-2 shadow-sm border-border/60">
-            <div className="flex items-end gap-2">
-              <Textarea
-                ref={taRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-                placeholder="Envie uma mensagem..."
-                disabled={send.isPending}
-                className="min-h-[44px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent"
-              />
-              <Button
-                size="icon"
-                onClick={handleSubmit}
-                disabled={!input.trim() || send.isPending}
-                className="bg-foreground text-background hover:bg-foreground/90"
-              >
-                {send.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </Card>
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] focus-within:border-white/20 transition-colors">
+            <Textarea
+              ref={taRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              placeholder="Envie uma mensagem..."
+              disabled={send.isPending}
+              className="min-h-[52px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent text-white placeholder:text-white/30 pr-14 py-3.5"
+            />
+            <button
+              onClick={handleSubmit}
+              disabled={!input.trim() || send.isPending}
+              className="absolute right-2.5 bottom-2.5 h-9 w-9 rounded-lg bg-gradient-to-br from-[#f7d774] to-[#d4a72c] text-[#1a1305] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_0_20px_-4px_rgba(212,167,44,0.6)] transition-all"
+            >
+              {send.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
