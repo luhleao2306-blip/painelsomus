@@ -8,7 +8,7 @@ import {
   listSomusConversations,
   deleteSomusConversation,
 } from '@/lib/somus-ia.functions';
-import { Plus, MessageSquare, Trash2, Settings2, Bot } from 'lucide-react';
+import { Plus, MessageSquare, Trash2, Settings2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfile } from '@/hooks/use-profile';
 import { toast } from 'sonner';
@@ -44,31 +44,39 @@ function SomusIaLayout() {
 
   return (
     <MainLayout>
-      <div className="h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-background border-t border-border">
+      <div className="relative h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-background border-t border-border">
+        {/* Ambient aurora background */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -bottom-40 right-0 h-[480px] w-[480px] rounded-full bg-primary/[0.07] blur-3xl" />
+        </div>
+
         {/* Sidebar */}
-        <aside className="w-[260px] shrink-0 flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+        <aside className="relative z-10 w-[270px] shrink-0 flex flex-col bg-sidebar/70 backdrop-blur-xl text-sidebar-foreground border-r border-sidebar-border">
           <div className="p-3 space-y-3">
-            <div className="flex items-center gap-2.5 px-2 py-2">
-              <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-                <Bot className="h-4 w-4" />
+            <div className="flex items-center gap-3 px-2 py-2">
+              <div className="relative h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
+                <Sparkles className="h-4.5 w-4.5" strokeWidth={2.25} />
+                <span className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold leading-none tracking-tight">SOMUS IA</p>
-                <p className="text-[10px] text-muted-foreground mt-1">Powered by OpenAI</p>
+                <p className="text-[14px] font-semibold leading-none tracking-tight">SOMUS IA</p>
+                <p className="text-[10px] text-muted-foreground mt-1.5 tracking-wide">Powered by OpenAI</p>
               </div>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={() => navigate({ to: '/somus-ia' })}
-              className="w-full justify-start gap-2"
+              className="group w-full flex items-center justify-between rounded-xl border border-border/60 bg-card/60 hover:bg-card hover:border-border px-3 py-2.5 text-[13px] font-medium transition-all hover:shadow-sm"
             >
-              <Plus className="h-4 w-4" /> Nova conversa
-            </Button>
+              <span className="flex items-center gap-2">
+                <Plus className="h-4 w-4" /> Nova conversa
+              </span>
+              <kbd className="hidden sm:inline-flex h-5 items-center rounded-md border border-border/60 bg-muted px-1.5 text-[10px] text-muted-foreground">⌘N</kbd>
+            </button>
           </div>
 
-          <div className="px-4 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+          <div className="px-4 pb-1.5 text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
             Histórico
           </div>
 
@@ -83,16 +91,16 @@ function SomusIaLayout() {
                 <div
                   key={c.id}
                   className={cn(
-                    'group flex items-center gap-2 rounded-md px-2.5 py-2 text-sm cursor-pointer transition-colors',
+                    'group flex items-center gap-2 rounded-lg px-2.5 py-2 cursor-pointer transition-all',
                     activeId === c.id
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'hover:bg-sidebar-accent/60',
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm'
+                      : 'hover:bg-sidebar-accent/50',
                   )}
                   onClick={() =>
                     navigate({ to: '/somus-ia/$conversationId', params: { conversationId: c.id } })
                   }
                 >
-                  <MessageSquare className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                  <MessageSquare className={cn('h-3.5 w-3.5 shrink-0', activeId === c.id ? 'opacity-80' : 'opacity-50')} />
                   <span className="flex-1 truncate text-[13px]">{c.title}</span>
                   <button
                     type="button"
@@ -125,7 +133,7 @@ function SomusIaLayout() {
           )}
         </aside>
 
-        <main className="flex-1 min-w-0 flex flex-col bg-background">
+        <main className="relative z-10 flex-1 min-w-0 flex flex-col">
           <Outlet />
         </main>
       </div>
