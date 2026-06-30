@@ -245,6 +245,7 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/cliente/metas', roles: ['client'] },
   { prefix: '/portal-cliente', roles: ['master', 'project_manager'] },
+  { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
 ];
 
 function getHomeForRole(_role: UserRole): string {
