@@ -3090,8 +3090,45 @@ export type Database = {
           },
         ]
       }
+      somus_agents: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          openai_assistant_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          openai_assistant_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          openai_assistant_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       somus_conversations: {
         Row: {
+          agent_id: string | null
           created_at: string
           id: string
           last_message_at: string
@@ -3101,6 +3138,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          agent_id?: string | null
           created_at?: string
           id?: string
           last_message_at?: string
@@ -3110,6 +3148,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          agent_id?: string | null
           created_at?: string
           id?: string
           last_message_at?: string
@@ -3118,7 +3157,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "somus_conversations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "somus_agents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       somus_messages: {
         Row: {
