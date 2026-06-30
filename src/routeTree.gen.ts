@@ -48,6 +48,7 @@ import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
 import { Route as ComercialIndexRouteImport } from './routes/comercial.index'
 import { Route as AlcateiaIndexRouteImport } from './routes/alcateia.index'
+import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
@@ -275,6 +276,11 @@ const AlcateiaIndexRoute = AlcateiaIndexRouteImport.update({
   path: '/alcateia/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SomusIaAgentesRoute = SomusIaAgentesRouteImport.update({
+  id: '/agentes',
+  path: '/agentes',
+  getParentRoute: () => SomusIaRoute,
+} as any)
 const SomusIaConversationIdRoute = SomusIaConversationIdRouteImport.update({
   id: '/$conversationId',
   path: '/$conversationId',
@@ -494,6 +500,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
+  '/somus-ia/agentes': typeof SomusIaAgentesRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -561,6 +568,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
+  '/somus-ia/agentes': typeof SomusIaAgentesRoute
   '/alcateia': typeof AlcateiaIndexRoute
   '/comercial': typeof ComercialIndexRoute
   '/contracts': typeof ContractsIndexRoute
@@ -634,6 +642,7 @@ export interface FileRoutesById {
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
+  '/somus-ia/agentes': typeof SomusIaAgentesRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -708,6 +717,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
+    | '/somus-ia/agentes'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -775,6 +785,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
+    | '/somus-ia/agentes'
     | '/alcateia'
     | '/comercial'
     | '/contracts'
@@ -847,6 +858,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
+    | '/somus-ia/agentes'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -1188,6 +1200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlcateiaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/somus-ia/agentes': {
+      id: '/somus-ia/agentes'
+      path: '/agentes'
+      fullPath: '/somus-ia/agentes'
+      preLoaderRoute: typeof SomusIaAgentesRouteImport
+      parentRoute: typeof SomusIaRoute
+    }
     '/somus-ia/$conversationId': {
       id: '/somus-ia/$conversationId'
       path: '/$conversationId'
@@ -1505,11 +1524,13 @@ const RegistrationsRouteWithChildren = RegistrationsRoute._addFileChildren(
 
 interface SomusIaRouteChildren {
   SomusIaConversationIdRoute: typeof SomusIaConversationIdRoute
+  SomusIaAgentesRoute: typeof SomusIaAgentesRoute
   SomusIaIndexRoute: typeof SomusIaIndexRoute
 }
 
 const SomusIaRouteChildren: SomusIaRouteChildren = {
   SomusIaConversationIdRoute: SomusIaConversationIdRoute,
+  SomusIaAgentesRoute: SomusIaAgentesRoute,
   SomusIaIndexRoute: SomusIaIndexRoute,
 }
 
