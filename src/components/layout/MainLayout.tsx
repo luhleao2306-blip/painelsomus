@@ -38,6 +38,7 @@ import {
   Star,
   Bot,
   Target,
+  Sparkles,
 } from 'lucide-react';
 
 
@@ -195,6 +196,7 @@ const navigationSections: NavSection[] = [
 
       { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
     ],
   },
@@ -243,6 +245,7 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/cliente/metas', roles: ['client'] },
   { prefix: '/portal-cliente', roles: ['master', 'project_manager'] },
+  { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
 ];
 
 function getHomeForRole(_role: UserRole): string {
