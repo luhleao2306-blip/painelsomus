@@ -1,0 +1,2 @@
+ALTER TABLE public.collaborator_invites DROP CONSTRAINT IF EXISTS collaborator_invites_role_check;
+ALTER TABLE public.collaborator_invites ADD CONSTRAINT collaborator_invites_role_check CHECK (role = ANY (ARRAY['master','project_manager','consultant','client']));

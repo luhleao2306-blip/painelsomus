@@ -1,0 +1,1 @@
+UPDATE public.profiles SET role = 'master' WHERE email = 'wilson@agenciaw2.com.br';

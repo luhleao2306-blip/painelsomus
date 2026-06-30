@@ -1,0 +1,2 @@
+ALTER TABLE public.client_registrations DROP CONSTRAINT IF EXISTS client_registrations_status_check;
+ALTER TABLE public.client_registrations ADD CONSTRAINT client_registrations_status_check CHECK (status = ANY (ARRAY['pendente'::text,'em_analise'::text,'aguardando_correcao'::text,'aprovado'::text,'reprovado'::text,'aguardando_contrato'::text,'aguardando_assinatura'::text,'contrato_assinado'::text,'ativo'::text]));

@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS fk_profiles_client;
+ALTER TABLE public.profiles ADD CONSTRAINT fk_profiles_client FOREIGN KEY (client_id) REFERENCES public.clients(id) ON DELETE SET NULL;

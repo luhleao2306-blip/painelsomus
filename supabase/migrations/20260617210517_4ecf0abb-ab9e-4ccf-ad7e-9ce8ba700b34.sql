@@ -1,0 +1,9 @@
+ALTER TABLE public.briefings
+  DROP CONSTRAINT IF EXISTS briefings_status_check;
+
+ALTER TABLE public.briefings
+  ADD CONSTRAINT briefings_status_check
+  CHECK (status IN ('aguardando', 'em_andamento', 'enviado'));
+
+ALTER TABLE public.briefings
+  ALTER COLUMN status SET DEFAULT 'aguardando';

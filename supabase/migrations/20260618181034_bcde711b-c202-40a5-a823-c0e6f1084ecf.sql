@@ -1,0 +1,1 @@
+ALTER TYPE public.commercial_funnel_stage ADD VALUE IF NOT EXISTS 'incomplete_data';

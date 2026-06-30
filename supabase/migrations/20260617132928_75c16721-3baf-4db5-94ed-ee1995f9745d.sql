@@ -1,0 +1,1 @@
+ALTER TABLE public.commercial_leads ALTER COLUMN responsible_id TYPE text USING responsible_id::text;
