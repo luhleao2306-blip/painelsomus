@@ -41,6 +41,7 @@ import { Route as BriefingsRouteImport } from './routes/briefings'
 import { Route as BolaoRouteImport } from './routes/bolao'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
 import { Route as GamificacaoIndexRouteImport } from './routes/gamificacao.index'
 import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
@@ -237,6 +238,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SomusIaIndexRoute = SomusIaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SomusIaRoute,
 } as any)
 const RegistrationsIndexRoute = RegistrationsIndexRouteImport.update({
   id: '/',
@@ -451,7 +457,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
-  '/somus-ia': typeof SomusIaRoute
+  '/somus-ia': typeof SomusIaRouteWithChildren
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -487,6 +493,7 @@ export interface FileRoutesByFullPath {
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
+  '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
@@ -517,7 +524,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
-  '/somus-ia': typeof SomusIaRoute
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -553,6 +559,7 @@ export interface FileRoutesByTo {
   '/financeiro': typeof FinanceiroIndexRoute
   '/gamificacao': typeof GamificacaoIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
+  '/somus-ia': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas': typeof ClienteTrilhasIndexRoute
@@ -588,7 +595,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
-  '/somus-ia': typeof SomusIaRoute
+  '/somus-ia': typeof SomusIaRouteWithChildren
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -624,6 +631,7 @@ export interface FileRoutesById {
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
+  '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
@@ -696,6 +704,7 @@ export interface FileRouteTypes {
     | '/financeiro/'
     | '/gamificacao/'
     | '/registrations/'
+    | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas/'
@@ -726,7 +735,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sales-performance'
     | '/settings'
-    | '/somus-ia'
     | '/system-docs'
     | '/tasks'
     | '/team-performance'
@@ -762,6 +770,7 @@ export interface FileRouteTypes {
     | '/financeiro'
     | '/gamificacao'
     | '/registrations'
+    | '/somus-ia'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas'
@@ -832,6 +841,7 @@ export interface FileRouteTypes {
     | '/financeiro/'
     | '/gamificacao/'
     | '/registrations/'
+    | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas/'
@@ -867,7 +877,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SalesPerformanceRoute: typeof SalesPerformanceRoute
   SettingsRoute: typeof SettingsRoute
-  SomusIaRoute: typeof SomusIaRoute
+  SomusIaRoute: typeof SomusIaRouteWithChildren
   SystemDocsRoute: typeof SystemDocsRoute
   TasksRoute: typeof TasksRoute
   TeamPerformanceRoute: typeof TeamPerformanceRoute
@@ -1116,6 +1126,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/somus-ia/': {
+      id: '/somus-ia/'
+      path: '/'
+      fullPath: '/somus-ia/'
+      preLoaderRoute: typeof SomusIaIndexRouteImport
+      parentRoute: typeof SomusIaRoute
     }
     '/registrations/': {
       id: '/registrations/'
@@ -1467,6 +1484,17 @@ const RegistrationsRouteWithChildren = RegistrationsRoute._addFileChildren(
   RegistrationsRouteChildren,
 )
 
+interface SomusIaRouteChildren {
+  SomusIaIndexRoute: typeof SomusIaIndexRoute
+}
+
+const SomusIaRouteChildren: SomusIaRouteChildren = {
+  SomusIaIndexRoute: SomusIaIndexRoute,
+}
+
+const SomusIaRouteWithChildren =
+  SomusIaRoute._addFileChildren(SomusIaRouteChildren)
+
 interface ClientesClienteIdProjetosProjetoIdRouteChildren {
   ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute: typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -1510,7 +1538,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SalesPerformanceRoute: SalesPerformanceRoute,
   SettingsRoute: SettingsRoute,
-  SomusIaRoute: SomusIaRoute,
+  SomusIaRoute: SomusIaRouteWithChildren,
   SystemDocsRoute: SystemDocsRoute,
   TasksRoute: TasksRoute,
   TeamPerformanceRoute: TeamPerformanceRoute,
