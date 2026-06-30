@@ -199,9 +199,12 @@ export const sendSomusMessage = createServerFn({ method: 'POST' })
       }
     }
 
+    if (!conversationId) throw new Error('Sem conversa');
+    const convId: string = conversationId;
+
     // Save user message
     await supabase.from('somus_messages').insert({
-      conversation_id: conversationId,
+      conversation_id: convId,
       user_id: userId,
       role: 'user',
       content: data.content,
@@ -220,7 +223,7 @@ export const sendSomusMessage = createServerFn({ method: 'POST' })
     const { data: assistantMsg, error: amErr } = await supabase
       .from('somus_messages')
       .insert({
-        conversation_id: conversationId,
+        conversation_id: convId,
         user_id: userId,
         role: 'assistant',
         content: reply,
@@ -232,7 +235,7 @@ export const sendSomusMessage = createServerFn({ method: 'POST' })
     await supabase
       .from('somus_conversations')
       .update({ last_message_at: new Date().toISOString() })
-      .eq('id', conversationId);
+      .eq('id', convId);
 
-    return { conversationId, assistantMessage: assistantMsg };
+    return { conversationId: convId, assistantMessage: assistantMsg };
   });
