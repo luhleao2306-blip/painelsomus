@@ -3090,6 +3090,80 @@ export type Database = {
           },
         ]
       }
+      somus_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          openai_thread_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          openai_thread_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          openai_thread_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      somus_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          openai_message_id: string | null
+          openai_run_id: string | null
+          role: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          openai_message_id?: string | null
+          openai_run_id?: string | null
+          role: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          openai_message_id?: string | null
+          openai_run_id?: string | null
+          role?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "somus_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "somus_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stage_templates: {
         Row: {
           created_at: string
