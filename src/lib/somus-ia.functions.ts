@@ -160,7 +160,7 @@ export const sendSomusMessage = createServerFn({ method: 'POST' })
     if (!agent) throw new Error('Agente não encontrado');
 
     // Load or create conversation
-    let conversationId = data.conversationId;
+    let conversationId: string | undefined = data.conversationId;
     let threadId: string | null = null;
 
     if (conversationId) {
