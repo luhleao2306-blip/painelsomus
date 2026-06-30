@@ -13,6 +13,7 @@ import { Route as TimeReportRouteImport } from './routes/time-report'
 import { Route as TeamPerformanceRouteImport } from './routes/team-performance'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SystemDocsRouteImport } from './routes/system-docs'
+import { Route as SomusIaRouteImport } from './routes/somus-ia'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalesPerformanceRouteImport } from './routes/sales-performance'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -95,6 +96,11 @@ const TasksRoute = TasksRouteImport.update({
 const SystemDocsRoute = SystemDocsRouteImport.update({
   id: '/system-docs',
   path: '/system-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SomusIaRoute = SomusIaRouteImport.update({
+  id: '/somus-ia',
+  path: '/somus-ia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -445,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
+  '/somus-ia': typeof SomusIaRoute
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -510,6 +517,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
+  '/somus-ia': typeof SomusIaRoute
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -580,6 +588,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sales-performance': typeof SalesPerformanceRoute
   '/settings': typeof SettingsRoute
+  '/somus-ia': typeof SomusIaRoute
   '/system-docs': typeof SystemDocsRoute
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
@@ -651,6 +660,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sales-performance'
     | '/settings'
+    | '/somus-ia'
     | '/system-docs'
     | '/tasks'
     | '/team-performance'
@@ -716,6 +726,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sales-performance'
     | '/settings'
+    | '/somus-ia'
     | '/system-docs'
     | '/tasks'
     | '/team-performance'
@@ -785,6 +796,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sales-performance'
     | '/settings'
+    | '/somus-ia'
     | '/system-docs'
     | '/tasks'
     | '/team-performance'
@@ -855,6 +867,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SalesPerformanceRoute: typeof SalesPerformanceRoute
   SettingsRoute: typeof SettingsRoute
+  SomusIaRoute: typeof SomusIaRoute
   SystemDocsRoute: typeof SystemDocsRoute
   TasksRoute: typeof TasksRoute
   TeamPerformanceRoute: typeof TeamPerformanceRoute
@@ -906,6 +919,13 @@ declare module '@tanstack/react-router' {
       path: '/system-docs'
       fullPath: '/system-docs'
       preLoaderRoute: typeof SystemDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/somus-ia': {
+      id: '/somus-ia'
+      path: '/somus-ia'
+      fullPath: '/somus-ia'
+      preLoaderRoute: typeof SomusIaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -1490,6 +1510,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SalesPerformanceRoute: SalesPerformanceRoute,
   SettingsRoute: SettingsRoute,
+  SomusIaRoute: SomusIaRoute,
   SystemDocsRoute: SystemDocsRoute,
   TasksRoute: TasksRoute,
   TeamPerformanceRoute: TeamPerformanceRoute,
