@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { getSomusConversation, sendSomusMessage, listSomusAgents } from '@/lib/somus-ia.functions';
+import { useProfile } from '@/hooks/use-profile';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowUp, User as UserIcon, Sparkles, Maximize2 } from 'lucide-react';
@@ -35,16 +36,21 @@ function BoardPage() {
   const getFn = useServerFn(getSomusConversation);
   const sendFn = useServerFn(sendSomusMessage);
   const listAgentsFn = useServerFn(listSomusAgents);
+  const { profile, authReady } = useProfile();
+  const authed = authReady && !!profile;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['somus-ia', 'conversation', conversationId],
     queryFn: () => getFn({ data: { id: conversationId } }),
+    enabled: authed,
   });
 
   const { data: agents = [] } = useQuery({
     queryKey: ['somus-ia', 'agents'],
     queryFn: () => listAgentsFn({}),
+    enabled: authed,
   });
+
 
   const [input, setInput] = useState('');
   const [positions, setPositions] = useState<Record<string, Pos>>({});

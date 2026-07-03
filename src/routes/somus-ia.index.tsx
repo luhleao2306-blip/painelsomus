@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { listSomusAgents, sendSomusMessage } from '@/lib/somus-ia.functions';
+import { useProfile } from '@/hooks/use-profile';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, ArrowUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -24,11 +25,14 @@ function NewBoardPage() {
   const qc = useQueryClient();
   const listAgentsFn = useServerFn(listSomusAgents);
   const sendFn = useServerFn(sendSomusMessage);
+  const { profile, authReady } = useProfile();
 
   const { data: agents = [] } = useQuery({
     queryKey: ['somus-ia', 'agents'],
     queryFn: () => listAgentsFn({}),
+    enabled: authReady && !!profile,
   });
+
 
   const activeAgents = agents.filter((a) => a.is_active);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);

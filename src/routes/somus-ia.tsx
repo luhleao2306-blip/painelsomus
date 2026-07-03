@@ -19,7 +19,7 @@ export const Route = createFileRoute('/somus-ia')({
 function SomusIaLayout() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { role } = useProfile();
+  const { role, profile, authReady } = useProfile();
   const params = useParams({ strict: false }) as { conversationId?: string };
   const activeId = params.conversationId;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -30,6 +30,7 @@ function SomusIaLayout() {
   const { data: conversations = [] } = useQuery({
     queryKey: ['somus-ia', 'conversations'],
     queryFn: () => listFn({}),
+    enabled: authReady && !!profile,
   });
 
   const del = useMutation({
