@@ -36,16 +36,21 @@ function BoardPage() {
   const getFn = useServerFn(getSomusConversation);
   const sendFn = useServerFn(sendSomusMessage);
   const listAgentsFn = useServerFn(listSomusAgents);
+  const { profile, authReady } = useProfile();
+  const authed = authReady && !!profile;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['somus-ia', 'conversation', conversationId],
     queryFn: () => getFn({ data: { id: conversationId } }),
+    enabled: authed,
   });
 
   const { data: agents = [] } = useQuery({
     queryKey: ['somus-ia', 'agents'],
     queryFn: () => listAgentsFn({}),
+    enabled: authed,
   });
+
 
   const [input, setInput] = useState('');
   const [positions, setPositions] = useState<Record<string, Pos>>({});
