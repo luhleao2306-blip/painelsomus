@@ -4,22 +4,22 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { listSomusAgents, sendSomusMessage } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/somus-ia/')({
-  component: NewChatPage,
+  component: NewBoardPage,
 });
 
-const PAUTAS = [
-  'Como estruturar a comunicação de um lançamento?',
-  'Redija um e-mail formal de follow-up',
-  'Quais melhorias posso fazer nesta apresentação?',
-  'Resuma os pontos-chave da última reunião',
+const IDEAS = [
+  'Brainstorm de nomes para produto',
+  'Mapa de stakeholders do projeto',
+  'Fluxo de onboarding',
+  'Análise SWOT rápida',
 ];
 
-function NewChatPage() {
+function NewBoardPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const listAgentsFn = useServerFn(listSomusAgents);
@@ -56,116 +56,50 @@ function NewChatPage() {
     onError: (e: any) => toast.error(e?.message ?? 'Erro'),
   });
 
-  const handleSubmit = (text?: string) => {
-    const value = (text ?? input).trim();
-    if (!value || !selectedAgent || send.isPending) return;
-    send.mutate(value);
+  const submit = (text?: string) => {
+    const v = (text ?? input).trim();
+    if (!v || !selectedAgent || send.isPending) return;
+    send.mutate(v);
     setInput('');
   };
 
-  const today = new Date().toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-12 py-12">
-        {/* Masthead */}
-        <div className="flex items-baseline justify-between border-b-2 border-foreground pb-3 mb-2">
-          <p className="text-[10px] uppercase tracking-[0.32em]">Editorial · Vol. 01</p>
-          <p className="text-[10px] uppercase tracking-[0.32em]">{today}</p>
-        </div>
-        <div className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.22em] text-muted-foreground border-b border-border pb-3 mb-14">
-          <span>Uma publicação diária, sob demanda</span>
-          <span>Preço: sua atenção</span>
-        </div>
+    <div className="relative flex-1 overflow-hidden">
+      {/* Dot grid canvas */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #d4d4d4 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+      />
 
-        {/* Hero headline */}
-        <div className="text-center space-y-6 mb-16">
-          <p className="text-[11px] uppercase tracking-[0.32em] text-primary">
-            — Consulte o corpo editorial —
-          </p>
-          <h1 className="font-serif text-6xl md:text-7xl leading-[0.95] tracking-tight text-foreground">
-            Qual pauta você <br />
-            <span className="italic font-light">quer investigar</span> hoje?
-          </h1>
-          <p className="max-w-lg mx-auto text-[15px] leading-relaxed text-muted-foreground italic font-serif">
-            Escolha um dos nossos colunistas, entregue uma pergunta e receba uma
-            peça editorial escrita sob medida.
-          </p>
-        </div>
-
-        {activeAgents.length === 0 ? (
-          <div className="border-y-2 border-foreground py-12 text-center font-serif italic">
-            <p className="text-lg">Nenhum colunista disponível.</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Peça ao editor-chefe para convocar a equipe.
+      {/* Center prompt */}
+      <div className="relative h-full flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-xl space-y-6">
+          <div className="text-center space-y-2">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-900 text-white shadow-lg mb-2">
+              <span className="text-lg font-semibold tracking-tight">S</span>
+            </div>
+            <h1 className="text-3xl font-medium tracking-tight text-neutral-900">
+              Board vazio.
+            </h1>
+            <p className="text-[14px] text-neutral-500">
+              Comece com uma pergunta — vou espalhar as ideias no canvas.
             </p>
           </div>
-        ) : (
-          <>
-            {/* Editorial board */}
-            <div className="mb-10">
-              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-4">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-                  Corpo editorial
-                </p>
-                <p className="font-serif italic text-xs text-muted-foreground">
-                  {activeAgents.length} colunistas
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 divide-y divide-border">
-                {activeAgents.map((a, i) => (
-                  <button
-                    key={a.id}
-                    onClick={() => setSelectedAgent(a.id)}
-                    className={cn(
-                      'group flex items-baseline gap-4 py-4 text-left transition',
-                      selectedAgent === a.id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        'font-serif italic text-2xl w-8 shrink-0 tabular-nums',
-                        selectedAgent === a.id ? 'text-primary' : '',
-                      )}
-                    >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-serif text-lg leading-tight">
-                        {a.name}
-                        {selectedAgent === a.id && (
-                          <span className="ml-2 text-[9px] uppercase tracking-[0.24em] text-primary align-middle">
-                            · em pauta
-                          </span>
-                        )}
-                      </p>
-                      {a.description && (
-                        <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1 italic">
-                          {a.description}
-                        </p>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Editorial brief */}
-            <div className="mb-10">
-              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-3">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-                  Sua pauta
-                </p>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Enter · publicar
-                </p>
-              </div>
-              <div className="relative border-t-2 border-b-2 border-foreground bg-background">
+          {activeAgents.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-neutral-300 bg-white/60 p-8 text-center">
+              <p className="text-sm font-medium">Nenhum agente disponível</p>
+              <p className="text-xs text-neutral-500 mt-1">
+                Peça a um administrador para cadastrar um agente.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Composer */}
+              <div className="relative rounded-2xl border border-neutral-300 bg-white shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] focus-within:border-neutral-900 transition">
                 <Textarea
                   ref={taRef}
                   value={input}
@@ -173,59 +107,63 @@ function NewChatPage() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      handleSubmit();
+                      submit();
                     }
                   }}
-                  placeholder="Escreva sua pergunta, brief ou tema..."
+                  placeholder="Ex: quais riscos desse contrato?"
                   disabled={send.isPending}
-                  className="min-h-[120px] max-h-[280px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent font-serif text-xl italic leading-relaxed placeholder:text-muted-foreground/60 pl-4 pr-4 py-5"
+                  className="min-h-[56px] max-h-[200px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent text-[15px] pr-12 pl-4 py-4 placeholder:text-neutral-400 text-neutral-900"
                 />
-                <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                    {input.length} caracteres
-                  </span>
-                  <button
-                    onClick={() => handleSubmit()}
-                    disabled={!input.trim() || send.isPending}
-                    className="flex items-center gap-2 px-5 py-2 bg-foreground text-background text-[11px] uppercase tracking-[0.24em] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-foreground/85 transition"
-                  >
-                    {send.isPending && <Loader2 className="h-3 w-3 animate-spin" />}
-                    Publicar edição →
-                  </button>
-                </div>
+                <button
+                  onClick={() => submit()}
+                  disabled={!input.trim() || send.isPending}
+                  className="absolute right-2 bottom-2 h-9 w-9 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition"
+                >
+                  {send.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-            </div>
 
-            {/* Suggested pautas */}
-            <div>
-              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-3">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-                  Pautas sugeridas
-                </p>
-              </div>
-              <div className="divide-y divide-border">
-                {PAUTAS.map((p, i) => (
+              {/* Agent chips */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
+                <span className="text-[11px] uppercase tracking-wider text-neutral-500 mr-1">
+                  Agente:
+                </span>
+                {activeAgents.map((a) => (
                   <button
-                    key={p}
-                    onClick={() => handleSubmit(p)}
-                    disabled={send.isPending}
-                    className="group w-full flex items-baseline gap-6 py-4 text-left hover:bg-muted/30 transition disabled:opacity-50 px-2 -mx-2"
+                    key={a.id}
+                    onClick={() => setSelectedAgent(a.id)}
+                    className={cn(
+                      'text-[12px] px-2.5 py-1 rounded-full border transition',
+                      selectedAgent === a.id
+                        ? 'border-neutral-900 bg-neutral-900 text-white'
+                        : 'border-neutral-300 bg-white text-neutral-600 hover:border-neutral-500',
+                    )}
                   >
-                    <span className="font-serif italic text-xl text-muted-foreground w-6 shrink-0">
-                      {i + 1}
-                    </span>
-                    <span className="flex-1 font-serif text-lg text-foreground/90 group-hover:text-foreground">
-                      “{p}”
-                    </span>
-                    <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground opacity-0 group-hover:opacity-100 transition">
-                      Encomendar →
-                    </span>
+                    {a.name}
                   </button>
                 ))}
               </div>
-            </div>
-          </>
-        )}
+
+              {/* Ideas */}
+              <div className="flex flex-wrap justify-center gap-1.5 pt-2">
+                {IDEAS.map((i) => (
+                  <button
+                    key={i}
+                    onClick={() => submit(i)}
+                    disabled={send.isPending}
+                    className="text-[12px] px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition disabled:opacity-50"
+                  >
+                    {i}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
