@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { getSomusConversation, sendSomusMessage, listSomusAgents } from '@/lib/somus-ia.functions';
+import { useProfile } from '@/hooks/use-profile';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowUp, User as UserIcon, Sparkles, Maximize2 } from 'lucide-react';
