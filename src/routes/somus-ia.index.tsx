@@ -25,11 +25,14 @@ function NewBoardPage() {
   const qc = useQueryClient();
   const listAgentsFn = useServerFn(listSomusAgents);
   const sendFn = useServerFn(sendSomusMessage);
+  const { profile, authReady } = useProfile();
 
   const { data: agents = [] } = useQuery({
     queryKey: ['somus-ia', 'agents'],
     queryFn: () => listAgentsFn({}),
+    enabled: authReady && !!profile,
   });
+
 
   const activeAgents = agents.filter((a) => a.is_active);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
