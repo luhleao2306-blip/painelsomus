@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet, Link, useNavigate, useParams } from '@tanstack/react-router';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
@@ -8,7 +7,7 @@ import {
   listSomusConversations,
   deleteSomusConversation,
 } from '@/lib/somus-ia.functions';
-import { Plus, MessageSquare, Trash2, Settings2, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Settings2, Radio, CircuitBoard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfile } from '@/hooks/use-profile';
 import { toast } from 'sonner';
@@ -37,80 +36,98 @@ function SomusIaLayout() {
     onSuccess: (_d, id) => {
       qc.invalidateQueries({ queryKey: ['somus-ia', 'conversations'] });
       if (activeId === id) navigate({ to: '/somus-ia' });
-      toast.success('Conversa excluída');
+      toast.success('Sessão terminada');
     },
     onError: (e: any) => toast.error(e?.message ?? 'Erro ao excluir'),
   });
 
   return (
     <MainLayout>
-      <div className="relative h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-background border-t border-border">
-        {/* Ambient aurora background */}
+      <div className="relative h-[calc(100vh-8rem)] -mx-4 -my-6 md:-mx-6 md:-my-8 flex overflow-hidden bg-background text-foreground border-t border-border">
+        {/* Holographic grid + aurora */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -bottom-40 right-0 h-[480px] w-[480px] rounded-full bg-primary/[0.07] blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)',
+              backgroundSize: '56px 56px',
+              maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 85%)',
+            }}
+          />
+          <div className="absolute -top-40 left-1/3 h-[520px] w-[520px] rounded-full bg-primary/10 blur-[120px]" />
+          <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-primary/5 blur-[120px]" />
         </div>
 
-        {/* Sidebar */}
-        <aside className="relative z-10 w-[270px] shrink-0 flex flex-col bg-sidebar/70 backdrop-blur-xl text-sidebar-foreground border-r border-sidebar-border">
-          <div className="p-3 space-y-3">
-            <div className="flex items-center gap-3 px-2 py-2">
-              <div className="relative h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/20">
-                <Sparkles className="h-4.5 w-4.5" strokeWidth={2.25} />
-                <span className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+        {/* Left rail — session nodes */}
+        <aside className="relative z-10 w-[240px] shrink-0 flex flex-col border-r border-border/60 bg-background/50 backdrop-blur-2xl">
+          <div className="p-4 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="relative h-8 w-8">
+                <div className="absolute inset-0 rounded-md bg-primary/20 blur-md" />
+                <div className="relative h-8 w-8 rounded-md border border-primary/50 bg-background flex items-center justify-center">
+                  <CircuitBoard className="h-4 w-4 text-primary" strokeWidth={2} />
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold leading-none tracking-tight">SOMUS IA</p>
-                <p className="text-[10px] text-muted-foreground mt-1.5 tracking-wide">Powered by OpenAI</p>
+              <div className="min-w-0">
+                <p className="font-mono text-[11px] tracking-[0.2em] text-primary/80">SOMUS//IA</p>
+                <p className="font-mono text-[9px] text-muted-foreground tracking-wider">v.NEURAL-01</p>
               </div>
             </div>
 
             <button
               onClick={() => navigate({ to: '/somus-ia' })}
-              className="group w-full flex items-center justify-between rounded-xl border border-border/60 bg-card/60 hover:bg-card hover:border-border px-3 py-2.5 text-[13px] font-medium transition-all hover:shadow-sm"
+              className="group relative w-full flex items-center gap-2 rounded-md border border-primary/30 bg-primary/[0.06] hover:bg-primary/10 hover:border-primary/50 px-3 py-2.5 text-[12px] font-mono uppercase tracking-[0.14em] text-foreground transition-all"
             >
-              <span className="flex items-center gap-2">
-                <Plus className="h-4 w-4" /> Nova conversa
-              </span>
-              <kbd className="hidden sm:inline-flex h-5 items-center rounded-md border border-border/60 bg-muted px-1.5 text-[10px] text-muted-foreground">⌘N</kbd>
+              <Plus className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+              <span>Nova sessão</span>
+              <span className="ml-auto font-mono text-[9px] text-muted-foreground">⌘N</span>
             </button>
           </div>
 
-          <div className="px-4 pb-1.5 text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
-            Histórico
+          <div className="px-4 pb-2 flex items-center gap-2">
+            <Radio className="h-2.5 w-2.5 text-primary animate-pulse" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-muted-foreground">
+              Log de sessões
+            </span>
+            <span className="ml-auto font-mono text-[9px] text-muted-foreground/60">
+              {String(conversations.length).padStart(3, '0')}
+            </span>
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="px-2 pb-2 space-y-0.5">
+            <div className="px-2 pb-3 space-y-px">
               {conversations.length === 0 && (
-                <p className="text-xs text-muted-foreground px-3 py-6 text-center">
-                  Sem conversas ainda
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60 px-3 py-8 text-center">
+                  ∅ Nenhum registro
                 </p>
               )}
-              {conversations.map((c) => (
+              {conversations.map((c, i) => (
                 <div
                   key={c.id}
-                  className={cn(
-                    'group flex items-center gap-2 rounded-lg px-2.5 py-2 cursor-pointer transition-all',
-                    activeId === c.id
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm'
-                      : 'hover:bg-sidebar-accent/50',
-                  )}
                   onClick={() =>
                     navigate({ to: '/somus-ia/$conversationId', params: { conversationId: c.id } })
                   }
+                  className={cn(
+                    'group relative flex items-center gap-2 px-3 py-2 cursor-pointer transition-all border-l-2',
+                    activeId === c.id
+                      ? 'border-primary bg-primary/[0.08] text-foreground'
+                      : 'border-transparent hover:border-primary/30 hover:bg-primary/[0.03] text-muted-foreground hover:text-foreground',
+                  )}
                 >
-                  <MessageSquare className={cn('h-3.5 w-3.5 shrink-0', activeId === c.id ? 'opacity-80' : 'opacity-50')} />
-                  <span className="flex-1 truncate text-[13px]">{c.title}</span>
+                  <span className="font-mono text-[9px] text-muted-foreground/60 tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="flex-1 truncate text-[12px]">{c.title}</span>
                   <button
                     type="button"
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm('Excluir esta conversa?')) del.mutate(c.id);
+                      if (confirm('Terminar esta sessão?')) del.mutate(c.id);
                     }}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3 w-3" />
                   </button>
                 </div>
               ))}
@@ -118,19 +135,20 @@ function SomusIaLayout() {
           </ScrollArea>
 
           {role === 'master' && (
-            <div className="p-2 border-t border-sidebar-border">
-              <Button
-                size="sm"
-                variant="ghost"
-                asChild
-                className="w-full justify-start gap-2 text-xs"
+            <div className="p-3 border-t border-border/60">
+              <Link
+                to="/somus-ia/agentes"
+                className="flex items-center gap-2 px-2 py-1.5 text-[11px] font-mono uppercase tracking-[0.14em] text-muted-foreground hover:text-primary transition"
               >
-                <Link to="/somus-ia/agentes">
-                  <Settings2 className="h-3.5 w-3.5" /> Gerenciar agentes
-                </Link>
-              </Button>
+                <Settings2 className="h-3 w-3" /> Config · Agentes
+              </Link>
             </div>
           )}
+
+          <div className="px-4 py-2 border-t border-border/60 font-mono text-[9px] text-muted-foreground/70 tracking-wider flex items-center justify-between">
+            <span>OPENAI · ONLINE</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          </div>
         </aside>
 
         <main className="relative z-10 flex-1 min-w-0 flex flex-col">

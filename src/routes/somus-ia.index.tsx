@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { listSomusAgents, sendSomusMessage } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Send, Loader2, Sparkles, ArrowUp } from 'lucide-react';
+import { Bot, Loader2, ArrowUp, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -12,11 +12,11 @@ export const Route = createFileRoute('/somus-ia/')({
   component: NewChatPage,
 });
 
-const SUGGESTIONS = [
-  'Resuma os principais pontos de uma reunião',
-  'Crie um plano de comunicação para um lançamento',
-  'Sugira melhorias para uma apresentação',
-  'Gere um e-mail profissional de follow-up',
+const PROTOCOLS = [
+  { code: 'P.01', label: 'Sintetizar reunião' },
+  { code: 'P.02', label: 'Plano de lançamento' },
+  { code: 'P.03', label: 'Refinar apresentação' },
+  { code: 'P.04', label: 'Redigir follow-up' },
 ];
 
 function NewChatPage() {
@@ -63,100 +63,157 @@ function NewChatPage() {
     setInput('');
   };
 
+  const now = new Date();
+  const ts = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto">
-      <div className="w-full max-w-2xl space-y-10 py-12 animate-fade-in">
-        <div className="text-center space-y-5">
-          <div className="relative inline-flex h-20 w-20 mx-auto items-center justify-center">
-            <span className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-primary to-primary/60 blur-2xl opacity-40" />
-            <div className="relative h-20 w-20 rounded-[28px] bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shadow-2xl shadow-primary/30 ring-1 ring-inset ring-white/10">
-              <Sparkles className="h-9 w-9" strokeWidth={2} />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text">
-              Como posso ajudar?
-            </h1>
-            <p className="text-[15px] text-muted-foreground">
-              Sua inteligência artificial pessoal, treinada pela Somus
-            </p>
-          </div>
+    <div className="flex-1 flex flex-col overflow-y-auto">
+      {/* HUD status bar */}
+      <div className="flex items-center justify-between px-6 py-2 border-b border-border/60 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-background/40 backdrop-blur-xl">
+        <div className="flex items-center gap-4">
+          <span className="text-primary">◉ CANAL LIVRE</span>
+          <span>NÓS ATIVOS · {String(activeAgents.length).padStart(2, '0')}</span>
         </div>
+        <div className="flex items-center gap-4">
+          <span>UPLINK · OPENAI</span>
+          <span className="tabular-nums">{ts}</span>
+        </div>
+      </div>
 
-        {activeAgents.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card/40 backdrop-blur-sm p-10 text-center">
-            <Bot className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm font-medium text-foreground">Nenhum agente disponível</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Peça a um administrador para cadastrar um agente.
-            </p>
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-3xl py-10 space-y-10">
+          {/* Orb */}
+          <div className="flex flex-col items-center gap-6">
+            <div className="relative h-32 w-32">
+              <div className="absolute inset-0 rounded-full border border-primary/20 animate-[spin_20s_linear_infinite]" />
+              <div className="absolute inset-3 rounded-full border border-primary/30 animate-[spin_12s_linear_infinite_reverse]" />
+              <div className="absolute inset-6 rounded-full border border-primary/40 animate-[spin_8s_linear_infinite]" />
+              <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
+              <div className="absolute inset-10 rounded-full bg-gradient-to-br from-primary to-primary/40 shadow-[0_0_60px_hsl(var(--primary)/0.6)]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--primary))]" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
+                Interface Neural
+              </p>
+              <h1 className="text-3xl md:text-4xl font-light tracking-tight text-foreground">
+                Estabelecer <span className="font-mono italic text-primary">/conexão</span>
+              </h1>
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                Selecione um nó · transmita instrução
+              </p>
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Agent picker */}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {activeAgents.map((a) => (
-                <button
-                  key={a.id}
-                  type="button"
-                  onClick={() => setSelectedAgent(a.id)}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all',
-                    selectedAgent === a.id
-                      ? 'border-primary/40 bg-primary/10 text-foreground shadow-sm'
-                      : 'border-border/70 bg-card/60 text-muted-foreground hover:text-foreground hover:bg-card hover:border-border',
-                  )}
-                >
-                  <Bot className={cn('h-3.5 w-3.5', selectedAgent === a.id ? 'text-primary' : '')} />
-                  {a.name}
-                </button>
-              ))}
-            </div>
 
-            {/* Composer */}
-            <div className="relative rounded-3xl border border-border/70 bg-card/70 backdrop-blur-xl shadow-2xl shadow-primary/[0.06] focus-within:border-primary/40 focus-within:shadow-primary/10 transition-all">
-              <Textarea
-                ref={taRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-                placeholder="Envie uma mensagem para SOMUS IA…"
-                disabled={send.isPending}
-                className="min-h-[64px] max-h-[220px] resize-none border-0 focus-visible:ring-0 shadow-none bg-transparent text-[15px] pr-14 pl-5 py-5 placeholder:text-muted-foreground/70"
-              />
-              <button
-                onClick={() => handleSubmit()}
-                disabled={!input.trim() || send.isPending}
-                className="absolute right-3 bottom-3 h-9 w-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed enabled:hover:scale-105 enabled:active:scale-95 transition-all shadow-md shadow-primary/30"
-              >
-                {send.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
-                )}
-              </button>
+          {activeAgents.length === 0 ? (
+            <div className="border border-dashed border-border/70 bg-card/30 backdrop-blur-sm p-10 text-center font-mono">
+              <Bot className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+              <p className="text-[11px] uppercase tracking-[0.2em] text-foreground">Nó indisponível</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-2">
+                Solicite configuração ao operador master
+              </p>
             </div>
+          ) : (
+            <>
+              {/* Node selector */}
+              <div className="space-y-2">
+                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground pl-1">
+                  [ Nós Disponíveis ]
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {activeAgents.map((a, i) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => setSelectedAgent(a.id)}
+                      className={cn(
+                        'relative group text-left px-3 py-3 border transition-all overflow-hidden',
+                        selectedAgent === a.id
+                          ? 'border-primary bg-primary/[0.08] text-foreground shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
+                          : 'border-border/60 bg-card/30 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card/50',
+                      )}
+                    >
+                      {selectedAgent === a.id && (
+                        <span className="absolute top-0 right-0 h-1.5 w-1.5 bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                      )}
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-[9px] text-primary/80">
+                          N.{String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">
+                          ●online
+                        </span>
+                      </div>
+                      <p className="text-[13px] font-medium truncate">{a.name}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Suggestions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleSubmit(s)}
-                  disabled={send.isPending}
-                  className="text-left rounded-xl border border-border/60 bg-card/40 hover:bg-card hover:border-border px-4 py-3 text-[13px] text-muted-foreground hover:text-foreground transition-all hover:shadow-sm disabled:opacity-50"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+              {/* Command input */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground px-1">
+                  <span>[ Transmissão ]</span>
+                  <span>ENTER · enviar</span>
+                </div>
+                <div className="relative border border-border/70 bg-background/60 backdrop-blur-xl focus-within:border-primary/60 focus-within:shadow-[0_0_30px_hsl(var(--primary)/0.12)] transition-all">
+                  <div className="absolute left-3 top-4 font-mono text-[11px] text-primary select-none">
+                    ▸
+                  </div>
+                  <Textarea
+                    ref={taRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit();
+                      }
+                    }}
+                    placeholder="digite a instrução..."
+                    disabled={send.isPending}
+                    className="min-h-[64px] max-h-[220px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent text-[14px] font-mono placeholder:text-muted-foreground/50 pl-9 pr-14 py-4"
+                  />
+                  <button
+                    onClick={() => handleSubmit()}
+                    disabled={!input.trim() || send.isPending}
+                    className="absolute right-2 bottom-2 h-10 w-10 border border-primary/50 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    {send.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Protocols */}
+              <div className="space-y-2">
+                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground pl-1">
+                  [ Protocolos rápidos ]
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                  {PROTOCOLS.map((p) => (
+                    <button
+                      key={p.code}
+                      onClick={() => handleSubmit(p.label)}
+                      disabled={send.isPending}
+                      className="group flex items-center gap-3 px-3 py-2.5 border border-border/50 hover:border-primary/40 bg-card/20 hover:bg-primary/[0.05] text-left transition-all disabled:opacity-50"
+                    >
+                      <Zap className="h-3 w-3 text-primary/60 group-hover:text-primary" />
+                      <span className="font-mono text-[9px] text-primary/70">{p.code}</span>
+                      <span className="text-[12px] text-muted-foreground group-hover:text-foreground">
+                        {p.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
