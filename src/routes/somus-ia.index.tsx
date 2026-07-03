@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { listSomusAgents, sendSomusMessage } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Loader2, ArrowUp, Zap } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -12,11 +12,11 @@ export const Route = createFileRoute('/somus-ia/')({
   component: NewChatPage,
 });
 
-const PROTOCOLS = [
-  { code: 'P.01', label: 'Sintetizar reunião' },
-  { code: 'P.02', label: 'Plano de lançamento' },
-  { code: 'P.03', label: 'Refinar apresentação' },
-  { code: 'P.04', label: 'Redigir follow-up' },
+const PAUTAS = [
+  'Como estruturar a comunicação de um lançamento?',
+  'Redija um e-mail formal de follow-up',
+  'Quais melhorias posso fazer nesta apresentação?',
+  'Resuma os pontos-chave da última reunião',
 ];
 
 function NewChatPage() {
@@ -53,7 +53,7 @@ function NewChatPage() {
         params: { conversationId: res.conversationId },
       });
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Erro ao enviar'),
+    onError: (e: any) => toast.error(e?.message ?? 'Erro'),
   });
 
   const handleSubmit = (text?: string) => {
@@ -63,157 +63,169 @@ function NewChatPage() {
     setInput('');
   };
 
-  const now = new Date();
-  const ts = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  const today = new Date().toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto">
-      {/* HUD status bar */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-border/60 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-background/40 backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <span className="text-primary">◉ CANAL LIVRE</span>
-          <span>NÓS ATIVOS · {String(activeAgents.length).padStart(2, '0')}</span>
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-4xl mx-auto px-12 py-12">
+        {/* Masthead */}
+        <div className="flex items-baseline justify-between border-b-2 border-foreground pb-3 mb-2">
+          <p className="text-[10px] uppercase tracking-[0.32em]">Editorial · Vol. 01</p>
+          <p className="text-[10px] uppercase tracking-[0.32em]">{today}</p>
         </div>
-        <div className="flex items-center gap-4">
-          <span>UPLINK · OPENAI</span>
-          <span className="tabular-nums">{ts}</span>
+        <div className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.22em] text-muted-foreground border-b border-border pb-3 mb-14">
+          <span>Uma publicação diária, sob demanda</span>
+          <span>Preço: sua atenção</span>
         </div>
-      </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-3xl py-10 space-y-10">
-          {/* Orb */}
-          <div className="flex flex-col items-center gap-6">
-            <div className="relative h-32 w-32">
-              <div className="absolute inset-0 rounded-full border border-primary/20 animate-[spin_20s_linear_infinite]" />
-              <div className="absolute inset-3 rounded-full border border-primary/30 animate-[spin_12s_linear_infinite_reverse]" />
-              <div className="absolute inset-6 rounded-full border border-primary/40 animate-[spin_8s_linear_infinite]" />
-              <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl" />
-              <div className="absolute inset-10 rounded-full bg-gradient-to-br from-primary to-primary/40 shadow-[0_0_60px_hsl(var(--primary)/0.6)]" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--primary))]" />
-            </div>
+        {/* Hero headline */}
+        <div className="text-center space-y-6 mb-16">
+          <p className="text-[11px] uppercase tracking-[0.32em] text-primary">
+            — Consulte o corpo editorial —
+          </p>
+          <h1 className="font-serif text-6xl md:text-7xl leading-[0.95] tracking-tight text-foreground">
+            Qual pauta você <br />
+            <span className="italic font-light">quer investigar</span> hoje?
+          </h1>
+          <p className="max-w-lg mx-auto text-[15px] leading-relaxed text-muted-foreground italic font-serif">
+            Escolha um dos nossos colunistas, entregue uma pergunta e receba uma
+            peça editorial escrita sob medida.
+          </p>
+        </div>
 
-            <div className="text-center space-y-2">
-              <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
-                Interface Neural
-              </p>
-              <h1 className="text-3xl md:text-4xl font-light tracking-tight text-foreground">
-                Estabelecer <span className="font-mono italic text-primary">/conexão</span>
-              </h1>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                Selecione um nó · transmita instrução
-              </p>
-            </div>
+        {activeAgents.length === 0 ? (
+          <div className="border-y-2 border-foreground py-12 text-center font-serif italic">
+            <p className="text-lg">Nenhum colunista disponível.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Peça ao editor-chefe para convocar a equipe.
+            </p>
           </div>
-
-          {activeAgents.length === 0 ? (
-            <div className="border border-dashed border-border/70 bg-card/30 backdrop-blur-sm p-10 text-center font-mono">
-              <Bot className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-              <p className="text-[11px] uppercase tracking-[0.2em] text-foreground">Nó indisponível</p>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-2">
-                Solicite configuração ao operador master
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Node selector */}
-              <div className="space-y-2">
-                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground pl-1">
-                  [ Nós Disponíveis ]
+        ) : (
+          <>
+            {/* Editorial board */}
+            <div className="mb-10">
+              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-4">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  Corpo editorial
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {activeAgents.map((a, i) => (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => setSelectedAgent(a.id)}
+                <p className="font-serif italic text-xs text-muted-foreground">
+                  {activeAgents.length} colunistas
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 divide-y divide-border">
+                {activeAgents.map((a, i) => (
+                  <button
+                    key={a.id}
+                    onClick={() => setSelectedAgent(a.id)}
+                    className={cn(
+                      'group flex items-baseline gap-4 py-4 text-left transition',
+                      selectedAgent === a.id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    <span
                       className={cn(
-                        'relative group text-left px-3 py-3 border transition-all overflow-hidden',
-                        selectedAgent === a.id
-                          ? 'border-primary bg-primary/[0.08] text-foreground shadow-[0_0_20px_hsl(var(--primary)/0.15)]'
-                          : 'border-border/60 bg-card/30 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card/50',
+                        'font-serif italic text-2xl w-8 shrink-0 tabular-nums',
+                        selectedAgent === a.id ? 'text-primary' : '',
                       )}
                     >
-                      {selectedAgent === a.id && (
-                        <span className="absolute top-0 right-0 h-1.5 w-1.5 bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-serif text-lg leading-tight">
+                        {a.name}
+                        {selectedAgent === a.id && (
+                          <span className="ml-2 text-[9px] uppercase tracking-[0.24em] text-primary align-middle">
+                            · em pauta
+                          </span>
+                        )}
+                      </p>
+                      {a.description && (
+                        <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1 italic">
+                          {a.description}
+                        </p>
                       )}
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-[9px] text-primary/80">
-                          N.{String(i + 1).padStart(2, '0')}
-                        </span>
-                        <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">
-                          ●online
-                        </span>
-                      </div>
-                      <p className="text-[13px] font-medium truncate">{a.name}</p>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Command input */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground px-1">
-                  <span>[ Transmissão ]</span>
-                  <span>ENTER · enviar</span>
-                </div>
-                <div className="relative border border-border/70 bg-background/60 backdrop-blur-xl focus-within:border-primary/60 focus-within:shadow-[0_0_30px_hsl(var(--primary)/0.12)] transition-all">
-                  <div className="absolute left-3 top-4 font-mono text-[11px] text-primary select-none">
-                    ▸
-                  </div>
-                  <Textarea
-                    ref={taRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSubmit();
-                      }
-                    }}
-                    placeholder="digite a instrução..."
-                    disabled={send.isPending}
-                    className="min-h-[64px] max-h-[220px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent text-[14px] font-mono placeholder:text-muted-foreground/50 pl-9 pr-14 py-4"
-                  />
+            {/* Editorial brief */}
+            <div className="mb-10">
+              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-3">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  Sua pauta
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  Enter · publicar
+                </p>
+              </div>
+              <div className="relative border-t-2 border-b-2 border-foreground bg-background">
+                <Textarea
+                  ref={taRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                  placeholder="Escreva sua pergunta, brief ou tema..."
+                  disabled={send.isPending}
+                  className="min-h-[120px] max-h-[280px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent font-serif text-xl italic leading-relaxed placeholder:text-muted-foreground/60 pl-4 pr-4 py-5"
+                />
+                <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                    {input.length} caracteres
+                  </span>
                   <button
                     onClick={() => handleSubmit()}
                     disabled={!input.trim() || send.isPending}
-                    className="absolute right-2 bottom-2 h-10 w-10 border border-primary/50 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    className="flex items-center gap-2 px-5 py-2 bg-foreground text-background text-[11px] uppercase tracking-[0.24em] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-foreground/85 transition"
                   >
-                    {send.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
-                    )}
+                    {send.isPending && <Loader2 className="h-3 w-3 animate-spin" />}
+                    Publicar edição →
                   </button>
                 </div>
               </div>
+            </div>
 
-              {/* Protocols */}
-              <div className="space-y-2">
-                <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-muted-foreground pl-1">
-                  [ Protocolos rápidos ]
+            {/* Suggested pautas */}
+            <div>
+              <div className="flex items-baseline justify-between border-b border-border pb-2 mb-3">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  Pautas sugeridas
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                  {PROTOCOLS.map((p) => (
-                    <button
-                      key={p.code}
-                      onClick={() => handleSubmit(p.label)}
-                      disabled={send.isPending}
-                      className="group flex items-center gap-3 px-3 py-2.5 border border-border/50 hover:border-primary/40 bg-card/20 hover:bg-primary/[0.05] text-left transition-all disabled:opacity-50"
-                    >
-                      <Zap className="h-3 w-3 text-primary/60 group-hover:text-primary" />
-                      <span className="font-mono text-[9px] text-primary/70">{p.code}</span>
-                      <span className="text-[12px] text-muted-foreground group-hover:text-foreground">
-                        {p.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
               </div>
-            </>
-          )}
-        </div>
+              <div className="divide-y divide-border">
+                {PAUTAS.map((p, i) => (
+                  <button
+                    key={p}
+                    onClick={() => handleSubmit(p)}
+                    disabled={send.isPending}
+                    className="group w-full flex items-baseline gap-6 py-4 text-left hover:bg-muted/30 transition disabled:opacity-50 px-2 -mx-2"
+                  >
+                    <span className="font-serif italic text-xl text-muted-foreground w-6 shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 font-serif text-lg text-foreground/90 group-hover:text-foreground">
+                      “{p}”
+                    </span>
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground opacity-0 group-hover:opacity-100 transition">
+                      Encomendar →
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

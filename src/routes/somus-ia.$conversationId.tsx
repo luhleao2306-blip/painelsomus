@@ -5,18 +5,17 @@ import { useServerFn } from '@tanstack/react-start';
 import { getSomusConversation, sendSomusMessage, listSomusAgents } from '@/lib/somus-ia.functions';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowUp, CircuitBoard, User as UserIcon } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 
 export const Route = createFileRoute('/somus-ia/$conversationId')({
   component: ChatPage,
 });
 
-function fmtTime(iso?: string) {
+function fmt(iso?: string) {
   const d = iso ? new Date(iso) : new Date();
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function ChatPage() {
@@ -63,22 +62,16 @@ function ChatPage() {
       qc.invalidateQueries({ queryKey: ['somus-ia', 'conversation', conversationId] });
       qc.invalidateQueries({ queryKey: ['somus-ia', 'conversations'] });
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Erro ao enviar'),
+    onError: (e: any) => toast.error(e?.message ?? 'Erro'),
   });
 
   if (error) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="border border-destructive/40 bg-background/60 backdrop-blur-xl p-8 text-center max-w-md">
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-destructive">
-            ⚠ Sessão perdida
-          </p>
-          <Button
-            variant="link"
-            className="mt-2 font-mono text-xs"
-            onClick={() => navigate({ to: '/somus-ia' })}
-          >
-            &gt; iniciar nova
+        <div className="text-center font-serif italic max-w-md">
+          <p className="text-2xl">Esta edição não existe.</p>
+          <Button variant="link" className="mt-2" onClick={() => navigate({ to: '/somus-ia' })}>
+            → Encomendar nova edição
           </Button>
         </div>
       </div>
@@ -87,11 +80,8 @@ function ChatPage() {
 
   if (isLoading || !data) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin text-primary" />
-          Sincronizando canal...
-        </div>
+      <div className="flex-1 flex items-center justify-center gap-3 font-serif italic text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Recuperando edição...
       </div>
     );
   }
@@ -106,122 +96,84 @@ function ChatPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      {/* HUD header */}
-      <header className="px-6 py-3 border-b border-border/60 flex items-center gap-4 bg-background/50 backdrop-blur-xl">
-        <div className="relative h-8 w-8">
-          <div className="absolute inset-0 rounded-md bg-primary/20 blur-md" />
-          <div className="relative h-8 w-8 rounded-md border border-primary/50 bg-background flex items-center justify-center">
-            <CircuitBoard className="h-3.5 w-3.5 text-primary" />
-          </div>
+      {/* Editorial header */}
+      <header className="px-12 pt-10 pb-6 border-b-2 border-foreground">
+        <div className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.32em] mb-3">
+          <span>Coluna · {agent?.name ?? 'Redação'}</span>
+          <span>{new Date(data.conversation.created_at).toLocaleDateString('pt-BR')}</span>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-medium truncate">{data.conversation.title}</p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            NÓ · {agent?.name ?? '—'} · CANAL {conversationId.slice(0, 6)}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          LIVE
-        </div>
+        <h1 className="font-serif text-4xl md:text-5xl leading-[1.05] tracking-tight text-foreground max-w-3xl">
+          {data.conversation.title}
+        </h1>
       </header>
 
-      {/* Transcript */}
+      {/* Editorial body */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+        <div className="max-w-3xl mx-auto px-12 py-10 space-y-14">
           {data.messages.map((m, idx) => {
             const isUser = m.role === 'user';
-            return (
-              <div key={m.id} className="animate-fade-in space-y-1.5">
-                <div
-                  className={cn(
-                    'flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.24em]',
-                    isUser ? 'justify-end text-muted-foreground' : 'text-primary/80',
-                  )}
-                >
-                  {!isUser && <span className="h-px w-6 bg-primary/40" />}
-                  <span>
-                    {isUser ? '⟵ OPERADOR' : '⟶ ' + (agent?.name ?? 'IA')}
-                  </span>
-                  <span className="text-muted-foreground/60">·</span>
-                  <span className="tabular-nums">
-                    {String(idx + 1).padStart(3, '0')}
-                  </span>
-                  <span className="text-muted-foreground/60">·</span>
-                  <span className="tabular-nums">{fmtTime(m.created_at)}</span>
-                  {isUser && <span className="h-px w-6 bg-border" />}
-                </div>
+            const num = String(idx + 1).padStart(2, '0');
 
-                <div className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}>
-                  {!isUser && (
-                    <div className="mt-0.5 h-7 w-7 shrink-0 border border-primary/40 bg-primary/[0.06] flex items-center justify-center">
-                      <CircuitBoard className="h-3.5 w-3.5 text-primary" />
-                    </div>
-                  )}
-                  <div
-                    className={cn(
-                      'max-w-[82%] px-4 py-3 border',
-                      isUser
-                        ? 'border-primary/40 bg-primary/[0.08] text-foreground'
-                        : 'border-border/60 bg-card/40 backdrop-blur-sm text-foreground',
-                    )}
-                    style={{
-                      clipPath: isUser
-                        ? 'polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))'
-                        : 'polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)',
-                    }}
-                  >
-                    {isUser ? (
-                      <p className="whitespace-pre-wrap text-[14px] leading-relaxed">{m.content}</p>
-                    ) : (
-                      <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-pre:my-2 prose-pre:bg-background/60 prose-pre:border prose-pre:border-border prose-code:text-primary prose-headings:text-foreground">
-                        <ReactMarkdown>{m.content}</ReactMarkdown>
-                      </div>
-                    )}
+            if (isUser) {
+              return (
+                <section key={m.id} className="relative pl-8 border-l-2 border-primary animate-fade-in">
+                  <div className="flex items-baseline gap-3 text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-3">
+                    <span className="font-serif italic text-primary text-base normal-case tracking-normal">
+                      §{num}
+                    </span>
+                    <span>Pergunta do leitor</span>
+                    <span>·</span>
+                    <span>{fmt(m.created_at)}</span>
                   </div>
-                  {isUser && (
-                    <div className="mt-0.5 h-7 w-7 shrink-0 border border-border bg-muted/40 flex items-center justify-center">
-                      <UserIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                    </div>
-                  )}
+                  <p className="font-serif text-2xl italic leading-snug text-foreground whitespace-pre-wrap">
+                    “{m.content}”
+                  </p>
+                </section>
+              );
+            }
+
+            return (
+              <article key={m.id} className="animate-fade-in">
+                <div className="flex items-baseline gap-3 text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-4 pb-3 border-b border-border">
+                  <span className="font-serif italic text-foreground text-base normal-case tracking-normal">
+                    §{num}
+                  </span>
+                  <span>Resposta editorial · {agent?.name ?? 'Redação'}</span>
+                  <span>·</span>
+                  <span>{fmt(m.created_at)}</span>
                 </div>
-              </div>
+                <div className="prose prose-lg dark:prose-invert max-w-none font-serif prose-p:leading-relaxed prose-p:text-foreground/90 prose-p:my-4 prose-headings:font-serif prose-headings:font-normal prose-strong:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-primary prose-blockquote:italic prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-code:text-primary prose-code:font-mono">
+                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
+              </article>
             );
           })}
 
           {send.isPending && (
-            <div className="animate-fade-in space-y-1.5">
-              <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.24em] text-primary/80">
-                <span className="h-px w-6 bg-primary/40" />
-                <span>⟶ {agent?.name ?? 'IA'} processando</span>
+            <article className="animate-fade-in">
+              <div className="flex items-baseline gap-3 text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-4 pb-3 border-b border-border">
+                <span>Redigindo próxima resposta...</span>
               </div>
-              <div className="flex gap-3">
-                <div className="mt-0.5 h-7 w-7 shrink-0 border border-primary/40 bg-primary/[0.06] flex items-center justify-center">
-                  <CircuitBoard className="h-3.5 w-3.5 text-primary animate-pulse" />
-                </div>
-                <div className="px-4 py-3 border border-border/60 bg-card/40 backdrop-blur-sm flex items-center gap-2 font-mono text-[11px] text-muted-foreground">
-                  <span className="inline-flex gap-1">
-                    <span className="h-1 w-1 bg-primary animate-bounce" />
-                    <span className="h-1 w-1 bg-primary animate-bounce [animation-delay:0.15s]" />
-                    <span className="h-1 w-1 bg-primary animate-bounce [animation-delay:0.3s]" />
-                  </span>
-                  decodificando resposta
-                </div>
+              <div className="space-y-3">
+                <div className="h-3 bg-muted rounded animate-pulse w-11/12" />
+                <div className="h-3 bg-muted rounded animate-pulse w-full" />
+                <div className="h-3 bg-muted rounded animate-pulse w-9/12" />
+                <div className="h-3 bg-muted rounded animate-pulse w-10/12" />
               </div>
-            </div>
+            </article>
           )}
           <div ref={endRef} />
         </div>
       </div>
 
-      {/* Composer */}
-      <div className="p-4 pb-5 bg-gradient-to-t from-background via-background/85 to-transparent">
-        <div className="max-w-3xl mx-auto space-y-1.5">
-          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.24em] text-muted-foreground px-1">
-            <span className="text-primary/80">▸ TRANSMITIR</span>
-            <span>ENTER · enviar · SHIFT+ENTER · quebra</span>
+      {/* Composer as editorial footer */}
+      <div className="border-t-2 border-foreground bg-background">
+        <div className="max-w-3xl mx-auto px-12 py-4">
+          <div className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-2">
+            <span>Continuar a pauta</span>
+            <span>Enter · publicar</span>
           </div>
-          <div className="relative border border-border/70 bg-background/70 backdrop-blur-xl focus-within:border-primary/60 focus-within:shadow-[0_0_25px_hsl(var(--primary)/0.12)] transition-all">
+          <div className="relative border-t border-b border-foreground/60">
             <Textarea
               ref={taRef}
               value={input}
@@ -232,25 +184,19 @@ function ChatPage() {
                   handleSubmit();
                 }
               }}
-              placeholder="instrução..."
+              placeholder="Escreva sua próxima pergunta..."
               disabled={send.isPending}
-              className="min-h-[56px] max-h-[220px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent text-[14px] font-mono placeholder:text-muted-foreground/50 pl-4 pr-14 py-4"
+              className="min-h-[64px] max-h-[200px] resize-none border-0 rounded-none focus-visible:ring-0 shadow-none bg-transparent font-serif text-lg italic placeholder:text-muted-foreground/60 pl-2 pr-32 py-4"
             />
             <button
               onClick={handleSubmit}
               disabled={!input.trim() || send.isPending}
-              className="absolute right-2 bottom-2 h-10 w-10 border border-primary/50 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="absolute right-2 bottom-2 flex items-center gap-2 px-4 py-2 bg-foreground text-background text-[10px] uppercase tracking-[0.24em] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-foreground/85 transition"
             >
-              {send.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
-              )}
+              {send.isPending && <Loader2 className="h-3 w-3 animate-spin" />}
+              Publicar →
             </button>
           </div>
-          <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 pt-1">
-            SOMUS//IA · verifique informações críticas
-          </p>
         </div>
       </div>
     </div>
