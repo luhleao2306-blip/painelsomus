@@ -123,7 +123,7 @@ const navigationSections: NavSection[] = [
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
-      { title: 'Briefings', icon: FileText, href: '/briefings', roles: ['master', 'project_manager', 'consultant'] },
+      
       { title: 'Relatório de Tempo', icon: Timer, href: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Performance do Time', icon: TrendingUp, href: '/team-performance', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Missões', icon: Crosshair, href: '/missoes', roles: ['master', 'project_manager', 'consultant'] },
@@ -464,6 +464,14 @@ export function MainLayout({ children }: { children: ReactNode }) {
             <div className="mx-1 hidden h-4 w-px bg-border sm:block" />
 
             <GlobalSearch />
+
+            <Link
+              to={'/operacoes' as any}
+              className="ml-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 text-[12px] font-semibold uppercase tracking-wide text-primary transition-colors hover:bg-primary/15"
+            >
+              <Workflow className="h-3.5 w-3.5" />
+              Operações
+            </Link>
 
             <div className="ml-auto flex items-center gap-2">
               {role !== 'client' && <PackEnergyIndicator />}
