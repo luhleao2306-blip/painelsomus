@@ -370,8 +370,20 @@ function LoginPage() {
               className="w-full h-12 font-bold text-sm uppercase tracking-wider bg-foreground text-background hover:bg-foreground/90 transition-all"
               disabled={loading}
             >
-              {loading ? 'Processando...' : 'Entrar no Portal'}
+              {loading ? 'Processando...' : mode === 'signin' ? 'Entrar no Portal' : 'Criar Conta'}
             </Button>
+
+            <p className="text-center text-xs text-muted-foreground">
+              {mode === 'signin' ? 'Ainda não tem conta?' : 'Já tem uma conta?'}{' '}
+              <button
+                type="button"
+                className="font-semibold text-foreground underline underline-offset-2 hover:opacity-70"
+                onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                disabled={loading}
+              >
+                {mode === 'signin' ? 'Cadastre-se' : 'Fazer login'}
+              </button>
+            </p>
 
           </form>
 
