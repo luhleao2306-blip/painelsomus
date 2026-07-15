@@ -5,8 +5,9 @@ import {
 } from '@/lib/operacoes-store';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
-  Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity,
+  Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const Route = createFileRoute('/operacoes/')({
   component: OperacoesPainel,
