@@ -39,21 +39,24 @@ function OperacoesPerformance() {
   const maxOpen = Math.max(1, ...stats.map(s => s.abertas));
 
   return (
-    <div className="px-6 py-8 lg:px-10">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Performance do Time</h1>
-          <p className="text-sm text-muted-foreground">Visão por pessoa: entregas, atrasos e carga atual.</p>
-        </div>
-        <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
-          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="semana">Semana</SelectItem>
-            <SelectItem value="mes">Mês</SelectItem>
-            <SelectItem value="trimestre">Trimestre</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+      <OpPageHeader
+        eyebrow="Rastro da caçada"
+        title="Performance do Time"
+        description="Entregas, atrasos e carga atual — cada lobo com sua régua à vista."
+        icon={<TrendingUp className="h-4 w-4" />}
+        actions={
+          <Select value={period} onValueChange={(v: any) => setPeriod(v)}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="semana">Semana</SelectItem>
+              <SelectItem value="mes">Mês</SelectItem>
+              <SelectItem value="trimestre">Trimestre</SelectItem>
+            </SelectContent>
+          </Select>
+        }
+      />
+
 
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
         <div className="hidden grid-cols-[minmax(220px,2fr)_1fr_1fr_1fr_1fr_1.5fr] gap-3 border-b border-border/60 bg-muted/20 px-4 py-2 text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
