@@ -250,7 +250,7 @@ function ListView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
 function TaskRow({ task, onOpen }: { task: OpTask; onOpen: () => void }) {
   const store = useOpStore();
   const meta = STATUS_META[task.status];
-  const assignee = store.users.find(u => u.id === task.assigneeId);
+  void store.users.find(u => u.id === task.assigneeId);
   const done = task.checklist.filter(c => c.done).length;
   return (
     <div className="flex items-center gap-2 px-3 py-2 hover:bg-muted/20">
