@@ -236,10 +236,70 @@ function OperacoesPainel() {
             })}
           </div>
         </div>
+
+        {/* Upcoming deadlines */}
+        <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-base font-semibold inline-flex items-center gap-2">
+                <CalendarClock className="h-4 w-4" /> Próximos vencimentos
+              </h2>
+              <p className="text-[11px] text-muted-foreground">As caças mais próximas · não deixe passar</p>
+            </div>
+            <Link to="/operacoes/projetos" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground hover:text-foreground">
+              Abrir projetos <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          {upcoming.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border/60 p-6 text-center text-[12.5px] text-muted-foreground">
+              <Sparkles className="mx-auto mb-2 h-4 w-4" />
+              Nenhum prazo no radar. Alcateia respirando.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+              {upcoming.map(({ t, d }) => {
+                const overdue = d < today;
+                const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+                const rel = overdue ? `${Math.abs(days)}d em atraso` : days === 0 ? 'hoje' : days === 1 ? 'amanhã' : `em ${days}d`;
+                const meta = STATUS_META[t.status];
+                const assignee = store.users.find(u => u.id === t.assigneeId);
+                return (
+                  <Link
+                    key={t.id}
+                    to="/operacoes/projetos"
+                    className={`group flex items-center gap-3 rounded-lg border p-3 transition hover:shadow-sm ${
+                      overdue ? 'border-red-500/40 bg-red-500/5' : 'border-border/60 bg-background hover:border-foreground/40'
+                    }`}
+                  >
+                    <div className={`flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-md font-mono ${
+                      overdue ? 'bg-red-500 text-white' : 'bg-muted text-foreground'
+                    }`}>
+                      <span className="text-[9px] uppercase leading-none">{d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')}</span>
+                      <span className="text-[14px] font-bold leading-none">{d.getDate()}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[12.5px] font-medium">{t.name}</p>
+                      <div className="mt-1 flex items-center gap-1.5 text-[10.5px]">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 ${meta.color} border`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
+                        </span>
+                        {assignee && <span className="text-muted-foreground">· {assignee.name.split(' ')[0]}</span>}
+                      </div>
+                    </div>
+                    <span className={`font-mono text-[10.5px] font-semibold uppercase tracking-wider ${overdue ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
+                      {rel}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
+
 
 function Kpi({
   icon, label, value, hint, tone = 'default',
