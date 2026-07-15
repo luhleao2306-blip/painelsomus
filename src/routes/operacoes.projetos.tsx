@@ -51,139 +51,261 @@ function OperacoesProjetos() {
 
   return (
     <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-1">
-      {/* Sidebar: Pastas → Projetos */}
-      <aside className="w-64 shrink-0 border-r border-border/60 bg-muted/10 overflow-y-auto">
-
-        <div className="flex items-center justify-between border-b border-border/60 px-3 py-3">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Pastas</span>
-          <button
-            onClick={() => {
-              const name = prompt('Nome da pasta:');
-              if (name?.trim()) opStore.addFolder(name.trim());
-            }}
-            className="rounded p-1 hover:bg-muted"
-            title="Nova pasta"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
+  return (
+    <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-1">
+      {/* Sidebar */}
+      <aside className="flex w-72 shrink-0 flex-col border-r border-border/60 bg-muted/10">
+        <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+          <div>
+            <div className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Workspace</div>
+            <div className="font-display text-[14px] font-semibold tracking-tight">Projetos</div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="h-7 gap-1 px-2 text-[11px]">
+                <Plus className="h-3.5 w-3.5" /> Novo
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem
+                onClick={() => {
+                  const name = prompt('Nome da pasta:');
+                  if (name?.trim()) opStore.addFolder(name.trim());
+                }}
+              >
+                <FolderPlus className="mr-2 h-3.5 w-3.5" /> Nova pasta
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const folder = store.folders[0];
+                  if (!folder) { alert('Crie uma pasta primeiro.'); return; }
+                  const name = prompt(`Nome do projeto em "${folder.name}":`);
+                  if (name?.trim()) {
+                    const id = opStore.addProject(folder.id, name.trim());
+                    setSelectedProject(id);
+                  }
+                }}
+              >
+                <FilePlus className="mr-2 h-3.5 w-3.5" /> Projeto em branco
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/operacoes/modelos">
+                  <Sparkles className="mr-2 h-3.5 w-3.5" /> A partir de modelo
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <div className="px-2 py-2">
+
+        <div className="flex-1 overflow-y-auto px-2 py-2">
+          {store.folders.length === 0 && (
+            <div className="mt-6 rounded-lg border border-dashed border-border/60 p-4 text-center">
+              <FolderKanban className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
+              <p className="text-[12px] font-medium">Sem pastas ainda</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">Crie uma pasta em "+ Novo" para começar a organizar seus projetos.</p>
+            </div>
+          )}
           {store.folders.map(folder => {
             const open = openFolders[folder.id] ?? true;
             const projs = store.projects.filter(p => p.folderId === folder.id);
             return (
               <div key={folder.id} className="mb-1">
-                <div className="group flex items-center gap-1 rounded px-1 py-1 hover:bg-muted/40">
-                  <button onClick={() => setOpenFolders(o => ({ ...o, [folder.id]: !open }))} className="p-0.5">
+                <div className="group flex items-center gap-1 rounded-md px-1.5 py-1.5 hover:bg-muted/50">
+                  <button
+                    onClick={() => setOpenFolders(o => ({ ...o, [folder.id]: !open }))}
+                    className="rounded p-0.5 hover:bg-muted"
+                  >
                     {open ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                   </button>
                   <FolderKanban className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="flex-1 truncate text-[12.5px] font-medium">{folder.name}</span>
-                  <button
-                    onClick={() => {
-                      const name = prompt('Nome do projeto:');
-                      if (name?.trim()) {
-                        const id = opStore.addProject(folder.id, name.trim());
-                        setSelectedProject(id);
-                      }
-                    }}
-                    className="p-0.5 opacity-0 group-hover:opacity-100"
-                    title="Novo projeto"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => { if (confirm(`Excluir pasta "${folder.name}" e todo o seu conteúdo?`)) opStore.removeFolder(folder.id); }}
-                    className="p-0.5 opacity-0 group-hover:opacity-100 text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <span className="font-mono text-[10px] text-muted-foreground">{projs.length}</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="rounded p-0.5 text-muted-foreground opacity-0 hover:bg-muted group-hover:opacity-100">
+                        <MoreHorizontal className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const name = prompt(`Nome do projeto em "${folder.name}":`);
+                          if (name?.trim()) {
+                            const id = opStore.addProject(folder.id, name.trim());
+                            setSelectedProject(id);
+                          }
+                        }}
+                      >
+                        <Plus className="mr-2 h-3.5 w-3.5" /> Novo projeto aqui
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const name = prompt('Renomear pasta:', folder.name);
+                          if (name?.trim()) opStore.renameFolder(folder.id, name.trim());
+                        }}
+                      >
+                        Renomear
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => { if (confirm(`Excluir pasta "${folder.name}" e todo o seu conteúdo?`)) opStore.removeFolder(folder.id); }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir pasta
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 {open && (
-                  <div className="ml-6 space-y-0.5">
-                    {projs.map(p => (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedProject(p.id)}
-                        className={`block w-full truncate rounded px-2 py-1 text-left text-[12px] transition-colors ${
-                          selectedProject === p.id ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted/60 text-foreground'
-                        }`}
-                      >
-                        {p.name}
-                      </button>
-                    ))}
+                  <div className="ml-6 space-y-0.5 border-l border-border/50 pl-2">
+                    {projs.map(p => {
+                      const secs = store.sections.filter(s => s.projectId === p.id);
+                      const secIds = new Set(secs.map(s => s.id));
+                      const pts = store.tasks.filter(t => secIds.has(t.sectionId));
+                      const done = pts.filter(t => t.status === 'concluido').length;
+                      const pct = pts.length ? Math.round((done / pts.length) * 100) : 0;
+                      const active = selectedProject === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => setSelectedProject(p.id)}
+                          className={`block w-full rounded-md px-2 py-1.5 text-left text-[12px] transition-colors ${
+                            active ? 'bg-foreground text-background' : 'hover:bg-muted/60 text-foreground'
+                          }`}
+                        >
+                          <div className="truncate font-medium">{p.name}</div>
+                          {pts.length > 0 && (
+                            <div className="mt-1 flex items-center gap-1.5">
+                              <div className={`h-1 flex-1 overflow-hidden rounded-full ${active ? 'bg-background/25' : 'bg-muted'}`}>
+                                <div className={`h-full ${active ? 'bg-background' : 'bg-foreground/80'}`} style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className={`font-mono text-[9.5px] ${active ? 'text-background/80' : 'text-muted-foreground'}`}>
+                                {done}/{pts.length}
+                              </span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                     {projs.length === 0 && <p className="px-2 py-1 text-[11px] italic text-muted-foreground">Sem projetos</p>}
                   </div>
                 )}
               </div>
             );
           })}
-          {store.folders.length === 0 && (
-            <p className="px-2 py-4 text-center text-[12px] text-muted-foreground">Nenhuma pasta ainda.</p>
-          )}
         </div>
       </aside>
 
       {/* Main area */}
       <div className="flex min-w-0 flex-1 flex-col">
         {!project ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-            Selecione um projeto na lateral, ou crie um a partir de <a href="/operacoes/modelos" className="ml-1 underline">Modelos</a>.
+          <div className="flex flex-1 items-center justify-center p-8">
+            <div className="max-w-md rounded-2xl border border-dashed border-border/60 bg-muted/10 p-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-foreground text-background">
+                <FolderKanban className="h-5 w-5" />
+              </div>
+              <h3 className="font-display text-lg font-semibold tracking-tight">Nenhum projeto aberto</h3>
+              <p className="mt-1.5 text-[12.5px] text-muted-foreground">
+                Escolha um projeto na lateral, crie um novo em "+ Novo", ou parta de um modelo pronto.
+              </p>
+              <div className="mt-4 flex justify-center gap-2">
+                <Button asChild size="sm" variant="outline"><Link to="/operacoes/modelos"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Modelos</Link></Button>
+              </div>
+            </div>
           </div>
         ) : (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 px-6 py-4">
-              <div className="min-w-0">
+            <div className="border-b border-border/60 px-6 pt-4 pb-3">
+              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="mb-0.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                    <FolderKanban className="h-3 w-3" />
+                    {store.folders.find(f => f.id === project.folderId)?.name ?? '—'}
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="truncate font-display text-xl font-semibold tracking-tight">{project.name}</h2>
+                    <Select value={project.status} onValueChange={(v: any) => opStore.updateProjectStatus(project.id, v)}>
+                      <SelectTrigger className="h-6 w-36 text-[10.5px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="nao_iniciado">Não iniciado</SelectItem>
+                        <SelectItem value="em_andamento">Em andamento</SelectItem>
+                        <SelectItem value="concluido">Concluído</SelectItem>
+                        <SelectItem value="pausado">Pausado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="mt-1 text-[11.5px] text-muted-foreground">
+                    <span className="font-mono">{sections.length}</span> {sections.length === 1 ? 'seção' : 'seções'}
+                    {' · '}
+                    <span className="font-mono">{tasks.length}</span> {tasks.length === 1 ? 'tarefa' : 'tarefas'}
+                    {tasks.length > 0 && (
+                      <>
+                        {' · '}
+                        <span className="font-mono">{Math.round((tasks.filter(t => t.status === 'concluido').length / tasks.length) * 100)}%</span> concluído
+                      </>
+                    )}
+                  </p>
+                </div>
                 <div className="flex items-center gap-2">
-                  <h2 className="truncate font-display text-xl font-semibold tracking-tight">{project.name}</h2>
-                  <Select value={project.status} onValueChange={(v: any) => opStore.updateProjectStatus(project.id, v)}>
-                    <SelectTrigger className="h-6 w-36 text-[10.5px]"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nao_iniciado">Não iniciado</SelectItem>
-                      <SelectItem value="em_andamento">Em andamento</SelectItem>
-                      <SelectItem value="concluido">Concluído</SelectItem>
-                      <SelectItem value="pausado">Pausado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Button size="sm" onClick={() => {
+                    const name = prompt('Nome da seção:');
+                    if (name?.trim()) opStore.addSection(project.id, name.trim());
+                  }}>
+                    <Plus className="mr-1 h-3.5 w-3.5" /> Nova seção
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="outline" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => {
+                        const name = prompt('Renomear projeto:', project.name);
+                        if (name?.trim()) opStore.renameProject(project.id, name.trim());
+                      }}>
+                        Renomear projeto
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setShowSaveTpl(true)}>
+                        <Save className="mr-2 h-3.5 w-3.5" /> Salvar como modelo
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          if (confirm(`Excluir projeto "${project.name}"?`)) {
+                            opStore.removeProject(project.id);
+                            setSelectedProject(null);
+                          }
+                        }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="mr-2 h-3.5 w-3.5" /> Excluir projeto
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <p className="text-[11.5px] text-muted-foreground">
-                  {sections.length} seções · {tasks.length} tarefas
-                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="inline-flex rounded-md border border-border/60 bg-muted/30 p-0.5">
-                  {([
-                    { v: 'lista',  Icon: LayoutList,    label: 'Lista' },
-                    { v: 'kanban', Icon: KanbanSquare,  label: 'Kanban' },
-                    { v: 'gantt',  Icon: GanttChart,    label: 'Gantt' },
-                    { v: 'cartao', Icon: LayoutGrid,    label: 'Cartão' },
-                  ] as const).map(x => (
-                    <button
-                      key={x.v}
-                      onClick={() => setView(x.v)}
-                      className={`inline-flex items-center gap-1.5 rounded px-2 py-1 text-[11.5px] ${view === x.v ? 'bg-background shadow-sm' : 'text-muted-foreground'}`}
-                    >
-                      <x.Icon className="h-3.5 w-3.5" /> {x.label}
-                    </button>
-                  ))}
-                </div>
-                <Button size="sm" variant="outline" onClick={() => {
-                  const name = prompt('Nome da seção:');
-                  if (name?.trim()) opStore.addSection(project.id, name.trim());
-                }}>
-                  <Plus className="mr-1 h-3.5 w-3.5" /> Seção
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => setShowSaveTpl(true)}>
-                  <Save className="mr-1 h-3.5 w-3.5" /> Salvar como modelo
-                </Button>
-                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => {
-                  if (confirm(`Excluir projeto "${project.name}"?`)) {
-                    opStore.removeProject(project.id);
-                    setSelectedProject(null);
-                  }
-                }}>
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+
+              {/* View switcher — clearer, labeled */}
+              <div className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-0.5">
+                {([
+                  { v: 'lista',  Icon: LayoutList,   label: 'Lista',  hint: 'Detalhes por linha' },
+                  { v: 'kanban', Icon: KanbanSquare, label: 'Kanban', hint: 'Fluxo por status' },
+                  { v: 'gantt',  Icon: GanttChart,   label: 'Gantt',  hint: 'Cronograma' },
+                  { v: 'cartao', Icon: LayoutGrid,   label: 'Cartão', hint: 'Grade visual' },
+                ] as const).map(x => (
+                  <button
+                    key={x.v}
+                    onClick={() => setView(x.v)}
+                    title={x.hint}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-colors ${
+                      view === x.v
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <x.Icon className="h-3.5 w-3.5" /> {x.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -202,6 +324,7 @@ function OperacoesProjetos() {
     </div>
   );
 }
+
 
 // ============= List View =============
 
