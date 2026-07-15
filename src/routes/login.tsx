@@ -54,41 +54,81 @@ function LoginPage() {
       return;
     }
 
+    if (mode === 'signup' && !fullName.trim()) {
+      toast.error('Informe seu nome completo.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      {
-        const { data, error } = await supabase.auth.signInWithPassword({
+      if (mode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password: normalizedPassword,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: {
+              full_name: fullName.trim(),
+              role: 'master',
+            },
+          },
         });
 
-
         if (error) {
-          toast.error(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
+          toast.error(error.message);
           setLoading(false);
           return;
         }
 
-        if (!data.user) {
-          toast.error('Falha ao autenticar. Tente novamente.');
+        if (!data.session) {
+          toast.success('Cadastro criado! Verifique seu e-mail para confirmar o acesso.');
+          setMode('signin');
           setLoading(false);
           return;
         }
 
-        const profile = await refreshProfileForUser(data.user.id);
-        
+        const profile = await refreshProfileForUser(data.user!.id);
         if (!profile) {
-          toast.error('Perfil não encontrado. Entre em contato com o suporte.');
-          await supabase.auth.signOut();
+          toast.error('Perfil não encontrado após cadastro.');
           setLoading(false);
           return;
         }
-
-        const path = getRedirectPath(profile.role);
-        toast.success('Bem-vindo ao Somus Hub!');
-        navigate({ to: path as any });
+        toast.success('Conta criada! Bem-vindo ao Somus Hub.');
+        navigate({ to: getRedirectPath(profile.role) as any });
+        setLoading(false);
+        return;
       }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: normalizedPassword,
+      });
+
+      if (error) {
+        toast.error(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        toast.error('Falha ao autenticar. Tente novamente.');
+        setLoading(false);
+        return;
+      }
+
+      const profile = await refreshProfileForUser(data.user.id);
+
+      if (!profile) {
+        toast.error('Perfil não encontrado. Entre em contato com o suporte.');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      const path = getRedirectPath(profile.role);
+      toast.success('Bem-vindo ao Somus Hub!');
+      navigate({ to: path as any });
       setLoading(false);
     } catch (err: any) {
       console.error('Auth error:', err);
