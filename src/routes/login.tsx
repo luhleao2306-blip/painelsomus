@@ -288,11 +288,29 @@ function LoginPage() {
               Sua operação, <span className="italic font-extralight">centralizada.</span>
             </h2>
             <p className="text-sm text-muted-foreground mt-3">
-              Entre com suas credenciais para acessar o Somus Hub.
+              {mode === 'signin'
+                ? 'Entre com suas credenciais para acessar o Somus Hub.'
+                : 'Crie sua conta para acessar o Somus Hub.'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+
+            {mode === 'signup' && (
+              <div className="grid gap-2">
+                <Label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-foreground/80">Nome completo</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Seu nome"
+                  required
+                  className="h-12 border-border bg-background"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-foreground/80">E-mail</Label>
