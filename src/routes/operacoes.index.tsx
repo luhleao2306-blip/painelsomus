@@ -72,12 +72,12 @@ function OperacoesPainel() {
       <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/10 p-8"
         style={{
           background:
-            'radial-gradient(600px 240px at 10% 0%, rgba(34,211,238,0.18), transparent 60%),' +
-            'radial-gradient(500px 220px at 90% 100%, rgba(168,85,247,0.14), transparent 60%),' +
-            'linear-gradient(180deg, #0f0f10, #0a0a0a)',
+            'radial-gradient(600px 240px at 10% 0%, rgba(255,255,255,0.06), transparent 60%),' +
+            'radial-gradient(500px 220px at 90% 100%, rgba(255,255,255,0.04), transparent 60%),' +
+            'linear-gradient(180deg, #141414, #0a0a0a)',
         }}
       >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.15]"
+        <div className="pointer-events-none absolute inset-0 opacity-[0.12]"
           style={{
             backgroundImage:
               'linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),' +
@@ -88,12 +88,12 @@ function OperacoesPainel() {
         />
         <div className="relative flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-300">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
               <Flame className="h-3 w-3" /> Alcateia em movimento
             </div>
             <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-tight text-white">
-              Painel de <span className="bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text text-transparent">Operações</span>
+              Painel de <span className="bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">Operações</span>
             </h1>
             <p className="mt-2 text-[13.5px] text-zinc-400">
               O comando central da alcateia — pastas, projetos, cargos e a caça aos gargalos da semana.
@@ -101,7 +101,7 @@ function OperacoesPainel() {
             <div className="mt-5 flex flex-wrap gap-2">
               <Link
                 to="/operacoes/projetos"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-b from-cyan-300 to-cyan-500 px-3.5 py-2 text-[12.5px] font-semibold text-zinc-950 shadow-[0_0_0_1px_rgba(34,211,238,0.35),0_8px_24px_-8px_rgba(34,211,238,0.55)] transition hover:brightness-110"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-b from-white to-zinc-300 px-3.5 py-2 text-[12.5px] font-semibold text-zinc-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_24px_-10px_rgba(0,0,0,0.7)] transition hover:brightness-110"
               >
                 Abrir projetos <ArrowRight className="h-3.5 w-3.5" />
               </Link>
@@ -124,6 +124,8 @@ function OperacoesPainel() {
           </div>
         </div>
       </div>
+
+
 
 
       {/* KPIs */}
@@ -366,8 +368,8 @@ function ProgressRing({ value }: { value: number }) {
       <svg width={size} height={size} className="rotate-[-90deg]">
         <defs>
           <linearGradient id="opring" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#67e8f9" />
-            <stop offset="100%" stopColor="#22d3ee" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="100%" stopColor="#a1a1aa" />
           </linearGradient>
         </defs>
         <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none" stroke="rgba(255,255,255,0.08)" />
@@ -376,7 +378,7 @@ function ProgressRing({ value }: { value: number }) {
           strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
           className="fill-none transition-all"
           stroke="url(#opring)"
-          style={{ filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.6))' }}
+          style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.3))' }}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold text-white">
