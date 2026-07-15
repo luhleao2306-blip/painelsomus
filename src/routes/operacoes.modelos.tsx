@@ -20,13 +20,14 @@ function OperacoesModelos() {
   const [applyTpl, setApplyTpl] = useState<string | null>(null);
 
   return (
-    <div className="px-6 py-8 lg:px-10">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Modelos</h1>
-          <p className="text-sm text-muted-foreground">Templates reutilizáveis de projeto. Duplicam toda a estrutura de seções e tarefas.</p>
-        </div>
-      </div>
+    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+      <OpPageHeader
+        eyebrow="Playbooks da alcateia"
+        title="Modelos"
+        description="Templates reutilizáveis de projeto. Um clique e a operação inteira nasce pronta."
+        icon={<LayoutTemplate className="h-4 w-4" />}
+      />
+
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {store.templates.map(tpl => {
