@@ -62,6 +62,20 @@ function LoginPage() {
     setLoading(true);
 
     try {
+      const finishLogin = async (userId: string, message = 'Bem-vindo ao Somus Hub!') => {
+        const profile = await refreshProfileForUser(userId);
+
+        if (!profile) {
+          toast.error('Perfil não encontrado. Tente entrar novamente em alguns segundos.');
+          await supabase.auth.signOut();
+          return false;
+        }
+
+        toast.success(message);
+        navigate({ to: getRedirectPath(profile.role) as any });
+        return true;
+      };
+
       if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
@@ -76,6 +90,26 @@ function LoginPage() {
         });
 
         if (error) {
+          const alreadyExists = /already registered|already exists|user_already_exists/i.test(error.message);
+
+          if (alreadyExists) {
+            const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+              email: normalizedEmail,
+              password: normalizedPassword,
+            });
+
+            if (!loginError && loginData.user) {
+              await finishLogin(loginData.user.id, 'Essa conta já existia. Entramos com ela agora.');
+              setLoading(false);
+              return;
+            }
+
+            toast.error('Esse e-mail já tem cadastro. Use "Fazer login" ou "Esqueceu a senha?".');
+            setMode('signin');
+            setLoading(false);
+            return;
+          }
+
           toast.error(error.message);
           setLoading(false);
           return;
@@ -88,14 +122,7 @@ function LoginPage() {
           return;
         }
 
-        const profile = await refreshProfileForUser(data.user!.id);
-        if (!profile) {
-          toast.error('Perfil não encontrado após cadastro.');
-          setLoading(false);
-          return;
-        }
-        toast.success('Conta criada! Bem-vindo ao Somus Hub.');
-        navigate({ to: getRedirectPath(profile.role) as any });
+        await finishLogin(data.user!.id, 'Conta criada! Bem-vindo ao Somus Hub.');
         setLoading(false);
         return;
       }
@@ -117,18 +144,7 @@ function LoginPage() {
         return;
       }
 
-      const profile = await refreshProfileForUser(data.user.id);
-
-      if (!profile) {
-        toast.error('Perfil não encontrado. Entre em contato com o suporte.');
-        await supabase.auth.signOut();
-        setLoading(false);
-        return;
-      }
-
-      const path = getRedirectPath(profile.role);
-      toast.success('Bem-vindo ao Somus Hub!');
-      navigate({ to: path as any });
+      await finishLogin(data.user.id);
       setLoading(false);
     } catch (err: any) {
       console.error('Auth error:', err);
