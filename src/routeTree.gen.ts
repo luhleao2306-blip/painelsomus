@@ -44,6 +44,7 @@ import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
+import { Route as OperacoesIndexRouteImport } from './routes/operacoes.index'
 import { Route as GamificacaoIndexRouteImport } from './routes/gamificacao.index'
 import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
@@ -53,7 +54,11 @@ import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as OperacoesSenhasRouteImport } from './routes/operacoes.senhas'
 import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
+import { Route as OperacoesPerformanceRouteImport } from './routes/operacoes.performance'
+import { Route as OperacoesModelosRouteImport } from './routes/operacoes.modelos'
+import { Route as OperacoesFormulariosRouteImport } from './routes/operacoes.formularios'
 import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as GamificacaoResgatesRouteImport } from './routes/gamificacao.resgates'
@@ -258,6 +263,11 @@ const RegistrationsIndexRoute = RegistrationsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RegistrationsRoute,
 } as any)
+const OperacoesIndexRoute = OperacoesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const GamificacaoIndexRoute = GamificacaoIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -303,9 +313,29 @@ const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
   path: '/$projectId',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const OperacoesSenhasRoute = OperacoesSenhasRouteImport.update({
+  id: '/senhas',
+  path: '/senhas',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OperacoesProjetosRoute = OperacoesProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
+  getParentRoute: () => OperacoesRoute,
+} as any)
+const OperacoesPerformanceRoute = OperacoesPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => OperacoesRoute,
+} as any)
+const OperacoesModelosRoute = OperacoesModelosRouteImport.update({
+  id: '/modelos',
+  path: '/modelos',
+  getParentRoute: () => OperacoesRoute,
+} as any)
+const OperacoesFormulariosRoute = OperacoesFormulariosRouteImport.update({
+  id: '/formularios',
+  path: '/formularios',
   getParentRoute: () => OperacoesRoute,
 } as any)
 const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
@@ -510,7 +540,11 @@ export interface FileRoutesByFullPath {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
+  '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -520,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/contracts/': typeof ContractsIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
+  '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -544,7 +579,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/operacoes': typeof OperacoesRouteWithChildren
   '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
@@ -580,7 +614,11 @@ export interface FileRoutesByTo {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
+  '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -590,6 +628,7 @@ export interface FileRoutesByTo {
   '/contracts': typeof ContractsIndexRoute
   '/financeiro': typeof FinanceiroIndexRoute
   '/gamificacao': typeof GamificacaoIndexRoute
+  '/operacoes': typeof OperacoesIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
   '/somus-ia': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -656,7 +695,11 @@ export interface FileRoutesById {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
+  '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -666,6 +709,7 @@ export interface FileRoutesById {
   '/contracts/': typeof ContractsIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
+  '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -733,7 +777,11 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/formularios'
+    | '/operacoes/modelos'
+    | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -743,6 +791,7 @@ export interface FileRouteTypes {
     | '/contracts/'
     | '/financeiro/'
     | '/gamificacao/'
+    | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
@@ -767,7 +816,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/meetings'
     | '/missoes'
-    | '/operacoes'
     | '/passwords'
     | '/portal-cliente'
     | '/processes'
@@ -803,7 +851,11 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/formularios'
+    | '/operacoes/modelos'
+    | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -813,6 +865,7 @@ export interface FileRouteTypes {
     | '/contracts'
     | '/financeiro'
     | '/gamificacao'
+    | '/operacoes'
     | '/registrations'
     | '/somus-ia'
     | '/cliente/trilhas/$trackId'
@@ -878,7 +931,11 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/formularios'
+    | '/operacoes/modelos'
+    | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -888,6 +945,7 @@ export interface FileRouteTypes {
     | '/contracts/'
     | '/financeiro/'
     | '/gamificacao/'
+    | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
@@ -1197,6 +1255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegistrationsIndexRouteImport
       parentRoute: typeof RegistrationsRoute
     }
+    '/operacoes/': {
+      id: '/operacoes/'
+      path: '/'
+      fullPath: '/operacoes/'
+      preLoaderRoute: typeof OperacoesIndexRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/gamificacao/': {
       id: '/gamificacao/'
       path: '/'
@@ -1260,11 +1325,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/operacoes/senhas': {
+      id: '/operacoes/senhas'
+      path: '/senhas'
+      fullPath: '/operacoes/senhas'
+      preLoaderRoute: typeof OperacoesSenhasRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/operacoes/projetos': {
       id: '/operacoes/projetos'
       path: '/projetos'
       fullPath: '/operacoes/projetos'
       preLoaderRoute: typeof OperacoesProjetosRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
+    '/operacoes/performance': {
+      id: '/operacoes/performance'
+      path: '/performance'
+      fullPath: '/operacoes/performance'
+      preLoaderRoute: typeof OperacoesPerformanceRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
+    '/operacoes/modelos': {
+      id: '/operacoes/modelos'
+      path: '/modelos'
+      fullPath: '/operacoes/modelos'
+      preLoaderRoute: typeof OperacoesModelosRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
+    '/operacoes/formularios': {
+      id: '/operacoes/formularios'
+      path: '/formularios'
+      fullPath: '/operacoes/formularios'
+      preLoaderRoute: typeof OperacoesFormulariosRouteImport
       parentRoute: typeof OperacoesRoute
     }
     '/onboarding/$token': {
@@ -1536,11 +1629,21 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
 )
 
 interface OperacoesRouteChildren {
+  OperacoesFormulariosRoute: typeof OperacoesFormulariosRoute
+  OperacoesModelosRoute: typeof OperacoesModelosRoute
+  OperacoesPerformanceRoute: typeof OperacoesPerformanceRoute
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
+  OperacoesSenhasRoute: typeof OperacoesSenhasRoute
+  OperacoesIndexRoute: typeof OperacoesIndexRoute
 }
 
 const OperacoesRouteChildren: OperacoesRouteChildren = {
+  OperacoesFormulariosRoute: OperacoesFormulariosRoute,
+  OperacoesModelosRoute: OperacoesModelosRoute,
+  OperacoesPerformanceRoute: OperacoesPerformanceRoute,
   OperacoesProjetosRoute: OperacoesProjetosRoute,
+  OperacoesSenhasRoute: OperacoesSenhasRoute,
+  OperacoesIndexRoute: OperacoesIndexRoute,
 }
 
 const OperacoesRouteWithChildren = OperacoesRoute._addFileChildren(
