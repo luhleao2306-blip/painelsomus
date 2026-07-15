@@ -17,12 +17,12 @@ export const Route = createFileRoute('/operacoes')({
 });
 
 const NAV = [
-  { to: '/operacoes',              label: 'Visão Geral',        icon: LayoutDashboard, exact: true },
-  { to: '/operacoes/projetos',     label: 'Pastas & Projetos',  icon: FolderKanban },
-  { to: '/operacoes/modelos',      label: 'Modelos',            icon: LayoutTemplate },
-  { to: '/operacoes/formularios',  label: 'Formulários',        icon: ClipboardList },
-  { to: '/operacoes/performance',  label: 'Performance do Time',icon: TrendingUp },
-  { to: '/operacoes/senhas',       label: 'Senhas',             icon: KeyRound },
+  { to: '/operacoes',              label: 'Visão Geral',   icon: LayoutDashboard, exact: true },
+  { to: '/operacoes/projetos',     label: 'Projetos',      icon: FolderKanban },
+  { to: '/operacoes/modelos',      label: 'Modelos',       icon: LayoutTemplate },
+  { to: '/operacoes/formularios',  label: 'Formulários',   icon: ClipboardList },
+  { to: '/operacoes/performance',  label: 'Performance',   icon: TrendingUp },
+  { to: '/operacoes/senhas',       label: 'Senhas',        icon: KeyRound },
 ] as const;
 
 function OperacoesLayout() {
@@ -30,55 +30,67 @@ function OperacoesLayout() {
   const { pathname } = useLocation();
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 lg:px-6">
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/dashboard' as any })}
-          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border/60 bg-background px-2.5 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Portal
-        </button>
-        <div className="mx-1 hidden h-4 w-px bg-border sm:block" />
-        <img src={somusLogoUrl} alt="Somus" className="h-6 w-auto object-contain dark:invert" />
-        <div className="flex items-center gap-2">
-          <Workflow className="h-4 w-4 text-primary" />
-          <span className="font-display text-sm font-semibold tracking-tight">Operações</span>
+    <div className="op-scope flex min-h-screen w-full flex-col bg-background text-foreground">
+      {/* Top bar */}
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+        <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/dashboard' as any })}
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border/60 bg-background px-2.5 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Portal
+          </button>
+          <div className="mx-1 hidden h-4 w-px bg-border sm:block" />
+          <img src={somusLogoUrl} alt="Somus" className="h-6 w-auto object-contain dark:invert" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-foreground text-background">
+              <Workflow className="h-3.5 w-3.5" />
+            </div>
+            <div className="leading-tight">
+              <div className="font-display text-[13px] font-semibold tracking-tight">Operações</div>
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Alcateia · Interno</div>
+            </div>
+          </div>
+          <div className="ml-auto hidden items-center gap-2 md:flex">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> Ao vivo
+            </span>
+          </div>
         </div>
-        <span className="ml-2 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-widest text-primary">
-          Interno · Alcateia
-        </span>
+        {/* Tabs */}
+        <nav className="flex items-center gap-0.5 overflow-x-auto border-t border-border/60 px-2 lg:px-4">
+          {NAV.map((item) => {
+            const active = 'exact' in item && item.exact ? pathname === item.to : pathname.startsWith(item.to);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.to}
+                to={item.to as any}
+                className={cn(
+                  'group relative inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-2.5 text-[12.5px] font-medium transition-colors',
+                  active
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {item.label}
+                <span
+                  className={cn(
+                    'absolute inset-x-2 -bottom-px h-0.5 rounded-full transition-all',
+                    active ? 'bg-foreground opacity-100' : 'bg-foreground/0 opacity-0 group-hover:opacity-30',
+                  )}
+                />
+              </Link>
+            );
+          })}
+        </nav>
       </header>
 
-      <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-56 shrink-0 flex-col border-r border-border/60 bg-muted/20 md:flex">
-          <nav className="p-3">
-            {NAV.map((item) => {
-              const active = 'exact' in item && item.exact ? pathname === item.to : pathname.startsWith(item.to);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to as any}
-                  className={cn(
-                    'mb-0.5 flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] font-medium transition-colors',
-                    active
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </aside>
-
-        <main className="min-w-0 flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <Outlet />
+      </main>
     </div>
   );
 }

@@ -11,6 +11,8 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
+import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+
 
 export const Route = createFileRoute('/operacoes/formularios')({
   component: OperacoesFormularios,
@@ -31,20 +33,23 @@ function OperacoesFormularios() {
   const [fillingId, setFillingId] = useState<string | null>(null);
 
   return (
-    <div className="px-6 py-8 lg:px-10">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Formulários</h1>
-          <p className="text-sm text-muted-foreground">Construa formulários reutilizáveis (briefing, tráfego pago) e associe respostas a projetos.</p>
-        </div>
-        <Button size="sm" onClick={() => {
-          const name = prompt('Nome do formulário:');
-          if (name?.trim()) {
-            const id = opStore.addForm(name.trim());
-            setEditingId(id);
-          }
-        }}><Plus className="mr-1 h-3.5 w-3.5" /> Novo formulário</Button>
-      </div>
+    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+      <OpPageHeader
+        eyebrow="Coleta de campo"
+        title="Formulários"
+        description="Construa briefings, entradas de tráfego e checklists — cada resposta amarra num projeto."
+        icon={<ClipboardList className="h-4 w-4" />}
+        actions={
+          <Button size="sm" onClick={() => {
+            const name = prompt('Nome do formulário:');
+            if (name?.trim()) {
+              const id = opStore.addForm(name.trim());
+              setEditingId(id);
+            }
+          }}><Plus className="mr-1 h-3.5 w-3.5" /> Novo formulário</Button>
+        }
+      />
+
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {store.forms.map(f => (

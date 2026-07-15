@@ -45,9 +45,10 @@ function OperacoesProjetos() {
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-1">
+    <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-1">
       {/* Sidebar: Pastas → Projetos */}
       <aside className="w-64 shrink-0 border-r border-border/60 bg-muted/10 overflow-y-auto">
+
         <div className="flex items-center justify-between border-b border-border/60 px-3 py-3">
           <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Pastas</span>
           <button

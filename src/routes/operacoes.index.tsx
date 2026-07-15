@@ -1,9 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import {
   useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, type OpStatus,
 } from '@/lib/operacoes-store';
-import { Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star } from 'lucide-react';
+import {
+  Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
+  Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity,
+} from 'lucide-react';
 
 export const Route = createFileRoute('/operacoes/')({
   component: OperacoesPainel,
@@ -16,43 +19,98 @@ function OperacoesPainel() {
 
   const stats = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
+    const in7 = new Date(today); in7.setDate(today.getDate() + 7);
     const byStatus = Object.fromEntries(STATUS_ORDER.map(s => [s, 0])) as Record<OpStatus, number>;
     let overdue = 0;
+    let dueSoon = 0;
+    let done = 0;
     const byAssignee: Record<string, number> = {};
     for (const t of store.tasks) {
       byStatus[t.status]++;
-      if (t.dueDate && t.status !== 'concluido' && new Date(t.dueDate) < today) overdue++;
-      if (t.assigneeId) byAssignee[t.assigneeId] = (byAssignee[t.assigneeId] ?? 0) + 1;
+      if (t.status === 'concluido') done++;
+      if (t.dueDate) {
+        const d = new Date(t.dueDate);
+        if (t.status !== 'concluido' && d < today) overdue++;
+        else if (t.status !== 'concluido' && d >= today && d <= in7) dueSoon++;
+      }
+      if (t.assigneeId && t.status !== 'concluido') byAssignee[t.assigneeId] = (byAssignee[t.assigneeId] ?? 0) + 1;
     }
+    const total = store.tasks.length;
+    const pctDone = total ? Math.round((done / total) * 100) : 0;
     return {
       totalProjects: store.projects.length,
       activeProjects: store.projects.filter(p => p.status === 'em_andamento').length,
-      totalTasks: store.tasks.length,
-      overdue,
+      totalTasks: total,
+      overdue, dueSoon, done, pctDone,
       byStatus,
       byAssignee,
     };
   }, [store]);
 
   const maxByStatus = Math.max(1, ...Object.values(stats.byStatus));
+  const workload = store.users
+    .map(u => ({ user: u, count: stats.byAssignee[u.id] ?? 0 }))
+    .sort((a, b) => b.count - a.count);
+  const maxWorkload = Math.max(1, ...workload.map(w => w.count));
 
   return (
-    <div className="px-6 py-8 lg:px-10">
-      <div className="mb-8">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Painel de Operações</h1>
-        <p className="text-sm text-muted-foreground">Visão geral da operação da alcateia — projetos, tarefas e time.</p>
+    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+      {/* HERO */}
+      <div className="mb-8 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-foreground to-foreground/85 p-8 text-background">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-background/20 bg-background/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em]">
+              <Flame className="h-3 w-3" /> Alcateia em movimento
+            </div>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">Painel de Operações</h1>
+            <p className="mt-2 text-[13.5px] text-background/70">
+              O comando central da alcateia — pastas, projetos, cargos e a caça aos gargalos da semana.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link
+                to="/operacoes/projetos"
+                className="inline-flex items-center gap-1.5 rounded-md bg-background px-3.5 py-2 text-[12.5px] font-semibold text-foreground transition hover:bg-background/90"
+              >
+                Abrir projetos <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link
+                to="/operacoes/modelos"
+                className="inline-flex items-center gap-1.5 rounded-md border border-background/25 px-3.5 py-2 text-[12.5px] font-medium text-background/90 transition hover:bg-background/10"
+              >
+                Novo projeto por modelo
+              </Link>
+            </div>
+          </div>
+          {/* Progress ring */}
+          <div className="flex items-center gap-6">
+            <ProgressRing value={stats.pctDone} />
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-background/60">Progresso geral</div>
+              <div className="font-display text-2xl font-semibold">{stats.done}/{stats.totalTasks}</div>
+              <div className="text-[11.5px] text-background/60">tarefas concluídas</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mb-8">
-        <Kpi label="Projetos ativos" value={stats.activeProjects} hint={`${stats.totalProjects} totais`} />
-        <Kpi label="Tarefas totais" value={stats.totalTasks} />
-        <Kpi label="Tarefas atrasadas" value={stats.overdue} tone={stats.overdue > 0 ? 'danger' : 'default'} />
-        <Kpi label="Colaboradores" value={store.users.length} hint={`${store.cargos.length} cargos`} />
+      {/* KPIs */}
+      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Kpi icon={<Target className="h-4 w-4" />} label="Projetos ativos" value={stats.activeProjects} hint={`${stats.totalProjects} totais`} />
+        <Kpi icon={<Activity className="h-4 w-4" />} label="Tarefas em jogo" value={stats.totalTasks - stats.done} hint={`${stats.totalTasks} totais`} />
+        <Kpi icon={<AlertTriangle className="h-4 w-4" />} label="Em atraso" value={stats.overdue} tone={stats.overdue > 0 ? 'danger' : 'default'} hint="prazo estourado" />
+        <Kpi icon={<CheckCircle2 className="h-4 w-4" />} label="Prazo em 7 dias" value={stats.dueSoon} tone={stats.dueSoon > 0 ? 'warning' : 'default'} hint="entregas próximas" />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border/60 bg-card p-5">
-          <h2 className="font-display text-base font-semibold mb-4">Tarefas por status</h2>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        {/* Status distribution */}
+        <div className="lg:col-span-5 rounded-2xl border border-border/70 bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-base font-semibold">Tarefas por status</h2>
+              <p className="text-[11px] text-muted-foreground">Fluxo real de execução</p>
+            </div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">6 estágios</span>
+          </div>
           <div className="space-y-2.5">
             {STATUS_ORDER.map(s => {
               const meta = STATUS_META[s];
@@ -63,10 +121,10 @@ function OperacoesPainel() {
                   <div className="mb-1 flex items-center gap-2 text-[12px]">
                     <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
                     <span className="flex-1 font-medium">{meta.label}</span>
-                    <span className="text-muted-foreground">{count}</span>
+                    <span className="font-mono text-[11px] text-muted-foreground">{count}</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div className={`h-full ${meta.dot}`} style={{ width: `${pct}%` }} />
+                    <div className={`h-full ${meta.dot} transition-all`} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
@@ -74,27 +132,92 @@ function OperacoesPainel() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card p-5">
-          <h2 className="font-display text-base font-semibold mb-4">Time da alcateia</h2>
+        {/* Active projects */}
+        <div className="lg:col-span-7 rounded-2xl border border-border/70 bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-base font-semibold">Projetos em andamento</h2>
+              <p className="text-[11px] text-muted-foreground">Operações vivas da semana</p>
+            </div>
+            <Link to="/operacoes/projetos" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground hover:text-foreground">
+              Ver todos <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
           <div className="space-y-2">
-            {store.users.map(u => {
-              const cargo = store.cargos.find(c => c.id === u.cargoId);
-              const Icon = cargo ? ICONS[cargo.icon] : Star;
-              const count = stats.byAssignee[u.id] ?? 0;
+            {store.projects.length === 0 && (
+              <div className="rounded-lg border border-dashed border-border/60 p-6 text-center text-[12.5px] text-muted-foreground">
+                Nenhum projeto ainda. <Link to="/operacoes/modelos" className="underline">Crie a partir de um modelo</Link>.
+              </div>
+            )}
+            {store.projects.slice(0, 6).map(p => {
+              const secs = store.sections.filter(s => s.projectId === p.id);
+              const secIds = new Set(secs.map(s => s.id));
+              const pts = store.tasks.filter(t => secIds.has(t.sectionId));
+              const doneCount = pts.filter(t => t.status === 'concluido').length;
+              const pct = pts.length ? Math.round((doneCount / pts.length) * 100) : 0;
+              const folder = store.folders.find(f => f.id === p.folderId);
               return (
-                <div key={u.id} className="flex items-center gap-2.5 rounded-lg border border-border/60 bg-background p-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary text-[11px] font-bold">
-                    {u.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
+                <Link
+                  key={p.id}
+                  to="/operacoes/projetos"
+                  className="group flex items-center gap-3 rounded-lg border border-border/60 bg-background p-3 transition hover:border-foreground/40 hover:shadow-sm"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted font-mono text-[11px] font-bold text-muted-foreground group-hover:bg-foreground group-hover:text-background">
+                    {(folder?.name ?? p.name).slice(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium">{u.name}</p>
-                    {cargo && (
-                      <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${CARGO_COLOR_MAP[cargo.color]}`}>
-                        <Icon className="h-2.5 w-2.5" /> {cargo.name}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-[12.5px] font-semibold">{p.name}</p>
+                      <StatusBadge status={p.status} />
+                    </div>
+                    <div className="mt-1 flex items-center gap-2">
+                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
+                        <div className="h-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="font-mono text-[10px] text-muted-foreground">{doneCount}/{pts.length}</span>
+                    </div>
                   </div>
-                  <span className="text-[11px] text-muted-foreground">{count} tarefas</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Workload */}
+        <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-base font-semibold">Carga da alcateia</h2>
+              <p className="text-[11px] text-muted-foreground">Tarefas abertas por pessoa · o gargalo mora aqui</p>
+            </div>
+            <Link to="/operacoes/performance" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground hover:text-foreground">
+              Ver performance <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {workload.map(({ user: u, count }) => {
+              const cargo = store.cargos.find(c => c.id === u.cargoId);
+              const Icon = cargo ? ICONS[cargo.icon] : Star;
+              const pct = Math.round((count / maxWorkload) * 100);
+              return (
+                <div key={u.id} className="rounded-lg border border-border/60 bg-background p-3">
+                  <div className="mb-2 flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground font-mono text-[10.5px] font-bold text-background">
+                      {u.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[12.5px] font-medium">{u.name}</p>
+                      {cargo && (
+                        <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9.5px] font-semibold ${CARGO_COLOR_MAP[cargo.color]}`}>
+                          <Icon className="h-2.5 w-2.5" /> {cargo.name}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-[11px] font-semibold">{count}</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
+                  </div>
                 </div>
               );
             })}
@@ -105,12 +228,59 @@ function OperacoesPainel() {
   );
 }
 
-function Kpi({ label, value, hint, tone = 'default' }: { label: string; value: number; hint?: string; tone?: 'default' | 'danger' }) {
+function Kpi({
+  icon, label, value, hint, tone = 'default',
+}: { icon: React.ReactNode; label: string; value: number; hint?: string; tone?: 'default' | 'danger' | 'warning' }) {
+  const toneCls =
+    tone === 'danger' ? 'border-red-500/40 bg-red-500/5' :
+    tone === 'warning' ? 'border-amber-500/40 bg-amber-500/5' :
+    'border-border/70 bg-card';
+  const iconCls =
+    tone === 'danger' ? 'text-red-600 dark:text-red-400' :
+    tone === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+    'text-muted-foreground';
   return (
-    <div className={`rounded-xl border p-4 ${tone === 'danger' ? 'border-red-500/40 bg-red-500/5' : 'border-border/60 bg-card'}`}>
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-2xl font-semibold">{value}</p>
-      {hint && <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>}
+    <div className={`rounded-xl border p-4 ${toneCls}`}>
+      <div className="mb-2 flex items-center justify-between">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
+        <span className={iconCls}>{icon}</span>
+      </div>
+      <p className="font-display text-3xl font-semibold leading-none tracking-tight">{value}</p>
+      {hint && <p className="mt-1.5 text-[11px] text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' }) {
+  const map = {
+    nao_iniciado: { label: 'Aguardando', cls: 'bg-muted text-muted-foreground' },
+    em_andamento: { label: 'Em andamento', cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' },
+    concluido: { label: 'Concluído', cls: 'bg-blue-500/15 text-blue-700 dark:text-blue-300' },
+    pausado: { label: 'Pausado', cls: 'bg-amber-500/15 text-amber-700 dark:text-amber-300' },
+  } as const;
+  const m = map[status];
+  return <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider ${m.cls}`}>{m.label}</span>;
+}
+
+function ProgressRing({ value }: { value: number }) {
+  const size = 88;
+  const stroke = 8;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const off = c - (value / 100) * c;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="rotate-[-90deg]">
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none stroke-background/15" />
+        <circle
+          cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke}
+          strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
+          className="fill-none stroke-background transition-all"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold">
+        {value}%
+      </div>
     </div>
   );
 }
