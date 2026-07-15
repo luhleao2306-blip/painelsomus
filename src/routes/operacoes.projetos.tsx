@@ -3,7 +3,12 @@ import { useMemo, useState } from 'react';
 import {
   Plus, Trash2, ChevronRight, ChevronDown, FolderKanban, LayoutList,
   KanbanSquare, GanttChart, LayoutGrid, Save, X, MessageSquare, Check, Tag,
+  MoreHorizontal, Search, Sparkles, FolderPlus, FilePlus,
 } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import {
   useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP,
   type OpStatus, type OpTask, type OpPriority,
