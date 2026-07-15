@@ -319,56 +319,173 @@ function TaskRow({ task, onOpen }: { task: OpTask; onOpen: () => void }) {
 
 function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (id: string) => void }) {
   const store = useOpStore();
-  const sectionIds = new Set(store.sections.filter(s => s.projectId === projectId).map(s => s.id));
-  const tasks = store.tasks.filter(t => sectionIds.has(t.sectionId));
+  const [query, setQuery] = useState('');
+  const [assignee, setAssignee] = useState<string>('__all');
+  const [priority, setPriority] = useState<string>('__all');
+  const [dragOver, setDragOver] = useState<OpStatus | null>(null);
+  const [addingIn, setAddingIn] = useState<OpStatus | null>(null);
+  const [newName, setNewName] = useState('');
+
+  const sections = store.sections.filter(s => s.projectId === projectId).sort((a, b) => a.order - b.order);
+  const sectionIds = new Set(sections.map(s => s.id));
+  const firstSectionId = sections[0]?.id;
+  const q = query.trim().toLowerCase();
+  const tasks = store.tasks.filter(t =>
+    sectionIds.has(t.sectionId)
+    && (!q || t.name.toLowerCase().includes(q))
+    && (assignee === '__all' || t.assigneeId === assignee || (assignee === '__none' && !t.assigneeId))
+    && (priority === '__all' || t.priority === priority),
+  );
+
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4">
-      {STATUS_ORDER.map(status => {
-        const meta = STATUS_META[status];
-        const items = tasks.filter(t => t.status === status);
-        return (
-          <div
-            key={status}
-            className="w-72 shrink-0 rounded-lg border border-border/60 bg-muted/10"
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => {
-              const id = e.dataTransfer.getData('text/plain');
-              if (id) opStore.updateTask(id, { status });
-            }}
+    <div className="flex h-full flex-col">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <Input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Buscar tarefa…"
+          className="h-8 w-56 text-[12px]"
+        />
+        <Select value={assignee} onValueChange={setAssignee}>
+          <SelectTrigger className="h-8 w-40 text-[11.5px]"><SelectValue placeholder="Responsável" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all">Todos responsáveis</SelectItem>
+            <SelectItem value="__none">Sem responsável</SelectItem>
+            {store.users.map(u => <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={priority} onValueChange={setPriority}>
+          <SelectTrigger className="h-8 w-32 text-[11.5px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all">Todas prioridades</SelectItem>
+            <SelectItem value="alta">Alta</SelectItem>
+            <SelectItem value="media">Média</SelectItem>
+            <SelectItem value="baixa">Baixa</SelectItem>
+          </SelectContent>
+        </Select>
+        {(q || assignee !== '__all' || priority !== '__all') && (
+          <button
+            onClick={() => { setQuery(''); setAssignee('__all'); setPriority('__all'); }}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted"
           >
-            <div className="flex items-center gap-2 border-b border-border/60 px-3 py-2">
-              <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
-              <span className="text-[12px] font-semibold">{meta.label}</span>
-              <span className="ml-auto text-[11px] text-muted-foreground">{items.length}</span>
-            </div>
-            <div className="space-y-2 p-2 min-h-[100px]">
-              {items.map(t => {
-                const assignee = store.users.find(u => u.id === t.assigneeId);
-                return (
-                  <div
-                    key={t.id}
-                    draggable
-                    onDragStart={e => e.dataTransfer.setData('text/plain', t.id)}
-                    onClick={() => onOpenTask(t.id)}
-                    className="cursor-grab rounded-md border border-border/60 bg-card p-2.5 hover:shadow-sm active:cursor-grabbing"
+            <X className="h-3 w-3" /> Limpar
+          </button>
+        )}
+        <span className="ml-auto font-mono text-[10.5px] uppercase tracking-wider text-muted-foreground">
+          {tasks.length} {tasks.length === 1 ? 'tarefa' : 'tarefas'}
+        </span>
+      </div>
+
+      <div className="flex flex-1 gap-3 overflow-x-auto pb-4">
+        {STATUS_ORDER.map(status => {
+          const meta = STATUS_META[status];
+          const items = tasks.filter(t => t.status === status);
+          const isOver = dragOver === status;
+          return (
+            <div
+              key={status}
+              className={`w-72 shrink-0 rounded-lg border bg-muted/10 transition-colors ${
+                isOver ? 'border-foreground/60 bg-foreground/5 ring-2 ring-foreground/20' : 'border-border/60'
+              }`}
+              onDragOver={e => { e.preventDefault(); if (dragOver !== status) setDragOver(status); }}
+              onDragLeave={() => setDragOver(prev => (prev === status ? null : prev))}
+              onDrop={e => {
+                setDragOver(null);
+                const id = e.dataTransfer.getData('text/plain');
+                if (id) opStore.updateTask(id, { status });
+              }}
+            >
+              <div className="flex items-center gap-2 border-b border-border/60 px-3 py-2">
+                <span className={`h-2 w-2 rounded-full ${meta.dot}`} />
+                <span className="text-[12px] font-semibold">{meta.label}</span>
+                <span className="ml-auto rounded-full bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{items.length}</span>
+                <button
+                  onClick={() => { setAddingIn(status); setNewName(''); }}
+                  className="rounded p-0.5 text-muted-foreground hover:bg-muted disabled:opacity-40"
+                  title="Adicionar tarefa"
+                  disabled={!firstSectionId}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="space-y-2 p-2 min-h-[120px]">
+                {addingIn === status && firstSectionId && (
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      if (newName.trim()) {
+                        opStore.addTask(firstSectionId, newName.trim());
+                        const created = opStore.get().tasks.filter(t => t.sectionId === firstSectionId).slice(-1)[0];
+                        if (created) opStore.updateTask(created.id, { status });
+                        setNewName('');
+                        setAddingIn(null);
+                      }
+                    }}
+                    className="rounded-md border border-dashed border-border/60 bg-card p-1.5"
                   >
-                    <p className="text-[12px] leading-snug">{t.name}</p>
-                    <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                      {assignee && <span className="rounded bg-muted px-1.5 py-0.5">{assignee.name.split(' ')[0]}</span>}
-                      {t.dueDate && <span>· {new Date(t.dueDate).toLocaleDateString('pt-BR')}</span>}
-                      {t.priority !== 'media' && <span className={`ml-auto rounded px-1.5 py-0.5 ${t.priority === 'alta' ? 'bg-red-500/15 text-red-600' : 'bg-muted'}`}>{t.priority}</span>}
+                    <Input
+                      autoFocus
+                      value={newName}
+                      onChange={e => setNewName(e.target.value)}
+                      onBlur={() => { if (!newName.trim()) setAddingIn(null); }}
+                      onKeyDown={e => { if (e.key === 'Escape') setAddingIn(null); }}
+                      placeholder="Nome da tarefa e Enter"
+                      className="h-7 border-0 text-[12px] focus-visible:ring-0"
+                    />
+                  </form>
+                )}
+                {items.map(t => {
+                  const assignee = store.users.find(u => u.id === t.assigneeId);
+                  const overdue = !!t.dueDate && t.status !== 'concluido' && new Date(t.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+                  return (
+                    <div
+                      key={t.id}
+                      draggable
+                      onDragStart={e => e.dataTransfer.setData('text/plain', t.id)}
+                      onClick={() => onOpenTask(t.id)}
+                      className="group cursor-grab rounded-md border border-border/60 bg-card p-2.5 transition-all hover:-translate-y-px hover:border-foreground/30 hover:shadow-md active:cursor-grabbing"
+                    >
+                      {t.priority === 'alta' && (
+                        <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-red-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                          <span className="h-1 w-1 rounded-full bg-red-500" /> Alta
+                        </div>
+                      )}
+                      <p className="text-[12px] leading-snug">{t.name}</p>
+                      <div className="mt-2 flex items-center gap-1.5 text-[10px]">
+                        {assignee && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-muted-foreground">
+                            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground font-mono text-[8px] font-bold text-background">
+                              {assignee.name[0]}
+                            </span>
+                            {assignee.name.split(' ')[0]}
+                          </span>
+                        )}
+                        {t.checklist.length > 0 && (
+                          <span className="rounded-full bg-muted px-1.5 py-0.5 font-mono text-muted-foreground">
+                            {t.checklist.filter(c => c.done).length}/{t.checklist.length}
+                          </span>
+                        )}
+                        {t.dueDate && (
+                          <span className={`ml-auto rounded-full px-1.5 py-0.5 ${overdue ? 'bg-red-500/15 text-red-600 dark:text-red-400 font-semibold' : 'bg-muted text-muted-foreground'}`}>
+                            {new Date(t.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-              {items.length === 0 && <p className="px-1 py-2 text-[11px] italic text-muted-foreground">—</p>}
+                  );
+                })}
+                {items.length === 0 && addingIn !== status && (
+                  <p className="px-1 py-3 text-center text-[11px] italic text-muted-foreground">—</p>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
+
 
 // ============= Gantt (simples, barras horizontais) =============
 
