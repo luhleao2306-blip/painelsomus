@@ -266,7 +266,7 @@ function TaskRow({ task, onOpen }: { task: OpTask; onOpen: () => void }) {
           <span className="ml-1.5 text-[10px] text-muted-foreground">({done}/{task.checklist.length})</span>
         )}
       </button>
-      <Select value={task.assigneeId ?? ''} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v || undefined })}>
+      <Select value={task.assigneeId ?? '__none'} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v === '__none' ? undefined : v })}>
         <SelectTrigger className="h-7 w-32 text-[11px]">
           <SelectValue placeholder="Ninguém" />
         </SelectTrigger>
