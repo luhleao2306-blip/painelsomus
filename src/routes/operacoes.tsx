@@ -44,7 +44,7 @@ function OperacoesLayout() {
           <div className="mx-1 hidden h-4 w-px bg-white/10 sm:block" />
           <img src={somusLogoUrl} alt="Somus" className="h-6 w-auto object-contain invert" />
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-b from-cyan-300 to-cyan-500 text-zinc-950 shadow-[0_0_12px_rgba(34,211,238,0.5)]">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-zinc-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_0_rgba(0,0,0,0.4)]">
               <Workflow className="h-3.5 w-3.5" />
             </div>
             <div className="leading-tight">
@@ -53,9 +53,10 @@ function OperacoesLayout() {
             </div>
           </div>
           <div className="ml-auto hidden items-center gap-2 md:flex">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-300">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> Ao vivo
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-300">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Ao vivo
             </span>
+
           </div>
         </div>
         {/* Tabs */}
