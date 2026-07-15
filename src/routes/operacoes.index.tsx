@@ -364,16 +364,25 @@ function ProgressRing({ value }: { value: number }) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="rotate-[-90deg]">
-        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none stroke-background/15" />
+        <defs>
+          <linearGradient id="opring" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#67e8f9" />
+            <stop offset="100%" stopColor="#22d3ee" />
+          </linearGradient>
+        </defs>
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none" stroke="rgba(255,255,255,0.08)" />
         <circle
           cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke}
           strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
-          className="fill-none stroke-background transition-all"
+          className="fill-none transition-all"
+          stroke="url(#opring)"
+          style={{ filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.6))' }}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold">
+      <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold text-white">
         {value}%
       </div>
     </div>
+
   );
 }
