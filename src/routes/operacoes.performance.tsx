@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useOpStore, CARGO_COLOR_MAP } from '@/lib/operacoes-store';
-import { Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star } from 'lucide-react';
+import { Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star, TrendingUp } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+
 
 export const Route = createFileRoute('/operacoes/performance')({
   component: OperacoesPerformance,
