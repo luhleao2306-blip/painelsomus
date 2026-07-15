@@ -53,6 +53,7 @@ import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
 import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as GamificacaoResgatesRouteImport } from './routes/gamificacao.resgates'
@@ -302,6 +303,11 @@ const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
   path: '/$projectId',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const OperacoesProjetosRoute = OperacoesProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
   id: '/onboarding/$token',
   path: '/onboarding/$token',
@@ -466,7 +472,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/operacoes': typeof OperacoesRoute
+  '/operacoes': typeof OperacoesRouteWithChildren
   '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
@@ -504,6 +510,7 @@ export interface FileRoutesByFullPath {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -537,7 +544,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/operacoes': typeof OperacoesRoute
+  '/operacoes': typeof OperacoesRouteWithChildren
   '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
@@ -573,6 +580,7 @@ export interface FileRoutesByTo {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -610,7 +618,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/operacoes': typeof OperacoesRoute
+  '/operacoes': typeof OperacoesRouteWithChildren
   '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
@@ -648,6 +656,7 @@ export interface FileRoutesById {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -724,6 +733,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -793,6 +803,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -867,6 +878,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -904,7 +916,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MeetingsRoute: typeof MeetingsRoute
   MissoesRoute: typeof MissoesRoute
-  OperacoesRoute: typeof OperacoesRoute
+  OperacoesRoute: typeof OperacoesRouteWithChildren
   PasswordsRoute: typeof PasswordsRoute
   PortalClienteRoute: typeof PortalClienteRoute
   ProcessesRoute: typeof ProcessesRoute
@@ -1248,6 +1260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/operacoes/projetos': {
+      id: '/operacoes/projetos'
+      path: '/projetos'
+      fullPath: '/operacoes/projetos'
+      preLoaderRoute: typeof OperacoesProjetosRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/onboarding/$token': {
       id: '/onboarding/$token'
       path: '/onboarding/$token'
@@ -1516,6 +1535,18 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
   GamificacaoRouteChildren,
 )
 
+interface OperacoesRouteChildren {
+  OperacoesProjetosRoute: typeof OperacoesProjetosRoute
+}
+
+const OperacoesRouteChildren: OperacoesRouteChildren = {
+  OperacoesProjetosRoute: OperacoesProjetosRoute,
+}
+
+const OperacoesRouteWithChildren = OperacoesRoute._addFileChildren(
+  OperacoesRouteChildren,
+)
+
 interface ProjectsRouteChildren {
   ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
 }
@@ -1591,7 +1622,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MeetingsRoute: MeetingsRoute,
   MissoesRoute: MissoesRoute,
-  OperacoesRoute: OperacoesRoute,
+  OperacoesRoute: OperacoesRouteWithChildren,
   PasswordsRoute: PasswordsRoute,
   PortalClienteRoute: PortalClienteRoute,
   ProcessesRoute: ProcessesRoute,
