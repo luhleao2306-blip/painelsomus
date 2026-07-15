@@ -54,7 +54,7 @@ function OperacoesLayout() {
         <aside className="hidden w-56 shrink-0 flex-col border-r border-border/60 bg-muted/20 md:flex">
           <nav className="p-3">
             {NAV.map((item) => {
-              const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+              const active = 'exact' in item && item.exact ? pathname === item.to : pathname.startsWith(item.to);
               const Icon = item.icon;
               return (
                 <Link
