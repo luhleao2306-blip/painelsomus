@@ -69,26 +69,45 @@ function OperacoesPainel() {
       className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10"
     >
       {/* HERO */}
-      <div className="mb-8 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-foreground to-foreground/85 p-8 text-background">
-        <div className="flex flex-wrap items-start justify-between gap-6">
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/10 p-8"
+        style={{
+          background:
+            'radial-gradient(600px 240px at 10% 0%, rgba(34,211,238,0.18), transparent 60%),' +
+            'radial-gradient(500px 220px at 90% 100%, rgba(168,85,247,0.14), transparent 60%),' +
+            'linear-gradient(180deg, #0f0f10, #0a0a0a)',
+        }}
+      >
+        <div className="pointer-events-none absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),' +
+              'linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+            maskImage: 'radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent 75%)',
+          }}
+        />
+        <div className="relative flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-background/20 bg-background/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em]">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-300">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
               <Flame className="h-3 w-3" /> Alcateia em movimento
             </div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight">Painel de Operações</h1>
-            <p className="mt-2 text-[13.5px] text-background/70">
+            <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-tight text-white">
+              Painel de <span className="bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text text-transparent">Operações</span>
+            </h1>
+            <p className="mt-2 text-[13.5px] text-zinc-400">
               O comando central da alcateia — pastas, projetos, cargos e a caça aos gargalos da semana.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Link
                 to="/operacoes/projetos"
-                className="inline-flex items-center gap-1.5 rounded-md bg-background px-3.5 py-2 text-[12.5px] font-semibold text-foreground transition hover:bg-background/90"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-b from-cyan-300 to-cyan-500 px-3.5 py-2 text-[12.5px] font-semibold text-zinc-950 shadow-[0_0_0_1px_rgba(34,211,238,0.35),0_8px_24px_-8px_rgba(34,211,238,0.55)] transition hover:brightness-110"
               >
                 Abrir projetos <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <Link
                 to="/operacoes/modelos"
-                className="inline-flex items-center gap-1.5 rounded-md border border-background/25 px-3.5 py-2 text-[12.5px] font-medium text-background/90 transition hover:bg-background/10"
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/[0.03] px-3.5 py-2 text-[12.5px] font-medium text-zinc-200 transition hover:bg-white/[0.06]"
               >
                 Novo projeto por modelo
               </Link>
@@ -98,13 +117,14 @@ function OperacoesPainel() {
           <div className="flex items-center gap-6">
             <ProgressRing value={stats.pctDone} />
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-background/60">Progresso geral</div>
-              <div className="font-display text-2xl font-semibold">{stats.done}/{stats.totalTasks}</div>
-              <div className="text-[11.5px] text-background/60">tarefas concluídas</div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">Progresso geral</div>
+              <div className="font-display text-2xl font-semibold text-white">{stats.done}/{stats.totalTasks}</div>
+              <div className="text-[11.5px] text-zinc-500">tarefas concluídas</div>
             </div>
           </div>
         </div>
       </div>
+
 
       {/* KPIs */}
       <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
