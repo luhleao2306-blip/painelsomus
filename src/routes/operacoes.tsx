@@ -74,12 +74,12 @@ function OperacoesLayout() {
                   active ? 'text-white' : 'text-zinc-500 hover:text-zinc-200',
                 )}
               >
-                <Icon className={cn('h-3.5 w-3.5 transition-colors', active && 'text-cyan-300')} />
+                <Icon className={cn('h-3.5 w-3.5 transition-colors', active && 'text-white')} />
                 {item.label}
                 <span
                   className={cn(
                     'op-tab-underline absolute inset-x-2 -bottom-px h-0.5 rounded-full transition-all',
-                    active ? 'bg-cyan-400 opacity-100' : 'bg-white/0 opacity-0 group-hover:bg-white/20 group-hover:opacity-100',
+                    active ? 'bg-white opacity-100' : 'bg-white/0 opacity-0 group-hover:bg-white/20 group-hover:opacity-100',
                   )}
                 />
               </Link>
