@@ -55,6 +55,7 @@ import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$co
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
 import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
+import { Route as OperacoesModelosRouteImport } from './routes/operacoes.modelos'
 import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as GamificacaoResgatesRouteImport } from './routes/gamificacao.resgates'
@@ -314,6 +315,11 @@ const OperacoesProjetosRoute = OperacoesProjetosRouteImport.update({
   path: '/projetos',
   getParentRoute: () => OperacoesRoute,
 } as any)
+const OperacoesModelosRoute = OperacoesModelosRouteImport.update({
+  id: '/modelos',
+  path: '/modelos',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
   id: '/onboarding/$token',
   path: '/onboarding/$token',
@@ -516,6 +522,7 @@ export interface FileRoutesByFullPath {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
@@ -586,6 +593,7 @@ export interface FileRoutesByTo {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
@@ -663,6 +671,7 @@ export interface FileRoutesById {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
+  '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
@@ -741,6 +750,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/modelos'
     | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
@@ -811,6 +821,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/modelos'
     | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
+    | '/operacoes/modelos'
     | '/operacoes/projetos'
     | '/projects/$projectId'
     | '/registrations/$id'
@@ -1284,6 +1296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperacoesProjetosRouteImport
       parentRoute: typeof OperacoesRoute
     }
+    '/operacoes/modelos': {
+      id: '/operacoes/modelos'
+      path: '/modelos'
+      fullPath: '/operacoes/modelos'
+      preLoaderRoute: typeof OperacoesModelosRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/onboarding/$token': {
       id: '/onboarding/$token'
       path: '/onboarding/$token'
@@ -1553,11 +1572,13 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
 )
 
 interface OperacoesRouteChildren {
+  OperacoesModelosRoute: typeof OperacoesModelosRoute
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
   OperacoesIndexRoute: typeof OperacoesIndexRoute
 }
 
 const OperacoesRouteChildren: OperacoesRouteChildren = {
+  OperacoesModelosRoute: OperacoesModelosRoute,
   OperacoesProjetosRoute: OperacoesProjetosRoute,
   OperacoesIndexRoute: OperacoesIndexRoute,
 }
