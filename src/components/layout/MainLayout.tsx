@@ -465,13 +465,17 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
             <GlobalSearch />
 
-            <Link
-              to={'/operacoes' as any}
-              className="ml-1 inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-primary px-4 text-[12.5px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="ml-1 h-7 shrink-0 gap-1.5 rounded-full border-border/60 bg-background px-2.5 text-[11px] font-medium uppercase tracking-wide text-foreground shadow-none transition-colors hover:bg-accent hover:text-foreground"
             >
-              <Workflow className="h-4 w-4" />
-              Operações
-            </Link>
+              <Link to={'/operacoes' as any}>
+                <Workflow className="h-3.5 w-3.5" />
+                Operações
+              </Link>
+            </Button>
 
             <div className="ml-auto flex items-center gap-2">
               {role !== 'client' && <PackEnergyIndicator />}
