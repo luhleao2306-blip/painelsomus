@@ -495,7 +495,7 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
           </div>
           <div>
             <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Responsável</label>
-            <Select value={task.assigneeId ?? ''} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v === '__none' ? undefined : v })}>
+            <Select value={task.assigneeId ?? '__none'} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v === '__none' ? undefined : v })}>
               <SelectTrigger className="h-9"><SelectValue placeholder="Ninguém" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="__none">Ninguém</SelectItem>
