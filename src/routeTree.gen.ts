@@ -44,6 +44,7 @@ import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
+import { Route as OperacoesIndexRouteImport } from './routes/operacoes.index'
 import { Route as GamificacaoIndexRouteImport } from './routes/gamificacao.index'
 import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
@@ -257,6 +258,11 @@ const RegistrationsIndexRoute = RegistrationsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => RegistrationsRoute,
+} as any)
+const OperacoesIndexRoute = OperacoesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OperacoesRoute,
 } as any)
 const GamificacaoIndexRoute = GamificacaoIndexRouteImport.update({
   id: '/',
@@ -520,6 +526,7 @@ export interface FileRoutesByFullPath {
   '/contracts/': typeof ContractsIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
+  '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -544,7 +551,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/operacoes': typeof OperacoesRouteWithChildren
   '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
@@ -590,6 +596,7 @@ export interface FileRoutesByTo {
   '/contracts': typeof ContractsIndexRoute
   '/financeiro': typeof FinanceiroIndexRoute
   '/gamificacao': typeof GamificacaoIndexRoute
+  '/operacoes': typeof OperacoesIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
   '/somus-ia': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -666,6 +673,7 @@ export interface FileRoutesById {
   '/contracts/': typeof ContractsIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
+  '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
@@ -743,6 +751,7 @@ export interface FileRouteTypes {
     | '/contracts/'
     | '/financeiro/'
     | '/gamificacao/'
+    | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
@@ -767,7 +776,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/meetings'
     | '/missoes'
-    | '/operacoes'
     | '/passwords'
     | '/portal-cliente'
     | '/processes'
@@ -813,6 +821,7 @@ export interface FileRouteTypes {
     | '/contracts'
     | '/financeiro'
     | '/gamificacao'
+    | '/operacoes'
     | '/registrations'
     | '/somus-ia'
     | '/cliente/trilhas/$trackId'
@@ -888,6 +897,7 @@ export interface FileRouteTypes {
     | '/contracts/'
     | '/financeiro/'
     | '/gamificacao/'
+    | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
     | '/cliente/trilhas/$trackId'
@@ -1196,6 +1206,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/registrations/'
       preLoaderRoute: typeof RegistrationsIndexRouteImport
       parentRoute: typeof RegistrationsRoute
+    }
+    '/operacoes/': {
+      id: '/operacoes/'
+      path: '/'
+      fullPath: '/operacoes/'
+      preLoaderRoute: typeof OperacoesIndexRouteImport
+      parentRoute: typeof OperacoesRoute
     }
     '/gamificacao/': {
       id: '/gamificacao/'
@@ -1537,10 +1554,12 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
 
 interface OperacoesRouteChildren {
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
+  OperacoesIndexRoute: typeof OperacoesIndexRoute
 }
 
 const OperacoesRouteChildren: OperacoesRouteChildren = {
   OperacoesProjetosRoute: OperacoesProjetosRoute,
+  OperacoesIndexRoute: OperacoesIndexRoute,
 }
 
 const OperacoesRouteWithChildren = OperacoesRoute._addFileChildren(
