@@ -123,7 +123,7 @@ const navigationSections: NavSection[] = [
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
-      { title: 'Briefings', icon: FileText, href: '/briefings', roles: ['master', 'project_manager', 'consultant'] },
+      
       { title: 'Relatório de Tempo', icon: Timer, href: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Performance do Time', icon: TrendingUp, href: '/team-performance', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Missões', icon: Crosshair, href: '/missoes', roles: ['master', 'project_manager', 'consultant'] },
