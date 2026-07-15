@@ -467,9 +467,9 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
             <Link
               to={'/operacoes' as any}
-              className="ml-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 text-[12px] font-semibold uppercase tracking-wide text-primary transition-colors hover:bg-primary/15"
+              className="ml-1 inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-primary px-4 text-[12.5px] font-semibold uppercase tracking-wide text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
             >
-              <Workflow className="h-3.5 w-3.5" />
+              <Workflow className="h-4 w-4" />
               Operações
             </Link>
 

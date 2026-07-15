@@ -44,9 +44,9 @@ const sections: Section[] = [
   {
     key: 'pastas',
     title: 'Pastas & Projetos',
-    description: 'Hierarquia Pasta → Projeto → Seção → Tarefa, no estilo Asana. Lista, Kanban e Gantt.',
+    description: 'Hierarquia Pasta → Projeto → Seção → Tarefa, no estilo Asana. Visão Lista e Kanban.',
     icon: FolderKanban,
-    badge: 'Em breve',
+    to: '/operacoes/projetos',
   },
   {
     key: 'modelos',
