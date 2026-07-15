@@ -465,6 +465,14 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
             <GlobalSearch />
 
+            <Link
+              to={'/operacoes' as any}
+              className="ml-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-primary/30 bg-primary/10 px-3 text-[12px] font-semibold uppercase tracking-wide text-primary transition-colors hover:bg-primary/15"
+            >
+              <Workflow className="h-3.5 w-3.5" />
+              Operações
+            </Link>
+
             <div className="ml-auto flex items-center gap-2">
               {role !== 'client' && <PackEnergyIndicator />}
               <Badge variant="secondary" className="hidden h-6 border-none bg-primary/10 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-primary sm:inline-flex">
