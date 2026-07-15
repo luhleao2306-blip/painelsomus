@@ -19,6 +19,8 @@ export const Route = createFileRoute('/login')({
 function LoginPage() {
   const navigate = useNavigate();
   const { refreshProfileForUser, profile: currentProfile, authReady, loading: profileLoading } = useProfile();
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,41 +54,81 @@ function LoginPage() {
       return;
     }
 
+    if (mode === 'signup' && !fullName.trim()) {
+      toast.error('Informe seu nome completo.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      {
-        const { data, error } = await supabase.auth.signInWithPassword({
+      if (mode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password: normalizedPassword,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: {
+              full_name: fullName.trim(),
+              role: 'master',
+            },
+          },
         });
 
-
         if (error) {
-          toast.error(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
+          toast.error(error.message);
           setLoading(false);
           return;
         }
 
-        if (!data.user) {
-          toast.error('Falha ao autenticar. Tente novamente.');
+        if (!data.session) {
+          toast.success('Cadastro criado! Verifique seu e-mail para confirmar o acesso.');
+          setMode('signin');
           setLoading(false);
           return;
         }
 
-        const profile = await refreshProfileForUser(data.user.id);
-        
+        const profile = await refreshProfileForUser(data.user!.id);
         if (!profile) {
-          toast.error('Perfil não encontrado. Entre em contato com o suporte.');
-          await supabase.auth.signOut();
+          toast.error('Perfil não encontrado após cadastro.');
           setLoading(false);
           return;
         }
-
-        const path = getRedirectPath(profile.role);
-        toast.success('Bem-vindo ao Somus Hub!');
-        navigate({ to: path as any });
+        toast.success('Conta criada! Bem-vindo ao Somus Hub.');
+        navigate({ to: getRedirectPath(profile.role) as any });
+        setLoading(false);
+        return;
       }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: normalizedPassword,
+      });
+
+      if (error) {
+        toast.error(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        toast.error('Falha ao autenticar. Tente novamente.');
+        setLoading(false);
+        return;
+      }
+
+      const profile = await refreshProfileForUser(data.user.id);
+
+      if (!profile) {
+        toast.error('Perfil não encontrado. Entre em contato com o suporte.');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      const path = getRedirectPath(profile.role);
+      toast.success('Bem-vindo ao Somus Hub!');
+      navigate({ to: path as any });
       setLoading(false);
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -246,11 +288,29 @@ function LoginPage() {
               Sua operação, <span className="italic font-extralight">centralizada.</span>
             </h2>
             <p className="text-sm text-muted-foreground mt-3">
-              Entre com suas credenciais para acessar o Somus Hub.
+              {mode === 'signin'
+                ? 'Entre com suas credenciais para acessar o Somus Hub.'
+                : 'Crie sua conta para acessar o Somus Hub.'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+
+            {mode === 'signup' && (
+              <div className="grid gap-2">
+                <Label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-foreground/80">Nome completo</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Seu nome"
+                  required
+                  className="h-12 border-border bg-background"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-foreground/80">E-mail</Label>
@@ -310,8 +370,20 @@ function LoginPage() {
               className="w-full h-12 font-bold text-sm uppercase tracking-wider bg-foreground text-background hover:bg-foreground/90 transition-all"
               disabled={loading}
             >
-              {loading ? 'Processando...' : 'Entrar no Portal'}
+              {loading ? 'Processando...' : mode === 'signin' ? 'Entrar no Portal' : 'Criar Conta'}
             </Button>
+
+            <p className="text-center text-xs text-muted-foreground">
+              {mode === 'signin' ? 'Ainda não tem conta?' : 'Já tem uma conta?'}{' '}
+              <button
+                type="button"
+                className="font-semibold text-foreground underline underline-offset-2 hover:opacity-70"
+                onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                disabled={loading}
+              >
+                {mode === 'signin' ? 'Cadastre-se' : 'Fazer login'}
+              </button>
+            </p>
 
           </form>
 
