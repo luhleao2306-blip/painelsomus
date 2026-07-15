@@ -9,6 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
 
 export const Route = createFileRoute('/operacoes/senhas')({
   component: OperacoesSenhas,
@@ -36,19 +37,20 @@ function OperacoesSenhas() {
   };
 
   return (
-    <div className="px-6 py-8 lg:px-10">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">Senhas</h1>
-          <p className="text-sm text-muted-foreground">Cofre de credenciais de clientes. Todas as senhas são mascaradas por padrão.</p>
-        </div>
-        <Button size="sm" onClick={() => setShowNew(true)}><Plus className="mr-1 h-3.5 w-3.5" /> Nova credencial</Button>
-      </div>
+    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+      <OpPageHeader
+        eyebrow="Cofre da alcateia"
+        title="Senhas"
+        description="Credenciais dos clientes — mascaradas por padrão, acesso restrito à liderança."
+        icon={<KeyRound className="h-4 w-4" />}
+        actions={<Button size="sm" onClick={() => setShowNew(true)}><Plus className="mr-1 h-3.5 w-3.5" /> Nova credencial</Button>}
+      />
 
       <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[12px] text-amber-800 dark:text-amber-300">
         <Shield className="h-4 w-4 shrink-0" />
-        <span>Armazenamento local apenas para MVP. Migrar para Supabase Vault / pgcrypto antes de uso real em produção.</span>
+        <span>Armazenamento local apenas para MVP. Migrar para o backend antes do uso em produção.</span>
       </div>
+
 
       <div className="relative mb-4">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
