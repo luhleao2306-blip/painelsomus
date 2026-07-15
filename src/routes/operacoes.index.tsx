@@ -125,7 +125,7 @@ function OperacoesPainel() {
         </div>
       </div>
 
-      </div>
+
 
 
       {/* KPIs */}
