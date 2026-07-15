@@ -11,6 +11,8 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
+import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+
 
 export const Route = createFileRoute('/operacoes/formularios')({
   component: OperacoesFormularios,
