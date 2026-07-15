@@ -54,8 +54,20 @@ function OperacoesPainel() {
     .sort((a, b) => b.count - a.count);
   const maxWorkload = Math.max(1, ...workload.map(w => w.count));
 
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const upcoming = store.tasks
+    .filter(t => t.dueDate && t.status !== 'concluido')
+    .map(t => ({ t, d: new Date(t.dueDate!) }))
+    .sort((a, b) => a.d.getTime() - b.d.getTime())
+    .slice(0, 6);
+
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10"
+    >
       {/* HERO */}
       <div className="mb-8 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-foreground to-foreground/85 p-8 text-background">
         <div className="flex flex-wrap items-start justify-between gap-6">
