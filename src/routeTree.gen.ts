@@ -54,6 +54,7 @@ import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as OperacoesSenhasRouteImport } from './routes/operacoes.senhas'
 import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
 import { Route as OperacoesPerformanceRouteImport } from './routes/operacoes.performance'
 import { Route as OperacoesModelosRouteImport } from './routes/operacoes.modelos'
@@ -312,6 +313,11 @@ const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
   path: '/$projectId',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const OperacoesSenhasRoute = OperacoesSenhasRouteImport.update({
+  id: '/senhas',
+  path: '/senhas',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OperacoesProjetosRoute = OperacoesProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
@@ -538,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -611,6 +618,7 @@ export interface FileRoutesByTo {
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -691,6 +699,7 @@ export interface FileRoutesById {
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
+  '/operacoes/senhas': typeof OperacoesSenhasRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -772,6 +781,7 @@ export interface FileRouteTypes {
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -845,6 +855,7 @@ export interface FileRouteTypes {
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -924,6 +935,7 @@ export interface FileRouteTypes {
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
+    | '/operacoes/senhas'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -1313,6 +1325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/operacoes/senhas': {
+      id: '/operacoes/senhas'
+      path: '/senhas'
+      fullPath: '/operacoes/senhas'
+      preLoaderRoute: typeof OperacoesSenhasRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/operacoes/projetos': {
       id: '/operacoes/projetos'
       path: '/projetos'
@@ -1614,6 +1633,7 @@ interface OperacoesRouteChildren {
   OperacoesModelosRoute: typeof OperacoesModelosRoute
   OperacoesPerformanceRoute: typeof OperacoesPerformanceRoute
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
+  OperacoesSenhasRoute: typeof OperacoesSenhasRoute
   OperacoesIndexRoute: typeof OperacoesIndexRoute
 }
 
@@ -1622,6 +1642,7 @@ const OperacoesRouteChildren: OperacoesRouteChildren = {
   OperacoesModelosRoute: OperacoesModelosRoute,
   OperacoesPerformanceRoute: OperacoesPerformanceRoute,
   OperacoesProjetosRoute: OperacoesProjetosRoute,
+  OperacoesSenhasRoute: OperacoesSenhasRoute,
   OperacoesIndexRoute: OperacoesIndexRoute,
 }
 
