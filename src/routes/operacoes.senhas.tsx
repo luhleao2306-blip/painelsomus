@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Eye, EyeOff, Copy, Trash2, Plus, Search, KeyRound, Shield, Lock,
   ChevronRight, Building2, Fingerprint,
