@@ -45,6 +45,8 @@ export type OpComment = {
   createdAt: string;
 };
 
+export type OpRecurrence = 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
+
 export type OpTask = {
   id: string;
   sectionId: string;
@@ -54,10 +56,12 @@ export type OpTask = {
   dueDate?: string;
   status: OpStatus;
   priority: OpPriority;
+  recurrence?: OpRecurrence;
   tags: string[];
   checklist: { id: string; text: string; done: boolean }[];
   comments: OpComment[];
 };
+
 
 export type OpSection = { id: string; projectId: string; name: string; order: number };
 export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
