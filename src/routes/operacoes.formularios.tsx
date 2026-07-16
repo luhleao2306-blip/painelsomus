@@ -14,11 +14,25 @@ import {
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
 import { toast } from 'sonner';
 
-function buildShareLink(form: OpForm): string {
-  const json = JSON.stringify({ id: form.id, name: form.name, fields: form.fields });
-  const b64 = btoa(unescape(encodeURIComponent(json)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  return `${window.location.origin}/f/${b64}`;
+import { supabase } from '@/integrations/supabase/client';
+
+function shortToken(len = 8): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+
+async function buildShareLink(form: OpForm): Promise<string> {
+  const { data: userData } = await supabase.auth.getUser();
+  const token = shortToken(8);
+  const { error } = await supabase.from('public_form_shares').insert({
+    token,
+    form: { id: form.id, name: form.name, fields: form.fields } as any,
+    created_by: userData.user?.id ?? null,
+  });
+  if (error) throw error;
+  return `${window.location.origin}/f/${token}`;
 }
 
 
