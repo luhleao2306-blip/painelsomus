@@ -51,7 +51,9 @@ const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
 function PublicFormPage() {
   const { data } = Route.useParams();
   const [form, setForm] = useState<OpForm | null | undefined>(undefined);
+  const [token, setToken] = useState<string | null>(null);
   const [values, setValues] = useState<Record<string, any>>({});
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -66,6 +68,7 @@ function PublicFormPage() {
         if (cancelled) return;
         if (!error && row?.form) {
           setForm(row.form as unknown as OpForm);
+          setToken(data);
           return;
         }
       }
@@ -75,21 +78,29 @@ function PublicFormPage() {
     return () => { cancelled = true; };
   }, [data]);
 
-  const responseText = useMemo(() => {
-    if (!form) return '';
-    return form.fields.map(f => {
-      const v = values[f.id];
-      const shown = typeof v === 'boolean' ? (v ? 'Sim' : 'Não') : (v ?? '—');
-      return `${f.label}:\n${shown}`;
-    }).join('\n\n');
-  }, [form, values]);
-
-  const copyAnswers = async () => {
+  const submit = async () => {
     if (!form) return;
-    const text = `Respostas — ${form.name}\n\n${responseText}`;
-    await navigator.clipboard.writeText(text);
-    toast.success('Respostas copiadas! Envie para a equipe.');
+    setSubmitting(true);
+    try {
+      if (token) {
+        const { error } = await supabase.from('public_form_submissions').insert({
+          token,
+          form_id: form.id,
+          form_name: form.name,
+          form_snapshot: { id: form.id, name: form.name, fields: form.fields } as any,
+          answers: values as any,
+        });
+        if (error) throw error;
+      }
+      setSubmitted(true);
+    } catch (e) {
+      console.error(e);
+      toast.error('Não foi possível enviar. Tente novamente.');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
     <div
