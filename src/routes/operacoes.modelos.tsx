@@ -60,9 +60,20 @@ function OperacoesModelos() {
                   </li>
                 ))}
               </ul>
-              <Button size="sm" className="mt-4" onClick={() => setApplyTpl(tpl.id)}>
-                <Copy className="mr-1 h-3.5 w-3.5" /> Usar este modelo
-              </Button>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button size="sm" className="flex-1 min-w-[110px]" onClick={() => setApplyTpl(tpl.id)}>
+                  <Copy className="mr-1 h-3.5 w-3.5" /> Usar
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => setEditTpl(tpl.id)}>
+                  <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 min-w-[110px]" onClick={() => {
+                  const id = opStore.duplicateTemplate(tpl.id);
+                  if (id) toast.success(`Modelo "${tpl.name}" duplicado.`);
+                }}>
+                  <Files className="mr-1 h-3.5 w-3.5" /> Duplicar
+                </Button>
+              </div>
             </div>
           );
         })}
