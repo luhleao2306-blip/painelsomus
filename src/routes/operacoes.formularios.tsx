@@ -115,7 +115,45 @@ function OperacoesFormularios() {
 
       <FormBuilderDialog formId={editingId} onClose={() => setEditingId(null)} />
       <FormFillDialog formId={fillingId} onClose={() => setFillingId(null)} />
+      <ShareLinkDialog formId={sharingId} onClose={() => setSharingId(null)} />
     </div>
+  );
+}
+
+function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: () => void }) {
+  const store = useOpStore();
+  const form = store.forms.find(f => f.id === formId);
+  if (!form) return null;
+  const url = buildShareLink(form);
+  const copy = async () => {
+    await navigator.clipboard.writeText(url);
+    toast.success('Link copiado! Envie ao cliente.');
+  };
+  const whatsapp = `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}`;
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Link do formulário</DialogTitle>
+          <DialogDescription>
+            Envie este link para o cliente preencher. Ele abrirá uma página pública com os campos do formulário "{form.name}".
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2">
+          <Input readOnly value={url} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
+          <Button onClick={copy}><Copy className="h-3.5 w-3.5" /></Button>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          Após preencher, o cliente copia as respostas e devolve pelo canal habitual (WhatsApp/e-mail).
+        </p>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" asChild>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer">Enviar por WhatsApp</a>
+          </Button>
+          <Button onClick={onClose}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
