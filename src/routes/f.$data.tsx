@@ -292,13 +292,18 @@ function PublicFormPage() {
           <div className="border-t border-white/10 px-6 py-5 sm:px-8">
             <Button
               size="lg"
-              onClick={() => setSubmitted(true)}
-              className="group h-12 w-full rounded-full bg-white text-[13px] font-semibold uppercase tracking-[0.14em] text-black hover:bg-white/90"
+              disabled={submitting}
+              onClick={submit}
+              className="group h-12 w-full rounded-full bg-white text-[13px] font-semibold uppercase tracking-[0.14em] text-black hover:bg-white/90 disabled:opacity-70"
             >
-              Concluir e ver respostas
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              {submitting ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando…</>
+              ) : (
+                <>Enviar respostas <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>
+              )}
             </Button>
           </div>
+
         </div>
       </main>
     </Shell>
