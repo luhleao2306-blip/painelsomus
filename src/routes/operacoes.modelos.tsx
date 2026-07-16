@@ -1,16 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { LayoutTemplate, Plus, Trash2, Copy } from 'lucide-react';
-import { useOpStore, opStore } from '@/lib/operacoes-store';
+import { useEffect, useState } from 'react';
+import { LayoutTemplate, Plus, Trash2, Copy, Pencil, Files, X } from 'lucide-react';
+import { useOpStore, opStore, type OpTemplate } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+import { toast } from 'sonner';
 
 
 export const Route = createFileRoute('/operacoes/modelos')({
