@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
-import { Check, Copy, Loader2, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, Loader2, ArrowRight } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
