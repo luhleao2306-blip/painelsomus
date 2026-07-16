@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy, Inbox, Download, Eye, CheckCircle2, Clock } from 'lucide-react';
 import { useOpStore, opStore, type OpForm, type OpFormField } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,12 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
 import { supabase } from '@/integrations/supabase/client';
+
 
 function shortToken(len = 8): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
