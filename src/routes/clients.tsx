@@ -125,7 +125,7 @@ function ClientsPage() {
           },
         });
         targetClientId = created.client?.id;
-        setClientsToast(created.loginCreated ? 'Cliente cadastrado e acesso criado!' : 'Cliente cadastrado!');
+        toast.success(created.loginCreated ? 'Cliente cadastrado e acesso criado!' : 'Cliente cadastrado!');
       }
       if (editingClient && clientPassword && targetClientId) {
         try {
