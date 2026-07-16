@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy } from 'lucide-react';
 import { useOpStore, opStore, type OpForm, type OpFormField } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
