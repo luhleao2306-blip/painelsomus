@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { ClipboardList, Plus, Trash2, FileText, X } from 'lucide-react';
+import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy } from 'lucide-react';
 import { useOpStore, opStore, type OpForm, type OpFormField } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,17 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+import { toast } from 'sonner';
+
+function buildShareLink(form: OpForm): string {
+  const json = JSON.stringify({ id: form.id, name: form.name, fields: form.fields });
+  const b64 = btoa(unescape(encodeURIComponent(json)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `${window.location.origin}/f/${b64}`;
+}
 
 
 export const Route = createFileRoute('/operacoes/formularios')({
