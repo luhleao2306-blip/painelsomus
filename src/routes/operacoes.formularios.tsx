@@ -39,6 +39,7 @@ function OperacoesFormularios() {
   const store = useOpStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [fillingId, setFillingId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
