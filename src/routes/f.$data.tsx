@@ -165,38 +165,26 @@ function PublicFormPage() {
   if (submitted) {
     return (
       <Shell>
-        <main className="mx-auto max-w-3xl px-6 py-12">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur">
-            <div className="flex items-center gap-2 text-emerald-400">
-              <Check className="h-5 w-5" />
-              <h1 className="text-lg font-semibold">Respostas registradas</h1>
+        <main className="mx-auto max-w-3xl px-6 py-16">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400">
+              <Check className="h-6 w-6" />
             </div>
-            <p className="mt-2 text-sm text-white/60">
-              Copie suas respostas e envie de volta para a equipe pelo canal habitual (WhatsApp / e-mail).
+            <h1 className="mt-5 text-2xl font-semibold tracking-tight">
+              Respostas{' '}
+              <span style={{ fontFamily: SERIF_STACK, fontStyle: 'italic', fontWeight: 400 }} className="text-white/70">
+                enviadas
+              </span>
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-sm text-white/60">
+              Obrigado! Suas respostas foram enviadas com sucesso para a equipe Somus. Você já pode fechar esta página.
             </p>
-            <pre className="mt-5 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-black/40 p-4 text-[12px] leading-relaxed text-white/80">
-{responseText}
-            </pre>
-            <div className="mt-5 flex gap-2">
-              <Button
-                onClick={copyAnswers}
-                className="flex-1 rounded-full bg-white text-black hover:bg-white/90"
-              >
-                <Copy className="mr-2 h-3.5 w-3.5" /> Copiar respostas
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setSubmitted(false)}
-                className="rounded-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
-              >
-                Editar
-              </Button>
-            </div>
           </div>
         </main>
       </Shell>
     );
   }
+
 
   return (
     <Shell>
