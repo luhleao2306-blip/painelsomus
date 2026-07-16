@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState, type FormEvent } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { createClientLogin } from '@/lib/clients.functions';
+import { createClientLogin, createClientWithLogin } from '@/lib/clients.functions';
 import { toast } from 'sonner';
 import { StatusBadge, MetricCard, EmptyState } from '@/components/design-system/DesignSystem';
 import { Textarea } from '@/components/ui/textarea';
@@ -65,6 +65,7 @@ function ClientsPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [clientPassword, setClientPassword] = useState('');
   const createLoginFn = useServerFn(createClientLogin);
+  const createClientWithLoginFn = useServerFn(createClientWithLogin);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -116,13 +117,17 @@ function ClientsPage() {
         await updateClient(editingClient.id, payload as any);
         targetClientId = editingClient.id;
       } else {
-        const newClient = await addClient({
-          ...(payload as any),
-          manager_id: profile?.id || null,
+        const created = await createClientWithLoginFn({
+          data: {
+            ...(payload as any),
+            manager_id: profile?.id || null,
+            client_password: clientPassword,
+          },
         });
-        targetClientId = newClient?.id;
+        targetClientId = created.client?.id;
+        toast.success(created.loginCreated ? 'Cliente cadastrado e acesso criado!' : 'Cliente cadastrado!');
       }
-      if (clientPassword && targetClientId) {
+      if (editingClient && clientPassword && targetClientId) {
         try {
           await createLoginFn({
             data: {
