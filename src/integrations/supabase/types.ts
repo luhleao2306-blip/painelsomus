@@ -3017,6 +3017,50 @@ export type Database = {
         }
         Relationships: []
       }
+      public_form_submissions: {
+        Row: {
+          answers: Json
+          created_at: string
+          form_id: string | null
+          form_name: string | null
+          form_snapshot: Json
+          id: string
+          submitted_at: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          form_id?: string | null
+          form_name?: string | null
+          form_snapshot: Json
+          id?: string
+          submitted_at?: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          form_id?: string | null
+          form_name?: string | null
+          form_snapshot?: Json
+          id?: string
+          submitted_at?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_form_submissions_token_fkey"
+            columns: ["token"]
+            isOneToOne: false
+            referencedRelation: "public_form_shares"
+            referencedColumns: ["token"]
+          },
+        ]
+      }
       registration_history: {
         Row: {
           actor_id: string | null
