@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy } from 'lucide-react';
 import { useOpStore, opStore, type OpForm, type OpFormField } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,25 @@ import {
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
 import { toast } from 'sonner';
 
-function buildShareLink(form: OpForm): string {
-  const json = JSON.stringify({ id: form.id, name: form.name, fields: form.fields });
-  const b64 = btoa(unescape(encodeURIComponent(json)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  return `${window.location.origin}/f/${b64}`;
+import { supabase } from '@/integrations/supabase/client';
+
+function shortToken(len = 8): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+
+async function buildShareLink(form: OpForm): Promise<string> {
+  const { data: userData } = await supabase.auth.getUser();
+  const token = shortToken(8);
+  const { error } = await supabase.from('public_form_shares').insert({
+    token,
+    form: { id: form.id, name: form.name, fields: form.fields } as any,
+    created_by: userData.user?.id ?? null,
+  });
+  if (error) throw error;
+  return `${window.location.origin}/f/${token}`;
 }
 
 
@@ -123,13 +137,24 @@ function OperacoesFormularios() {
 function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: () => void }) {
   const store = useOpStore();
   const form = store.forms.find(f => f.id === formId);
+  const [url, setUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (!form) return;
+    setUrl('');
+    buildShareLink(form)
+      .then(u => setUrl(u))
+      .catch(err => { toast.error('Não foi possível gerar o link.'); console.error(err); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formId]);
+
   if (!form) return null;
-  const url = buildShareLink(form);
   const copy = async () => {
+    if (!url) return;
     await navigator.clipboard.writeText(url);
     toast.success('Link copiado! Envie ao cliente.');
   };
-  const whatsapp = `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}`;
+  const whatsapp = url ? `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}` : '#';
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
@@ -140,14 +165,14 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2">
-          <Input readOnly value={url} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
-          <Button onClick={copy}><Copy className="h-3.5 w-3.5" /></Button>
+          <Input readOnly value={url || 'Gerando link…'} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
+          <Button onClick={copy} disabled={!url}><Copy className="h-3.5 w-3.5" /></Button>
         </div>
         <p className="text-[11px] text-muted-foreground">
           Após preencher, o cliente copia as respostas e devolve pelo canal habitual (WhatsApp/e-mail).
         </p>
         <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild disabled={!url}>
             <a href={whatsapp} target="_blank" rel="noopener noreferrer">Enviar por WhatsApp</a>
           </Button>
           <Button onClick={onClose}>Fechar</Button>
