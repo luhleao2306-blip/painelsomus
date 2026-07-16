@@ -138,16 +138,15 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
   const store = useOpStore();
   const form = store.forms.find(f => f.id === formId);
   const [url, setUrl] = useState<string>('');
-  const [loading, setLoading] = useState(false);
 
-  useState(() => { /* noop */ });
-  // generate link when dialog opens
-  if (form && !url && !loading) {
-    setLoading(true);
+  useEffect(() => {
+    if (!form) return;
+    setUrl('');
     buildShareLink(form)
-      .then(u => { setUrl(u); setLoading(false); })
-      .catch(err => { toast.error('Não foi possível gerar o link.'); console.error(err); setLoading(false); });
-  }
+      .then(u => setUrl(u))
+      .catch(err => { toast.error('Não foi possível gerar o link.'); console.error(err); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formId]);
 
   if (!form) return null;
   const copy = async () => {
