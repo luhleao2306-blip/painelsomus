@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ClipboardList, Check, Copy, Loader2 } from 'lucide-react';
+import { Check, Copy, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +10,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import type { OpForm } from '@/lib/operacoes-store';
-import somusLogo from '@/assets/somus-logo.png.asset.json';
+import somusLogo from '@/assets/somus-logo.png';
 
 export const Route = createFileRoute('/f/$data')({
   component: PublicFormPage,
@@ -18,6 +18,15 @@ export const Route = createFileRoute('/f/$data')({
     meta: [
       { title: 'Formulário — Somus' },
       { name: 'description', content: 'Preencha o formulário enviado pela equipe Somus.' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    ],
+    links: [
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap',
+      },
     ],
   }),
 });
@@ -35,16 +44,18 @@ function decodeLegacyBase64(raw: string): OpForm | null {
   }
 }
 
+const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
+const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
+
 function PublicFormPage() {
   const { data } = Route.useParams();
-  const [form, setForm] = useState<OpForm | null | undefined>(undefined); // undefined = loading
+  const [form, setForm] = useState<OpForm | null | undefined>(undefined);
   const [values, setValues] = useState<Record<string, any>>({});
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Short token (<= 24 chars): look up in DB
       if (data.length <= 24) {
         const { data: row, error } = await supabase
           .from('public_form_shares')
@@ -57,7 +68,6 @@ function PublicFormPage() {
           return;
         }
       }
-      // Fallback: legacy base64-encoded link
       const legacy = decodeLegacyBase64(data);
       if (!cancelled) setForm(legacy);
     })();
@@ -80,112 +90,196 @@ function PublicFormPage() {
     toast.success('Respostas copiadas! Envie para a equipe.');
   };
 
+  const Shell = ({ children }: { children: React.ReactNode }) => (
+    <div
+      className="min-h-screen w-full"
+      style={{
+        fontFamily: FONT_STACK,
+        background: '#000',
+        color: '#fff',
+        backgroundImage:
+          'radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.06), transparent 60%)',
+      }}
+    >
+      <header className="border-b border-white/10">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
+          <img src={somusLogo} alt="SOMUS" className="h-6 w-auto brightness-0 invert" />
+          <span
+            className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/60"
+          >
+            Formulário
+          </span>
+        </div>
+      </header>
+      {children}
+      <footer className="mx-auto max-w-3xl px-6 pb-10 pt-4">
+        <p className="text-center text-[11px] tracking-wide text-white/40">
+          Enviado com <span style={{ fontFamily: SERIF_STACK, fontStyle: 'italic' }}>Somus</span> · painelsomus.com
+        </p>
+      </footer>
+    </div>
+  );
+
   if (form === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_top,_hsl(var(--muted))_0%,_hsl(var(--background))_60%)]">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-      </div>
+      <Shell>
+        <main className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center px-6">
+          <Loader2 className="h-6 w-6 animate-spin text-white/50" />
+        </main>
+      </Shell>
     );
   }
 
   if (!form) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_hsl(var(--muted))_0%,_hsl(var(--background))_60%)]">
-        <div className="max-w-md text-center rounded-2xl border border-border/60 bg-card p-8 shadow-sm">
-          <img src={somusLogo.url} alt="Somus" className="mx-auto mb-4 h-10 w-auto" />
-          <h1 className="font-display text-xl font-semibold">Link inválido</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Este formulário não pôde ser carregado ou expirou. Peça um novo link à equipe.
-          </p>
-        </div>
-      </div>
+      <Shell>
+        <main className="mx-auto max-w-3xl px-6 py-16">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Link{' '}
+              <span style={{ fontFamily: SERIF_STACK, fontStyle: 'italic', fontWeight: 400 }}>
+                inválido
+              </span>
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-sm text-white/60">
+              Este formulário não pôde ser carregado ou expirou. Peça um novo link à equipe.
+            </p>
+          </div>
+        </main>
+      </Shell>
     );
   }
 
-  const Header = (
-    <header className="border-b border-border/60 bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-        <img src={somusLogo.url} alt="Somus" className="h-8 w-auto" />
-        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          Formulário
-        </span>
-      </div>
-    </header>
-  );
-
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_hsl(var(--muted))_0%,_hsl(var(--background))_60%)]">
-        {Header}
-        <main className="mx-auto max-w-2xl px-4 py-10">
-          <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
-            <div className="flex items-center gap-2 text-emerald-600">
+      <Shell>
+        <main className="mx-auto max-w-3xl px-6 py-12">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur">
+            <div className="flex items-center gap-2 text-emerald-400">
               <Check className="h-5 w-5" />
-              <h1 className="font-display text-lg font-semibold">Respostas registradas</h1>
+              <h1 className="text-lg font-semibold">Respostas registradas</h1>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Copie suas respostas e envie de volta para a equipe pelo canal habitual (WhatsApp/e-mail).
+            <p className="mt-2 text-sm text-white/60">
+              Copie suas respostas e envie de volta para a equipe pelo canal habitual (WhatsApp / e-mail).
             </p>
-            <pre className="mt-4 whitespace-pre-wrap rounded-lg border border-border/60 bg-muted/40 p-3 text-[12px] max-h-80 overflow-auto">
+            <pre className="mt-5 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-black/40 p-4 text-[12px] leading-relaxed text-white/80">
 {responseText}
             </pre>
-            <div className="mt-4 flex gap-2">
-              <Button onClick={copyAnswers} className="flex-1">
-                <Copy className="mr-1 h-3.5 w-3.5" /> Copiar respostas
+            <div className="mt-5 flex gap-2">
+              <Button
+                onClick={copyAnswers}
+                className="flex-1 rounded-full bg-white text-black hover:bg-white/90"
+              >
+                <Copy className="mr-2 h-3.5 w-3.5" /> Copiar respostas
               </Button>
-              <Button variant="outline" onClick={() => setSubmitted(false)}>Editar</Button>
+              <Button
+                variant="outline"
+                onClick={() => setSubmitted(false)}
+                className="rounded-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
+                Editar
+              </Button>
             </div>
           </div>
-          <p className="mt-4 text-center text-[11px] text-muted-foreground">
-            Enviado com Somus · painelsomus.com
-          </p>
         </main>
-      </div>
+      </Shell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_hsl(var(--muted))_0%,_hsl(var(--background))_60%)]">
-      {Header}
-      <main className="mx-auto max-w-2xl px-4 py-10">
-        <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
-          <div className="border-b border-border/60 bg-gradient-to-b from-muted/40 to-transparent px-6 py-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground text-background shadow-sm">
-                <ClipboardList className="h-5 w-5" />
-              </div>
-              <div>
-                <h1 className="font-display text-xl font-semibold leading-tight">{form.name}</h1>
-                <p className="text-[12px] text-muted-foreground">Preencha os campos abaixo e envie as respostas.</p>
-              </div>
-            </div>
+    <Shell>
+      <main className="mx-auto max-w-3xl px-6 pt-12 pb-6">
+        {/* Editorial hero */}
+        <div className="mb-10">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">
+            Somus · Formulário
           </div>
+          <h1
+            className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl"
+          >
+            {form.name}
+            <span
+              style={{ fontFamily: SERIF_STACK, fontStyle: 'italic', fontWeight: 400 }}
+              className="ml-2 text-white/50"
+            >
+              .
+            </span>
+          </h1>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/60">
+            Preencha os campos abaixo com atenção. Ao concluir, você poderá copiar as respostas
+            e devolvê-las à equipe pelo canal habitual.
+          </p>
+        </div>
 
-          <div className="space-y-5 px-6 py-6">
-            {form.fields.map(f => (
-              <div key={f.id}>
-                <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">{f.label}</label>
-                <div className="mt-1.5">
-                  {f.type === 'texto_curto' && <Input value={values[f.id] ?? ''} onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))} />}
-                  {f.type === 'texto_longo' && <Textarea rows={4} value={values[f.id] ?? ''} onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))} />}
-                  {f.type === 'data' && <Input type="date" value={values[f.id] ?? ''} onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))} />}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur">
+          <div className="space-y-6 px-6 py-8 sm:px-8">
+            {form.fields.map((f, i) => (
+              <div key={f.id} className="grid gap-2">
+                <label className="flex items-baseline gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
+                  <span className="text-white/30">{String(i + 1).padStart(2, '0')}</span>
+                  <span>{f.label}</span>
+                </label>
+                <div>
+                  {f.type === 'texto_curto' && (
+                    <Input
+                      value={values[f.id] ?? ''}
+                      onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))}
+                      className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+                    />
+                  )}
+                  {f.type === 'texto_longo' && (
+                    <Textarea
+                      rows={4}
+                      value={values[f.id] ?? ''}
+                      onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))}
+                      className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+                    />
+                  )}
+                  {f.type === 'data' && (
+                    <Input
+                      type="date"
+                      value={values[f.id] ?? ''}
+                      onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))}
+                      className="h-11 rounded-lg border-white/15 bg-black/40 text-white [color-scheme:dark] focus-visible:border-white/40 focus-visible:ring-0"
+                    />
+                  )}
                   {f.type === 'checkbox' && (
-                    <label className="mt-1 inline-flex items-center gap-2 text-[13px]">
-                      <input type="checkbox" checked={!!values[f.id]} onChange={e => setValues(v => ({ ...v, [f.id]: e.target.checked }))} className="h-4 w-4 rounded border-border" />
-                      <span className="text-muted-foreground">Marque se aplicável</span>
+                    <label className="inline-flex cursor-pointer items-center gap-2.5 text-[13px] text-white/80">
+                      <input
+                        type="checkbox"
+                        checked={!!values[f.id]}
+                        onChange={e => setValues(v => ({ ...v, [f.id]: e.target.checked }))}
+                        className="h-4 w-4 rounded border-white/30 bg-black/40 accent-white"
+                      />
+                      <span>Marque se aplicável</span>
                     </label>
                   )}
                   {f.type === 'upload' && (
                     <>
-                      <Input type="file" onChange={e => setValues(v => ({ ...v, [f.id]: e.target.files?.[0]?.name }))} />
-                      <p className="mt-1 text-[10.5px] text-muted-foreground">Anote o nome do arquivo aqui e envie o arquivo em separado para a equipe.</p>
+                      <Input
+                        type="file"
+                        onChange={e => setValues(v => ({ ...v, [f.id]: e.target.files?.[0]?.name }))}
+                        className="h-11 rounded-lg border-white/15 bg-black/40 text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1 file:text-xs file:font-semibold file:text-black focus-visible:border-white/40 focus-visible:ring-0"
+                      />
+                      <p className="mt-1.5 text-[11px] text-white/40">
+                        Anote o nome do arquivo e envie-o em separado à equipe.
+                      </p>
                     </>
                   )}
                   {f.type === 'multipla_escolha' && (
-                    <Select value={values[f.id] ?? ''} onValueChange={val => setValues(v => ({ ...v, [f.id]: val }))}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {(f.options ?? []).map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                    <Select
+                      value={values[f.id] ?? ''}
+                      onValueChange={val => setValues(v => ({ ...v, [f.id]: val }))}
+                    >
+                      <SelectTrigger className="h-11 rounded-lg border-white/15 bg-black/40 text-white focus:ring-0">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent className="border-white/10 bg-zinc-950 text-white">
+                        {(f.options ?? []).map(o => (
+                          <SelectItem key={o} value={o} className="focus:bg-white/10 focus:text-white">
+                            {o}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   )}
@@ -194,16 +288,18 @@ function PublicFormPage() {
             ))}
           </div>
 
-          <div className="border-t border-border/60 bg-muted/20 px-6 py-4">
-            <Button className="w-full" size="lg" onClick={() => setSubmitted(true)}>
+          <div className="border-t border-white/10 px-6 py-5 sm:px-8">
+            <Button
+              size="lg"
+              onClick={() => setSubmitted(true)}
+              className="group h-12 w-full rounded-full bg-white text-[13px] font-semibold uppercase tracking-[0.14em] text-black hover:bg-white/90"
+            >
               Concluir e ver respostas
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Button>
           </div>
         </div>
-        <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          Enviado com Somus · painelsomus.com
-        </p>
       </main>
-    </div>
+    </Shell>
   );
 }
