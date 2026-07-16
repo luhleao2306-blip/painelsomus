@@ -5,9 +5,13 @@ import {
   ChevronRight, Building2, Fingerprint,
 } from 'lucide-react';
 import { useOpStore, opStore, type OpSenha } from '@/lib/operacoes-store';
+import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
@@ -305,6 +309,7 @@ function StatTile({
 function NewSenhaDialog({
   open, onOpenChange, defaultClientName,
 }: { open: boolean; onOpenChange: (b: boolean) => void; defaultClientName?: string }) {
+  const { clients } = useData();
   const [form, setForm] = useState<Omit<OpSenha, 'id'>>({
     clientName: '', service: '', username: '', password: '', notes: '',
   });
@@ -314,6 +319,13 @@ function NewSenhaDialog({
     if (open) setForm(f => ({ ...f, clientName: defaultClientName ?? f.clientName }));
   }, [open, defaultClientName]);
 
+  const clientOptions = useMemo(() => {
+    const names = new Set<string>();
+    clients.forEach(c => { if (c.name) names.add(c.name); });
+    if (form.clientName) names.add(form.clientName);
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [clients, form.clientName]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -321,7 +333,19 @@ function NewSenhaDialog({
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2">
             <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Cliente</label>
-            <Input value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} />
+            <Select
+              value={form.clientName || undefined}
+              onValueChange={(v) => setForm(f => ({ ...f, clientName: v }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                {clientOptions.map(name => (
+                  <SelectItem key={name} value={name}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="col-span-2">
             <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Serviço / Plataforma</label>
