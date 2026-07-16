@@ -69,6 +69,7 @@ import { Route as GamificacaoHabitosRouteImport } from './routes/gamificacao.hab
 import { Route as GamificacaoGaleriaDoLoboRouteImport } from './routes/gamificacao.galeria-do-lobo'
 import { Route as GamificacaoEstrelaDoLiderRouteImport } from './routes/gamificacao.estrela-do-lider'
 import { Route as FinanceiroIndicadoresRouteImport } from './routes/financeiro.indicadores'
+import { Route as FDataRouteImport } from './routes/f.$data'
 import { Route as CronogramaTokenRouteImport } from './routes/cronograma.$token'
 import { Route as ContratoTokenRouteImport } from './routes/contrato.$token'
 import { Route as ContractsContractIdRouteImport } from './routes/contracts.$contractId'
@@ -390,6 +391,11 @@ const FinanceiroIndicadoresRoute = FinanceiroIndicadoresRouteImport.update({
   path: '/indicadores',
   getParentRoute: () => FinanceiroRoute,
 } as any)
+const FDataRoute = FDataRouteImport.update({
+  id: '/f/$data',
+  path: '/f/$data',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CronogramaTokenRoute = CronogramaTokenRouteImport.update({
   id: '/cronograma/$token',
   path: '/cronograma/$token',
@@ -530,6 +536,7 @@ export interface FileRoutesByFullPath {
   '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
+  '/f/$data': typeof FDataRoute
   '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
@@ -604,6 +611,7 @@ export interface FileRoutesByTo {
   '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
+  '/f/$data': typeof FDataRoute
   '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
@@ -685,6 +693,7 @@ export interface FileRoutesById {
   '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
+  '/f/$data': typeof FDataRoute
   '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
@@ -767,6 +776,7 @@ export interface FileRouteTypes {
     | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
+    | '/f/$data'
     | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
@@ -841,6 +851,7 @@ export interface FileRouteTypes {
     | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
+    | '/f/$data'
     | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
@@ -921,6 +932,7 @@ export interface FileRouteTypes {
     | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
+    | '/f/$data'
     | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
@@ -998,6 +1010,7 @@ export interface RootRouteChildren {
   ContractsContractIdRoute: typeof ContractsContractIdRoute
   ContratoTokenRoute: typeof ContratoTokenRoute
   CronogramaTokenRoute: typeof CronogramaTokenRoute
+  FDataRoute: typeof FDataRoute
   InviteTokenRoute: typeof InviteTokenRoute
   OnboardingTokenRoute: typeof OnboardingTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
@@ -1430,6 +1443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceiroIndicadoresRouteImport
       parentRoute: typeof FinanceiroRoute
     }
+    '/f/$data': {
+      id: '/f/$data'
+      path: '/f/$data'
+      fullPath: '/f/$data'
+      preLoaderRoute: typeof FDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cronograma/$token': {
       id: '/cronograma/$token'
       path: '/cronograma/$token'
@@ -1749,6 +1769,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContractsContractIdRoute: ContractsContractIdRoute,
   ContratoTokenRoute: ContratoTokenRoute,
   CronogramaTokenRoute: CronogramaTokenRoute,
+  FDataRoute: FDataRoute,
   InviteTokenRoute: InviteTokenRoute,
   OnboardingTokenRoute: OnboardingTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
@@ -1762,13 +1783,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
