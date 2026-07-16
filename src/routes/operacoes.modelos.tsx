@@ -21,6 +21,7 @@ export const Route = createFileRoute('/operacoes/modelos')({
 function OperacoesModelos() {
   const store = useOpStore();
   const [applyTpl, setApplyTpl] = useState<string | null>(null);
+  const [editTpl, setEditTpl] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
