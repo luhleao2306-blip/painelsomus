@@ -1,16 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { LayoutTemplate, Plus, Trash2, Copy } from 'lucide-react';
-import { useOpStore, opStore } from '@/lib/operacoes-store';
+import { useEffect, useState } from 'react';
+import { LayoutTemplate, Plus, Trash2, Copy, Pencil, Files, X } from 'lucide-react';
+import { useOpStore, opStore, type OpTemplate } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+import { toast } from 'sonner';
 
 
 export const Route = createFileRoute('/operacoes/modelos')({
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/operacoes/modelos')({
 function OperacoesModelos() {
   const store = useOpStore();
   const [applyTpl, setApplyTpl] = useState<string | null>(null);
+  const [editTpl, setEditTpl] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
@@ -58,9 +60,20 @@ function OperacoesModelos() {
                   </li>
                 ))}
               </ul>
-              <Button size="sm" className="mt-4" onClick={() => setApplyTpl(tpl.id)}>
-                <Copy className="mr-1 h-3.5 w-3.5" /> Usar este modelo
-              </Button>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button size="sm" className="flex-1 min-w-[110px]" onClick={() => setApplyTpl(tpl.id)}>
+                  <Copy className="mr-1 h-3.5 w-3.5" /> Usar
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => setEditTpl(tpl.id)}>
+                  <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 min-w-[110px]" onClick={() => {
+                  const id = opStore.duplicateTemplate(tpl.id);
+                  if (id) toast.success(`Modelo "${tpl.name}" duplicado.`);
+                }}>
+                  <Files className="mr-1 h-3.5 w-3.5" /> Duplicar
+                </Button>
+              </div>
             </div>
           );
         })}
@@ -72,7 +85,128 @@ function OperacoesModelos() {
       </div>
 
       <ApplyTemplateDialog templateId={applyTpl} onClose={() => setApplyTpl(null)} />
+      <EditTemplateDialog templateId={editTpl} onClose={() => setEditTpl(null)} />
     </div>
+  );
+}
+
+function EditTemplateDialog({ templateId, onClose }: { templateId: string | null; onClose: () => void }) {
+  const store = useOpStore();
+  const tpl = store.templates.find(t => t.id === templateId) ?? null;
+  const [draft, setDraft] = useState<OpTemplate | null>(null);
+
+  useEffect(() => {
+    if (tpl) {
+      setDraft({
+        id: tpl.id,
+        name: tpl.name,
+        sections: tpl.sections.map(s => ({ name: s.name, tasks: [...s.tasks] })),
+      });
+    } else {
+      setDraft(null);
+    }
+  }, [templateId]);
+
+  if (!tpl || !draft) return null;
+
+  const setSection = (idx: number, patch: Partial<{ name: string; tasks: string[] }>) => {
+    setDraft(d => d ? { ...d, sections: d.sections.map((s, i) => i === idx ? { ...s, ...patch } : s) } : d);
+  };
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Editar modelo</DialogTitle>
+          <DialogDescription>Ajuste nome, seções e tarefas. As alterações valem para os próximos projetos criados a partir deste modelo.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Nome do modelo</label>
+            <Input value={draft.name} onChange={e => setDraft(d => d ? { ...d, name: e.target.value } : d)} />
+          </div>
+
+          <div className="space-y-3">
+            {draft.sections.map((sec, si) => (
+              <div key={si} className="rounded-lg border border-border/60 bg-muted/20 p-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={sec.name}
+                    onChange={e => setSection(si, { name: e.target.value })}
+                    className="font-medium"
+                    placeholder="Nome da seção"
+                  />
+                  <button
+                    onClick={() => setDraft(d => d ? { ...d, sections: d.sections.filter((_, i) => i !== si) } : d)}
+                    className="rounded p-1.5 text-destructive/70 hover:bg-destructive/10 hover:text-destructive"
+                    title="Remover seção"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <ul className="mt-2 space-y-1">
+                  {sec.tasks.map((task, ti) => (
+                    <li key={ti} className="flex items-center gap-2">
+                      <Input
+                        value={task}
+                        onChange={e => setSection(si, { tasks: sec.tasks.map((t, i) => i === ti ? e.target.value : t) })}
+                        className="h-8 text-[12.5px]"
+                        placeholder="Descrição da tarefa"
+                      />
+                      <button
+                        onClick={() => setSection(si, { tasks: sec.tasks.filter((_, i) => i !== ti) })}
+                        className="text-destructive/70 hover:text-destructive"
+                        title="Remover tarefa"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="mt-1 h-7 text-[11.5px]"
+                  onClick={() => setSection(si, { tasks: [...sec.tasks, ''] })}
+                >
+                  <Plus className="mr-1 h-3 w-3" /> Adicionar tarefa
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setDraft(d => d ? { ...d, sections: [...d.sections, { name: 'Nova seção', tasks: [] }] } : d)}
+          >
+            <Plus className="mr-1 h-3.5 w-3.5" /> Nova seção
+          </Button>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button
+            disabled={!draft.name.trim()}
+            onClick={() => {
+              opStore.updateTemplate(draft.id, {
+                name: draft.name.trim(),
+                sections: draft.sections
+                  .map(s => ({ name: s.name.trim(), tasks: s.tasks.map(t => t.trim()).filter(Boolean) }))
+                  .filter(s => s.name.length > 0),
+              });
+              toast.success('Modelo atualizado.');
+              onClose();
+            }}
+          >
+            Salvar alterações
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -382,6 +382,22 @@ export const opStore = {
     persist();
   },
   removeTemplate(id: string) { state = { ...state, templates: state.templates.filter(t => t.id !== id) }; persist(); },
+  updateTemplate(id: string, patch: Partial<Omit<OpTemplate, 'id'>>) {
+    state = { ...state, templates: state.templates.map(t => t.id === id ? { ...t, ...patch } : t) };
+    persist();
+  },
+  duplicateTemplate(id: string) {
+    const tpl = state.templates.find(t => t.id === id);
+    if (!tpl) return null;
+    const copy: OpTemplate = {
+      id: uid(),
+      name: `${tpl.name} (cópia)`,
+      sections: tpl.sections.map(s => ({ name: s.name, tasks: [...s.tasks] })),
+    };
+    state = { ...state, templates: [...state.templates, copy] };
+    persist();
+    return copy.id;
+  },
 
   // Forms
   addForm(name: string) {
