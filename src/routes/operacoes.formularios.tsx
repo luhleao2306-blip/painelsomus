@@ -52,11 +52,40 @@ const FIELD_TYPES: { v: OpFormField['type']; label: string }[] = [
   { v: 'checkbox',         label: 'Checkbox' },
 ];
 
+type ShareRow = { token: string; form: any; created_at: string };
+type SubmissionRow = {
+  id: string;
+  token: string;
+  form_id: string | null;
+  form_name: string | null;
+  form_snapshot: any;
+  answers: Record<string, any>;
+  submitted_at: string;
+};
+
 function OperacoesFormularios() {
   const store = useOpStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [fillingId, setFillingId] = useState<string | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
+  const [shares, setShares] = useState<ShareRow[]>([]);
+  const [submissions, setSubmissions] = useState<SubmissionRow[]>([]);
+  const [viewing, setViewing] = useState<SubmissionRow | null>(null);
+
+  const loadShares = useCallback(async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+    const [{ data: sh }, { data: sub }] = await Promise.all([
+      supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
+      supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
+    ]);
+    setShares((sh ?? []) as any);
+    setSubmissions((sub ?? []) as any);
+  }, []);
+
+  useEffect(() => { loadShares(); }, [loadShares]);
+
+  const submissionsByToken = (t: string) => submissions.filter(s => s.token === t);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
@@ -107,35 +136,188 @@ function OperacoesFormularios() {
         )}
       </div>
 
-      {store.formAnswers.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-display text-base font-semibold mb-3">Respostas preenchidas</h2>
+      <div className="mt-10">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-base font-semibold flex items-center gap-2"><Inbox className="h-4 w-4" /> Links enviados</h2>
+            <p className="text-[11px] text-muted-foreground">Acompanhe o status de cada link compartilhado com clientes.</p>
+          </div>
+          <Button size="sm" variant="ghost" onClick={loadShares}>Atualizar</Button>
+        </div>
+        {shares.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border/60 p-6 text-center text-[12px] text-muted-foreground">
+            Nenhum link enviado ainda. Clique em "Link" no formulário para gerar um.
+          </p>
+        ) : (
           <div className="space-y-2">
-            {store.formAnswers.map(a => {
-              const form = store.forms.find(f => f.id === a.formId);
-              const project = store.projects.find(p => p.id === a.projectId);
+            {shares.map(sh => {
+              const subs = submissionsByToken(sh.token);
+              const answered = subs.length > 0;
+              const latest = subs[0];
               return (
-                <div key={a.id} className="flex items-center gap-3 rounded-lg border border-border/60 bg-card p-3">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="text-[12.5px] font-medium">{form?.name ?? 'Formulário removido'}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {project?.name ?? 'Sem projeto'} · {new Date(a.createdAt).toLocaleDateString('pt-BR')}
-                    </p>
+                <div key={sh.token} className="rounded-lg border border-border/60 bg-card p-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-[200px]">
+                      <p className="text-[12.5px] font-medium">{sh.form?.name ?? 'Formulário'}</p>
+                      <p className="text-[10.5px] text-muted-foreground font-mono">
+                        /f/{sh.token} · enviado em {new Date(sh.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    {answered ? (
+                      <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-0">
+                        <CheckCircle2 className="mr-1 h-3 w-3" /> Recebido{subs.length > 1 ? ` (${subs.length})` : ''}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-0">
+                        <Clock className="mr-1 h-3 w-3" /> Aguardando
+                      </Badge>
+                    )}
+                    <Button size="sm" variant="outline" onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/f/${sh.token}`);
+                      toast.success('Link copiado');
+                    }}>
+                      <Copy className="h-3.5 w-3.5" />
+                    </Button>
+                    {answered && (
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => setViewing(latest)}>
+                          <Eye className="mr-1 h-3.5 w-3.5" /> Ver
+                        </Button>
+                        <Button size="sm" onClick={() => exportSubmissionPDF(latest)}>
+                          <Download className="mr-1 h-3.5 w-3.5" /> PDF
+                        </Button>
+                      </>
+                    )}
                   </div>
+                  {answered && subs.length > 1 && (
+                    <div className="mt-2 pl-7 space-y-1">
+                      {subs.slice(1).map(s => (
+                        <div key={s.id} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                          <span>· Resposta de {new Date(s.submitted_at).toLocaleString('pt-BR')}</span>
+                          <button onClick={() => setViewing(s)} className="underline hover:text-foreground">ver</button>
+                          <button onClick={() => exportSubmissionPDF(s)} className="underline hover:text-foreground">PDF</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <FormBuilderDialog formId={editingId} onClose={() => setEditingId(null)} />
       <FormFillDialog formId={fillingId} onClose={() => setFillingId(null)} />
-      <ShareLinkDialog formId={sharingId} onClose={() => setSharingId(null)} />
+      <ShareLinkDialog formId={sharingId} onClose={() => { setSharingId(null); loadShares(); }} />
+      <SubmissionViewDialog submission={viewing} onClose={() => setViewing(null)} />
     </div>
   );
 }
+
+function formatAnswer(v: any): string {
+  if (v === undefined || v === null || v === '') return '—';
+  if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+  if (Array.isArray(v)) return v.join(', ');
+  return String(v);
+}
+
+function exportSubmissionPDF(sub: SubmissionRow) {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const marginX = 48;
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  let y = 60;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('SOMUS', marginX, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text('Formulário respondido', pageW - marginX, y, { align: 'right' });
+  doc.setTextColor(0);
+
+  y += 26;
+  doc.setDrawColor(220);
+  doc.line(marginX, y, pageW - marginX, y);
+
+  y += 24;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text(sub.form_name ?? 'Formulário', marginX, y);
+  y += 16;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(`Recebido em ${new Date(sub.submitted_at).toLocaleString('pt-BR')}`, marginX, y);
+  doc.setTextColor(0);
+  y += 24;
+
+  const fields: { id: string; label: string }[] = (sub.form_snapshot?.fields ?? []) as any;
+  fields.forEach((f, i) => {
+    const val = formatAnswer(sub.answers?.[f.id]);
+    const label = `${String(i + 1).padStart(2, '0')}. ${f.label}`;
+    if (y > pageH - 80) { doc.addPage(); y = 60; }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(label, marginX, y);
+    y += 14;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(val, pageW - marginX * 2);
+    lines.forEach((ln: string) => {
+      if (y > pageH - 60) { doc.addPage(); y = 60; }
+      doc.text(ln, marginX, y);
+      y += 14;
+    });
+    y += 10;
+  });
+
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text('Enviado com Somus · painelsomus.com', pageW / 2, pageH - 24, { align: 'center' });
+
+  doc.save(`${(sub.form_name ?? 'formulario').replace(/\s+/g, '_')}_${sub.id.slice(0, 6)}.pdf`);
+}
+
+function SubmissionViewDialog({ submission, onClose }: { submission: SubmissionRow | null; onClose: () => void }) {
+  if (!submission) return null;
+  const fields: { id: string; label: string }[] = (submission.form_snapshot?.fields ?? []) as any;
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{submission.form_name ?? 'Formulário'}</DialogTitle>
+          <DialogDescription>
+            Recebido em {new Date(submission.submitted_at).toLocaleString('pt-BR')}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[60vh] overflow-y-auto space-y-4">
+          {fields.map((f, i) => (
+            <div key={f.id} className="rounded-md border border-border/60 p-3">
+              <p className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {String(i + 1).padStart(2, '0')} · {f.label}
+              </p>
+              <p className="mt-1 text-[13px] whitespace-pre-wrap">{formatAnswer(submission.answers?.[f.id])}</p>
+            </div>
+          ))}
+          {fields.length === 0 && (
+            <pre className="text-[12px] whitespace-pre-wrap">{JSON.stringify(submission.answers, null, 2)}</pre>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => exportSubmissionPDF(submission)}>
+            <Download className="mr-2 h-4 w-4" /> Exportar PDF
+          </Button>
+          <Button onClick={onClose}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: () => void }) {
   const store = useOpStore();
