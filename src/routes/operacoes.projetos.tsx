@@ -767,6 +767,19 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
             </Select>
           </div>
           <div>
+            <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Recorrência</label>
+            <Select value={task.recurrence ?? 'nenhuma'} onValueChange={(v) => opStore.updateTask(task.id, { recurrence: v as any })}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="nenhuma">Sem recorrência</SelectItem>
+                <SelectItem value="diaria">Diária</SelectItem>
+                <SelectItem value="semanal">Semanal</SelectItem>
+                <SelectItem value="mensal">Mensal</SelectItem>
+                <SelectItem value="anual">Anual</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">Tags</label>
             <div className="flex flex-wrap items-center gap-1">
               {task.tags.map(tag => (
