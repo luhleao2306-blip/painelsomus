@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { ClipboardList, Plus, Trash2, FileText, X } from 'lucide-react';
+import { ClipboardList, Plus, Trash2, FileText, X, Link as LinkIcon, Copy } from 'lucide-react';
 import { useOpStore, opStore, type OpForm, type OpFormField } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,17 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
+import { toast } from 'sonner';
+
+function buildShareLink(form: OpForm): string {
+  const json = JSON.stringify({ id: form.id, name: form.name, fields: form.fields });
+  const b64 = btoa(unescape(encodeURIComponent(json)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `${window.location.origin}/f/${b64}`;
+}
 
 
 export const Route = createFileRoute('/operacoes/formularios')({
@@ -31,6 +39,7 @@ function OperacoesFormularios() {
   const store = useOpStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [fillingId, setFillingId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
@@ -65,9 +74,12 @@ function OperacoesFormularios() {
             <p className="mt-1 text-[11px] text-muted-foreground">
               {store.formAnswers.filter(a => a.formId === f.id).length} respostas
             </p>
-            <div className="mt-3 flex gap-2">
-              <Button size="sm" variant="outline" className="flex-1" onClick={() => setEditingId(f.id)}>Editar</Button>
-              <Button size="sm" className="flex-1" onClick={() => setFillingId(f.id)}>Preencher</Button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => setEditingId(f.id)}>Editar</Button>
+              <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => setSharingId(f.id)}>
+                <LinkIcon className="mr-1 h-3.5 w-3.5" /> Link
+              </Button>
+              <Button size="sm" className="flex-1 min-w-[90px]" onClick={() => setFillingId(f.id)}>Preencher</Button>
             </div>
           </div>
         ))}
@@ -103,7 +115,45 @@ function OperacoesFormularios() {
 
       <FormBuilderDialog formId={editingId} onClose={() => setEditingId(null)} />
       <FormFillDialog formId={fillingId} onClose={() => setFillingId(null)} />
+      <ShareLinkDialog formId={sharingId} onClose={() => setSharingId(null)} />
     </div>
+  );
+}
+
+function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: () => void }) {
+  const store = useOpStore();
+  const form = store.forms.find(f => f.id === formId);
+  if (!form) return null;
+  const url = buildShareLink(form);
+  const copy = async () => {
+    await navigator.clipboard.writeText(url);
+    toast.success('Link copiado! Envie ao cliente.');
+  };
+  const whatsapp = `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}`;
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Link do formulário</DialogTitle>
+          <DialogDescription>
+            Envie este link para o cliente preencher. Ele abrirá uma página pública com os campos do formulário "{form.name}".
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2">
+          <Input readOnly value={url} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
+          <Button onClick={copy}><Copy className="h-3.5 w-3.5" /></Button>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          Após preencher, o cliente copia as respostas e devolve pelo canal habitual (WhatsApp/e-mail).
+        </p>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" asChild>
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer">Enviar por WhatsApp</a>
+          </Button>
+          <Button onClick={onClose}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
