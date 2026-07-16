@@ -315,7 +315,7 @@ function NewSenhaDialog({
   });
 
   // Prefill when opening
-  useMemo(() => {
+  useEffect(() => {
     if (open) setForm(f => ({ ...f, clientName: defaultClientName ?? f.clientName }));
   }, [open, defaultClientName]);
 
@@ -338,10 +338,14 @@ function NewSenhaDialog({
               onValueChange={(v) => setForm(f => ({ ...f, clientName: v }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um cliente" />
+                <SelectValue placeholder={clientOptions.length ? 'Selecione um cliente' : 'Nenhum cliente cadastrado'} />
               </SelectTrigger>
-              <SelectContent>
-                {clientOptions.map(name => (
+              <SelectContent className="max-h-72">
+                {clientOptions.length === 0 ? (
+                  <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                    Cadastre um cliente primeiro
+                  </div>
+                ) : clientOptions.map(name => (
                   <SelectItem key={name} value={name}>{name}</SelectItem>
                 ))}
               </SelectContent>
