@@ -206,9 +206,10 @@ function PublicFormPage() {
             </span>
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/60">
-            Preencha os campos abaixo com atenção. Ao concluir, você poderá copiar as respostas
-            e devolvê-las à equipe pelo canal habitual.
+            Preencha os campos abaixo com atenção. Ao concluir, suas respostas serão enviadas
+            diretamente para a equipe Somus.
           </p>
+
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur">
