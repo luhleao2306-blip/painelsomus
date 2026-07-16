@@ -137,13 +137,25 @@ function OperacoesFormularios() {
 function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: () => void }) {
   const store = useOpStore();
   const form = store.forms.find(f => f.id === formId);
+  const [url, setUrl] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
+  useState(() => { /* noop */ });
+  // generate link when dialog opens
+  if (form && !url && !loading) {
+    setLoading(true);
+    buildShareLink(form)
+      .then(u => { setUrl(u); setLoading(false); })
+      .catch(err => { toast.error('Não foi possível gerar o link.'); console.error(err); setLoading(false); });
+  }
+
   if (!form) return null;
-  const url = buildShareLink(form);
   const copy = async () => {
+    if (!url) return;
     await navigator.clipboard.writeText(url);
     toast.success('Link copiado! Envie ao cliente.');
   };
-  const whatsapp = `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}`;
+  const whatsapp = url ? `https://wa.me/?text=${encodeURIComponent(`Olá! Por favor preencha este formulário: ${form.name}\n${url}`)}` : '#';
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
@@ -154,14 +166,14 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2">
-          <Input readOnly value={url} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
-          <Button onClick={copy}><Copy className="h-3.5 w-3.5" /></Button>
+          <Input readOnly value={url || 'Gerando link…'} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
+          <Button onClick={copy} disabled={!url}><Copy className="h-3.5 w-3.5" /></Button>
         </div>
         <p className="text-[11px] text-muted-foreground">
           Após preencher, o cliente copia as respostas e devolve pelo canal habitual (WhatsApp/e-mail).
         </p>
         <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild disabled={!url}>
             <a href={whatsapp} target="_blank" rel="noopener noreferrer">Enviar por WhatsApp</a>
           </Button>
           <Button onClick={onClose}>Fechar</Button>
