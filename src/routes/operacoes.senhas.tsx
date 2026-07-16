@@ -5,9 +5,13 @@ import {
   ChevronRight, Building2, Fingerprint,
 } from 'lucide-react';
 import { useOpStore, opStore, type OpSenha } from '@/lib/operacoes-store';
+import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
