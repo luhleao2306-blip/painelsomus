@@ -148,24 +148,68 @@ function CollaboratorsPage() {
     const { data, error } = await (supabase as any).from('collaborators').select('*').order('full_name');
     if (error) {
       toast.error('Erro ao carregar colaboradores');
-    } else {
-      const collabs = (data || []) as Collaborator[];
-      const emails = collabs.map(c => c.email).filter(Boolean) as string[];
-      if (emails.length) {
-        const { data: profs } = await (supabase as any)
-          .from('profiles')
-          .select('email, avatar_url')
-          .in('email', emails);
-        const map = new Map<string, string>();
-        (profs || []).forEach((p: any) => { if (p.email && p.avatar_url) map.set(p.email.toLowerCase(), p.avatar_url); });
-        collabs.forEach(c => {
-          if (!c.avatar_url && c.email && map.has(c.email.toLowerCase())) {
-            c.avatar_url = map.get(c.email.toLowerCase())!;
-          }
-        });
-      }
-      setItems(collabs);
+      setLoading(false);
+      return;
     }
+    const collabs = (data || []) as Collaborator[];
+
+    // Também exibe profiles ativos (usuários com login) que ainda não foram
+    // cadastrados como colaborador — assim a lista nunca fica vazia após signup.
+    const { data: profs } = await (supabase as any)
+      .from('profiles')
+      .select('id, email, full_name, avatar_url, role, status')
+      .eq('status', 'active');
+    const profileList = (profs || []) as Array<{
+      id: string; email: string | null; full_name: string | null;
+      avatar_url: string | null; role: string | null; status: string | null;
+    }>;
+
+    const avatarByEmail = new Map<string, string>();
+    profileList.forEach(p => {
+      if (p.email && p.avatar_url) avatarByEmail.set(p.email.toLowerCase(), p.avatar_url);
+    });
+    collabs.forEach(c => {
+      if (!c.avatar_url && c.email && avatarByEmail.has(c.email.toLowerCase())) {
+        c.avatar_url = avatarByEmail.get(c.email.toLowerCase())!;
+      }
+    });
+
+    const emailsInCollab = new Set(
+      collabs.map(c => (c.email || '').toLowerCase()).filter(Boolean),
+    );
+    const virtual: Collaborator[] = profileList
+      .filter(p => p.email && !emailsInCollab.has(p.email.toLowerCase()))
+      .map(p => ({
+        id: `profile:${p.id}`,
+        full_name: p.full_name || p.email || 'Sem nome',
+        display_name: null,
+        email: p.email,
+        phone: null, birth_date: null, cpf: null, rg: null,
+        address: null, city: null, state: null,
+        avatar_url: p.avatar_url,
+        job_title: null,
+        role_function:
+          p.role === 'master' ? 'Administrador'
+          : p.role === 'project_manager' ? 'Gerente de Projetos'
+          : p.role === 'consultant' ? 'Consultor'
+          : p.role === 'client' ? 'Cliente' : null,
+        department: null,
+        contract_type: null,
+        start_date: null,
+        status: 'ativo',
+        manager_id: null,
+        access_level: 'colaborador',
+        linked_project_ids: [], linked_client_ids: [],
+        payment_type: null, monthly_value: null, hourly_value: null,
+        bank_name: null, bank_agency: null, bank_account: null, bank_account_type: null,
+        pix_key: null, pix_key_type: null,
+        cnpj: null, company_name: null, payment_day: null, financial_notes: null,
+      }));
+
+    const merged = [...collabs, ...virtual].sort((a, b) =>
+      (a.full_name || '').localeCompare(b.full_name || ''),
+    );
+    setItems(merged);
     setLoading(false);
   };
 
