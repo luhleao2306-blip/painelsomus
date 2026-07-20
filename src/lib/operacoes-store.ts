@@ -67,11 +67,12 @@ export type OpSection = { id: string; projectId: string; name: string; order: nu
 export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
 export type OpFolder = { id: string; name: string };
 
-// Modelos: um snapshot de estrutura (seções + tarefas com nome apenas)
+// Modelos: um snapshot de estrutura (seções + tarefas com subtarefas opcionais)
+export type OpTemplateTask = { name: string; subtasks: string[] };
 export type OpTemplate = {
   id: string;
   name: string;
-  sections: { name: string; tasks: string[] }[];
+  sections: { name: string; tasks: OpTemplateTask[] }[];
 };
 
 // Formulários
@@ -118,48 +119,50 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 
 // ============= Seed =============
 
+const t = (name: string, subtasks: string[] = []): OpTemplateTask => ({ name, subtasks });
+
 const SDR_LP_TEMPLATE: OpTemplate = {
   id: 'tpl-sdr-lp',
   name: 'Agente IA SDR + LP',
   sections: [
     { name: 'Ativação', tasks: [
-      'Criar grupo no WhatsApp com o cliente',
-      'Configurar pasta do projeto no Google Drive',
-      'Anexar briefing do cliente preenchido à tarefa',
-      'Ler e validar briefing internamente antes de iniciar o desenvolvimento',
-      'Confirmar acesso ao Kommo do cliente',
+      t('Criar grupo no WhatsApp com o cliente'),
+      t('Configurar pasta do projeto no Google Drive'),
+      t('Anexar briefing do cliente preenchido à tarefa'),
+      t('Ler e validar briefing internamente antes de iniciar o desenvolvimento'),
+      t('Confirmar acesso ao Kommo do cliente'),
     ]},
     { name: 'Desenvolvimento', tasks: [
-      'Redigir System Prompt com base no briefing anexado (bússola, tom, regras)',
-      'Mapear fluxo de conversação e rotas operacionais',
-      'Programar Agente 01 — esqueleto e rotas básicas no Kommo',
-      'Programar Agente 02 — injeção de conhecimento, portfólio e diferenciais',
-      'Aplicar engenharia de prompts (travas, variáveis e limites de escopo)',
-      'Definir estrutura e briefing da Landing Page',
-      'Redigir copywriting da Landing Page (headline, benefícios e CTA)',
-      'Criar design e wireframe da Landing Page',
-      'Integrar formulário da Landing Page ao Kommo e ao agente',
-      'Testar responsividade e velocidade da Landing Page',
+      t('Redigir System Prompt com base no briefing anexado (bússola, tom, regras)'),
+      t('Mapear fluxo de conversação e rotas operacionais'),
+      t('Programar Agente 01 — esqueleto e rotas básicas no Kommo'),
+      t('Programar Agente 02 — injeção de conhecimento, portfólio e diferenciais'),
+      t('Aplicar engenharia de prompts (travas, variáveis e limites de escopo)'),
+      t('Definir estrutura e briefing da Landing Page'),
+      t('Redigir copywriting da Landing Page (headline, benefícios e CTA)'),
+      t('Criar design e wireframe da Landing Page'),
+      t('Integrar formulário da Landing Page ao Kommo e ao agente'),
+      t('Testar responsividade e velocidade da Landing Page'),
     ]},
     { name: 'Finalização', tasks: [
-      'Realizar teste de stress da IA no Kommo (simular leads exigentes)',
-      'Verificar coerência de tom, limites e regras de decisão',
-      'Preencher checklist de aprovação interna',
-      'Submeter agente para aprovação da liderança',
+      t('Realizar teste de stress da IA no Kommo (simular leads exigentes)'),
+      t('Verificar coerência de tom, limites e regras de decisão'),
+      t('Preencher checklist de aprovação interna'),
+      t('Submeter agente para aprovação da liderança'),
     ]},
     { name: 'Entrega', tasks: [
-      'Conectar WhatsApp Business ao Kommo em produção',
-      'Realizar deploy oficial do agente em produção',
-      'Monitoramento intensivo nas primeiras 48h (hypercare)',
-      'Apresentar entrega ao cliente — reunião ou documento formal',
-      'Enviar primeiro relatório de métricas ao cliente',
+      t('Conectar WhatsApp Business ao Kommo em produção'),
+      t('Realizar deploy oficial do agente em produção'),
+      t('Monitoramento intensivo nas primeiras 48h (hypercare)'),
+      t('Apresentar entrega ao cliente — reunião ou documento formal'),
+      t('Enviar primeiro relatório de métricas ao cliente'),
     ]},
     { name: 'Atualização', tasks: [
-      'Otimização mensal de prompts com base em conversas reais',
-      'Atualizar base de conhecimento conforme mudanças do cliente',
-      'Enviar relatório semanal de métricas',
-      'Realizar reunião mensal de revisão estratégica',
-      'Atualizar playbook comercial do cliente',
+      t('Otimização mensal de prompts com base em conversas reais'),
+      t('Atualizar base de conhecimento conforme mudanças do cliente'),
+      t('Enviar relatório semanal de métricas'),
+      t('Realizar reunião mensal de revisão estratégica'),
+      t('Atualizar playbook comercial do cliente'),
     ]},
   ],
 };
@@ -193,15 +196,15 @@ function seed(): Store {
   }));
   const tasks: OpTask[] = [];
   SDR_LP_TEMPLATE.sections.forEach((s, i) => {
-    s.tasks.forEach(t => {
+    s.tasks.forEach(tt => {
       tasks.push({
         id: uid(),
         sectionId: sections[i].id,
-        name: t,
+        name: tt.name,
         status: 'nao_iniciado',
         priority: 'media',
         tags: [],
-        checklist: [],
+        checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
         comments: [],
       });
     });
@@ -243,7 +246,20 @@ function load(): Store {
       window.localStorage.setItem(KEY, JSON.stringify(s));
       return s;
     }
-    return JSON.parse(raw) as Store;
+    const parsed = JSON.parse(raw) as Store;
+    // Backward compat: normalize legacy template tasks (string[] -> OpTemplateTask[])
+    if (Array.isArray(parsed.templates)) {
+      parsed.templates = parsed.templates.map(tpl => ({
+        ...tpl,
+        sections: (tpl.sections ?? []).map((s: any) => ({
+          name: s.name,
+          tasks: (s.tasks ?? []).map((tt: any) =>
+            typeof tt === 'string' ? { name: tt, subtasks: [] } : { name: tt.name ?? '', subtasks: tt.subtasks ?? [] }
+          ),
+        })),
+      }));
+    }
+    return parsed;
   } catch {
     return { cargos: [], users: [], folders: [], projects: [], sections: [], tasks: [], templates: [], forms: [], formAnswers: [], senhas: [] };
   }
@@ -356,10 +372,12 @@ export const opStore = {
     const newSections: OpSection[] = tpl.sections.map((s, i) => ({ id: uid(), projectId, name: s.name, order: i }));
     const newTasks: OpTask[] = [];
     tpl.sections.forEach((s, i) => {
-      s.tasks.forEach(taskName => {
+      s.tasks.forEach(tt => {
         newTasks.push({
-          id: uid(), sectionId: newSections[i].id, name: taskName,
-          status: 'nao_iniciado', priority: 'media', tags: [], checklist: [], comments: [],
+          id: uid(), sectionId: newSections[i].id, name: tt.name,
+          status: 'nao_iniciado', priority: 'media', tags: [],
+          checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
+          comments: [],
         });
       });
     });
@@ -379,7 +397,10 @@ export const opStore = {
       name,
       sections: secs.map(s => ({
         name: s.name,
-        tasks: state.tasks.filter(t => t.sectionId === s.id).map(t => t.name),
+        tasks: state.tasks.filter(t => t.sectionId === s.id).map(t => ({
+          name: t.name,
+          subtasks: t.checklist.map(c => c.text),
+        })),
       })),
     };
     state = { ...state, templates: [...state.templates, tpl] };
@@ -396,7 +417,7 @@ export const opStore = {
     const copy: OpTemplate = {
       id: uid(),
       name: `${tpl.name} (cópia)`,
-      sections: tpl.sections.map(s => ({ name: s.name, tasks: [...s.tasks] })),
+      sections: tpl.sections.map(s => ({ name: s.name, tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })) })),
     };
     state = { ...state, templates: [...state.templates, copy] };
     persist();
