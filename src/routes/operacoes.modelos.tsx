@@ -100,7 +100,10 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
       setDraft({
         id: tpl.id,
         name: tpl.name,
-        sections: tpl.sections.map(s => ({ name: s.name, tasks: [...s.tasks] })),
+        sections: tpl.sections.map(s => ({
+          name: s.name,
+          tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })),
+        })),
       });
     } else {
       setDraft(null);
@@ -109,8 +112,15 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
 
   if (!tpl || !draft) return null;
 
-  const setSection = (idx: number, patch: Partial<{ name: string; tasks: string[] }>) => {
+  const setSection = (idx: number, patch: Partial<{ name: string; tasks: { name: string; subtasks: string[] }[] }>) => {
     setDraft(d => d ? { ...d, sections: d.sections.map((s, i) => i === idx ? { ...s, ...patch } : s) } : d);
+  };
+
+  const updateTask = (si: number, ti: number, patch: Partial<{ name: string; subtasks: string[] }>) => {
+    setDraft(d => d ? { ...d, sections: d.sections.map((s, i) => i === si ? {
+      ...s,
+      tasks: s.tasks.map((t, j) => j === ti ? { ...t, ...patch } : t),
+    } : s) } : d);
   };
 
   return (
@@ -118,7 +128,7 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar modelo</DialogTitle>
-          <DialogDescription>Ajuste nome, seções e tarefas. As alterações valem para os próximos projetos criados a partir deste modelo.</DialogDescription>
+          <DialogDescription>Ajuste nome, seções, tarefas e subtarefas. As alterações valem para os próximos projetos criados a partir deste modelo.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -146,22 +156,56 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
                   </button>
                 </div>
 
-                <ul className="mt-2 space-y-1">
+                <ul className="mt-2 space-y-2">
                   {sec.tasks.map((task, ti) => (
-                    <li key={ti} className="flex items-center gap-2">
-                      <Input
-                        value={task}
-                        onChange={e => setSection(si, { tasks: sec.tasks.map((t, i) => i === ti ? e.target.value : t) })}
-                        className="h-8 text-[12.5px]"
-                        placeholder="Descrição da tarefa"
-                      />
-                      <button
-                        onClick={() => setSection(si, { tasks: sec.tasks.filter((_, i) => i !== ti) })}
-                        className="text-destructive/70 hover:text-destructive"
-                        title="Remover tarefa"
+                    <li key={ti} className="rounded-md border border-border/40 bg-background/40 p-2">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={task.name}
+                          onChange={e => updateTask(si, ti, { name: e.target.value })}
+                          className="h-8 text-[12.5px]"
+                          placeholder="Descrição da tarefa"
+                        />
+                        <button
+                          onClick={() => setSection(si, { tasks: sec.tasks.filter((_, i) => i !== ti) })}
+                          className="text-destructive/70 hover:text-destructive"
+                          title="Remover tarefa"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
+                      {task.subtasks.length > 0 && (
+                        <ul className="mt-2 space-y-1 pl-4 border-l border-border/40">
+                          {task.subtasks.map((st, sti) => (
+                            <li key={sti} className="flex items-center gap-2">
+                              <span className="text-muted-foreground text-[11px]">↳</span>
+                              <Input
+                                value={st}
+                                onChange={e => updateTask(si, ti, { subtasks: task.subtasks.map((x, i) => i === sti ? e.target.value : x) })}
+                                className="h-7 text-[11.5px]"
+                                placeholder="Sub tarefa"
+                              />
+                              <button
+                                onClick={() => updateTask(si, ti, { subtasks: task.subtasks.filter((_, i) => i !== sti) })}
+                                className="text-destructive/70 hover:text-destructive"
+                                title="Remover sub tarefa"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="mt-1 h-6 px-2 text-[10.5px] text-muted-foreground"
+                        onClick={() => updateTask(si, ti, { subtasks: [...task.subtasks, ''] })}
                       >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
+                        <Plus className="mr-1 h-3 w-3" /> Adicionar sub tarefa
+                      </Button>
                     </li>
                   ))}
                 </ul>
@@ -170,7 +214,7 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
                   size="sm"
                   variant="ghost"
                   className="mt-1 h-7 text-[11.5px]"
-                  onClick={() => setSection(si, { tasks: [...sec.tasks, ''] })}
+                  onClick={() => setSection(si, { tasks: [...sec.tasks, { name: '', subtasks: [] }] })}
                 >
                   <Plus className="mr-1 h-3 w-3" /> Adicionar tarefa
                 </Button>
@@ -195,7 +239,15 @@ function EditTemplateDialog({ templateId, onClose }: { templateId: string | null
               opStore.updateTemplate(draft.id, {
                 name: draft.name.trim(),
                 sections: draft.sections
-                  .map(s => ({ name: s.name.trim(), tasks: s.tasks.map(t => t.trim()).filter(Boolean) }))
+                  .map(s => ({
+                    name: s.name.trim(),
+                    tasks: s.tasks
+                      .map(t => ({
+                        name: t.name.trim(),
+                        subtasks: t.subtasks.map(x => x.trim()).filter(Boolean),
+                      }))
+                      .filter(t => t.name.length > 0),
+                  }))
                   .filter(s => s.name.length > 0),
               });
               toast.success('Modelo atualizado.');
