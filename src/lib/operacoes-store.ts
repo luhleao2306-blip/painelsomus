@@ -417,7 +417,7 @@ export const opStore = {
     const copy: OpTemplate = {
       id: uid(),
       name: `${tpl.name} (cópia)`,
-      sections: tpl.sections.map(s => ({ name: s.name, tasks: [...s.tasks] })),
+      sections: tpl.sections.map(s => ({ name: s.name, tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })) })),
     };
     state = { ...state, templates: [...state.templates, copy] };
     persist();
