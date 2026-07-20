@@ -357,7 +357,15 @@ function ListView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
               </div>
             </div>
             <div className="divide-y divide-border/60">
-              {tasks.map(t => <TaskRow key={t.id} task={t} onOpen={() => onOpenTask(t.id)} />)}
+              {tasks.map((t, idx) => (
+                <TaskRow
+                  key={t.id}
+                  task={t}
+                  onOpen={() => onOpenTask(t.id)}
+                  canMoveUp={idx > 0}
+                  canMoveDown={idx < tasks.length - 1}
+                />
+              ))}
               {tasks.length === 0 && (
                 <div className="px-4 py-3 text-[11.5px] italic text-muted-foreground">Nenhuma tarefa.</div>
               )}
