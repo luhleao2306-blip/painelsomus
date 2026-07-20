@@ -359,10 +359,12 @@ export const opStore = {
     const newSections: OpSection[] = tpl.sections.map((s, i) => ({ id: uid(), projectId, name: s.name, order: i }));
     const newTasks: OpTask[] = [];
     tpl.sections.forEach((s, i) => {
-      s.tasks.forEach(taskName => {
+      s.tasks.forEach(tt => {
         newTasks.push({
-          id: uid(), sectionId: newSections[i].id, name: taskName,
-          status: 'nao_iniciado', priority: 'media', tags: [], checklist: [], comments: [],
+          id: uid(), sectionId: newSections[i].id, name: tt.name,
+          status: 'nao_iniciado', priority: 'media', tags: [],
+          checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
+          comments: [],
         });
       });
     });
