@@ -384,7 +384,10 @@ export const opStore = {
       name,
       sections: secs.map(s => ({
         name: s.name,
-        tasks: state.tasks.filter(t => t.sectionId === s.id).map(t => t.name),
+        tasks: state.tasks.filter(t => t.sectionId === s.id).map(t => ({
+          name: t.name,
+          subtasks: t.checklist.map(c => c.text),
+        })),
       })),
     };
     state = { ...state, templates: [...state.templates, tpl] };
