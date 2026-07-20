@@ -363,6 +363,33 @@ export const opStore = {
     persist();
   },
   removeTask(id: string) { state = { ...state, tasks: state.tasks.filter(t => t.id !== id) }; persist(); },
+  moveTask(id: string, direction: 'up' | 'down') {
+    const task = state.tasks.find(t => t.id === id);
+    if (!task) return;
+    const siblings = state.tasks.filter(t => t.sectionId === task.sectionId);
+    const idx = siblings.findIndex(t => t.id === id);
+    const swapWith = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapWith < 0 || swapWith >= siblings.length) return;
+    const other = siblings[swapWith];
+    const tasks = [...state.tasks];
+    const i1 = tasks.findIndex(t => t.id === task.id);
+    const i2 = tasks.findIndex(t => t.id === other.id);
+    [tasks[i1], tasks[i2]] = [tasks[i2], tasks[i1]];
+    state = { ...state, tasks };
+    persist();
+  },
+  reorderTask(id: string, targetId: string, position: 'before' | 'after' = 'before') {
+    if (id === targetId) return;
+    const src = state.tasks.find(t => t.id === id);
+    const tgt = state.tasks.find(t => t.id === targetId);
+    if (!src || !tgt) return;
+    const tasks = state.tasks.filter(t => t.id !== id);
+    const moved = { ...src, sectionId: tgt.sectionId };
+    const idx = tasks.findIndex(t => t.id === targetId);
+    tasks.splice(position === 'before' ? idx : idx + 1, 0, moved);
+    state = { ...state, tasks };
+    persist();
+  },
 
   // Templates
   applyTemplate(templateId: string, folderId: string, projectName: string) {

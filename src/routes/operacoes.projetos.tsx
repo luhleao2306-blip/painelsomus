@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import {
   Plus, Trash2, ChevronRight, ChevronDown, FolderKanban, LayoutList,
   KanbanSquare, GanttChart, LayoutGrid, Save, X, MessageSquare, Check, Tag,
-  MoreHorizontal, Search, Sparkles, FolderPlus, FilePlus,
+  MoreHorizontal, Search, Sparkles, FolderPlus, FilePlus, GripVertical, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import {
@@ -357,7 +357,15 @@ function ListView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
               </div>
             </div>
             <div className="divide-y divide-border/60">
-              {tasks.map(t => <TaskRow key={t.id} task={t} onOpen={() => onOpenTask(t.id)} />)}
+              {tasks.map((t, idx) => (
+                <TaskRow
+                  key={t.id}
+                  task={t}
+                  onOpen={() => onOpenTask(t.id)}
+                  canMoveUp={idx > 0}
+                  canMoveDown={idx < tasks.length - 1}
+                />
+              ))}
               {tasks.length === 0 && (
                 <div className="px-4 py-3 text-[11.5px] italic text-muted-foreground">Nenhuma tarefa.</div>
               )}
@@ -374,13 +382,59 @@ function ListView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
   );
 }
 
-function TaskRow({ task, onOpen }: { task: OpTask; onOpen: () => void }) {
+function TaskRow({
+  task, onOpen, canMoveUp = true, canMoveDown = true,
+}: { task: OpTask; onOpen: () => void; canMoveUp?: boolean; canMoveDown?: boolean }) {
   const store = useOpStore();
   const meta = STATUS_META[task.status];
   void store.users.find(u => u.id === task.assigneeId);
   const done = task.checklist.filter(c => c.done).length;
+  const [dragOver, setDragOver] = useState<'top' | 'bottom' | null>(null);
   return (
-    <div className="flex items-center gap-2 px-3 py-2 hover:bg-muted/20">
+    <div
+      className={`relative flex items-center gap-2 px-3 py-2 hover:bg-muted/20 ${
+        dragOver === 'top' ? 'border-t-2 border-t-primary' : dragOver === 'bottom' ? 'border-b-2 border-b-primary' : ''
+      }`}
+      onDragOver={e => {
+        e.preventDefault();
+        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+        setDragOver(e.clientY < rect.top + rect.height / 2 ? 'top' : 'bottom');
+      }}
+      onDragLeave={() => setDragOver(null)}
+      onDrop={e => {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData('text/task-id');
+        const pos = dragOver === 'top' ? 'before' : 'after';
+        setDragOver(null);
+        if (draggedId && draggedId !== task.id) opStore.reorderTask(draggedId, task.id, pos);
+      }}
+    >
+      <div
+        draggable
+        onDragStart={e => { e.dataTransfer.setData('text/task-id', task.id); e.dataTransfer.effectAllowed = 'move'; }}
+        className="flex cursor-grab items-center text-muted-foreground/50 hover:text-foreground active:cursor-grabbing"
+        title="Arrastar para reordenar"
+      >
+        <GripVertical className="h-4 w-4" />
+      </div>
+      <div className="flex flex-col">
+        <button
+          onClick={() => opStore.moveTask(task.id, 'up')}
+          disabled={!canMoveUp}
+          className="rounded p-0.5 text-muted-foreground hover:bg-muted disabled:opacity-30"
+          title="Mover para cima"
+        >
+          <ArrowUp className="h-3 w-3" />
+        </button>
+        <button
+          onClick={() => opStore.moveTask(task.id, 'down')}
+          disabled={!canMoveDown}
+          className="rounded p-0.5 text-muted-foreground hover:bg-muted disabled:opacity-30"
+          title="Mover para baixo"
+        >
+          <ArrowDown className="h-3 w-3" />
+        </button>
+      </div>
       <input
         type="checkbox"
         checked={task.status === 'concluido'}
