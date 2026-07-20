@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import {
   Plus, Trash2, ChevronRight, ChevronDown, FolderKanban, LayoutList,
   KanbanSquare, GanttChart, LayoutGrid, Save, X, MessageSquare, Check, Tag,
-  MoreHorizontal, Search, Sparkles, FolderPlus, FilePlus,
+  MoreHorizontal, Search, Sparkles, FolderPlus, FilePlus, GripVertical, ArrowUp, ArrowDown,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import {
