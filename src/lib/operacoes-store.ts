@@ -246,7 +246,20 @@ function load(): Store {
       window.localStorage.setItem(KEY, JSON.stringify(s));
       return s;
     }
-    return JSON.parse(raw) as Store;
+    const parsed = JSON.parse(raw) as Store;
+    // Backward compat: normalize legacy template tasks (string[] -> OpTemplateTask[])
+    if (Array.isArray(parsed.templates)) {
+      parsed.templates = parsed.templates.map(tpl => ({
+        ...tpl,
+        sections: (tpl.sections ?? []).map((s: any) => ({
+          name: s.name,
+          tasks: (s.tasks ?? []).map((tt: any) =>
+            typeof tt === 'string' ? { name: tt, subtasks: [] } : { name: tt.name ?? '', subtasks: tt.subtasks ?? [] }
+          ),
+        })),
+      }));
+    }
+    return parsed;
   } catch {
     return { cargos: [], users: [], folders: [], projects: [], sections: [], tasks: [], templates: [], forms: [], formAnswers: [], senhas: [] };
   }
