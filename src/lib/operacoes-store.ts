@@ -196,15 +196,15 @@ function seed(): Store {
   }));
   const tasks: OpTask[] = [];
   SDR_LP_TEMPLATE.sections.forEach((s, i) => {
-    s.tasks.forEach(t => {
+    s.tasks.forEach(tt => {
       tasks.push({
         id: uid(),
         sectionId: sections[i].id,
-        name: t,
+        name: tt.name,
         status: 'nao_iniciado',
         priority: 'media',
         tags: [],
-        checklist: [],
+        checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
         comments: [],
       });
     });
