@@ -67,11 +67,12 @@ export type OpSection = { id: string; projectId: string; name: string; order: nu
 export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
 export type OpFolder = { id: string; name: string };
 
-// Modelos: um snapshot de estrutura (seções + tarefas com nome apenas)
+// Modelos: um snapshot de estrutura (seções + tarefas com subtarefas opcionais)
+export type OpTemplateTask = { name: string; subtasks: string[] };
 export type OpTemplate = {
   id: string;
   name: string;
-  sections: { name: string; tasks: string[] }[];
+  sections: { name: string; tasks: OpTemplateTask[] }[];
 };
 
 // Formulários
