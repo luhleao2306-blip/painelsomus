@@ -39,7 +39,8 @@ function MinhasDemandas() {
   const tasks = useMemo(() => {
     if (!opUser) return [];
     return store.tasks
-      .filter(t => t.assigneeId === opUser.id && t.status !== 'concluido')
+      .filter(t => t.assigneeId === opUser.id)
+      .filter(t => t.status !== 'concluido' || t.status === 'concluido') // Mantém tudo para teste, mas vamos filtrar depois
       .filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
         if (!a.dueDate) return 1;
