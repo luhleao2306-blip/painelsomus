@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, type OpStatus,
+  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, type OpStatus, opStore,
 } from '@/lib/operacoes-store';
+import { toast } from 'sonner';
+import { UploadCloud, Loader2 } from 'lucide-react';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
