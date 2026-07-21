@@ -907,10 +907,11 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
           <div className="mt-1 space-y-2">
             {task.comments.map(c => {
               const author = store.users.find(u => u.id === c.authorId);
+              const displayName = c.authorName ?? author?.name ?? 'Desconhecido';
               return (
                 <div key={c.id} className="rounded-md border border-border/60 bg-muted/20 p-2">
                   <div className="mb-0.5 flex items-center gap-2 text-[10.5px] text-muted-foreground">
-                    <span className="font-semibold text-foreground">{author?.name ?? 'Desconhecido'}</span>
+                    <span className="font-semibold text-foreground">{displayName}</span>
                     <span>·</span>
                     <span>{new Date(c.createdAt).toLocaleString('pt-BR')}</span>
                   </div>
@@ -923,7 +924,7 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
               <Textarea value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="Escreva um comentário..." rows={2} className="text-[12px]" />
               <Button size="sm" onClick={() => {
                 if (newComment.trim() && currentUser) {
-                  opStore.addComment(task.id, currentUser.id, newComment.trim());
+                  opStore.addComment(task.id, currentUser.id, newComment.trim(), currentUser.name);
                   setNewComment('');
                 }
               }}>Enviar</Button>
