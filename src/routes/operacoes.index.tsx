@@ -143,6 +143,17 @@ function OperacoesPainel() {
               >
                 Novo projeto por modelo
               </Link>
+              <button
+                type="button"
+                onClick={handleForceSync}
+                disabled={syncing}
+                title="Envia dados de Operações que ainda estão no seu navegador para o Lovable Cloud, tornando-os visíveis para todo o time."
+                className="inline-flex items-center gap-1.5 rounded-md border border-amber-400/30 bg-amber-400/10 px-3.5 py-2 text-[12.5px] font-medium text-amber-200 transition hover:bg-amber-400/15 disabled:opacity-60"
+              >
+                {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
+                {syncing ? 'Sincronizando…' : 'Sincronizar dados locais'}
+              </button>
+
             </div>
           </div>
           {/* Progress ring */}
