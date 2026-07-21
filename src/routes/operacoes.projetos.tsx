@@ -22,6 +22,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
+import { AttachmentsPanel } from '@/components/shared/AttachmentsPanel';
 
 export const Route = createFileRoute('/operacoes/projetos')({
   component: OperacoesProjetos,
@@ -910,6 +911,17 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
             </div>
           </div>
         </div>
+
+
+
+        <div className="border-t pt-4">
+          <label className="mb-2 block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Anexos
+          </label>
+          <AttachmentsPanel entityType="task" entityId={task.id} />
+        </div>
+
+
 
         <DialogFooter>
           <Button variant="ghost" className="text-destructive" onClick={() => { opStore.removeTask(task.id); onClose(); }}>Excluir tarefa</Button>
