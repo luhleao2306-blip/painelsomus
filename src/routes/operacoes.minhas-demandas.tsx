@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, getTaskClientName, type OpTask, opStore,
+  useOpStore, STATUS_META, getTaskClientName, getTaskProjectName, type OpTask, opStore,
 } from '@/lib/operacoes-store';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
