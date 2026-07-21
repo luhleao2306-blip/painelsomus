@@ -35,7 +35,7 @@ export type Cargo = {
 
 export type OpUser = { id: string; name: string; cargoId: string };
 
-export type OpComment = { id: string; authorId: string; text: string; createdAt: string };
+export type OpComment = { id: string; authorId: string; authorName?: string; text: string; createdAt: string };
 
 export type OpRecurrence = 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
 
@@ -577,8 +577,8 @@ export const opStore = {
     const u = patchTaskLocal(taskId, t => ({ ...t, checklist: t.checklist.filter(i => i.id !== itemId) }));
     if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
-  addComment(taskId: string, authorId: string, text: string) {
-    const c: OpComment = { id: uid(), authorId, text, createdAt: new Date().toISOString() };
+  addComment(taskId: string, authorId: string, text: string, authorName?: string) {
+    const c: OpComment = { id: uid(), authorId, authorName, text, createdAt: new Date().toISOString() };
     const u = patchTaskLocal(taskId, t => ({ ...t, comments: [...t.comments, c] }));
     if (u) bg(supabase.from('op_tasks').update({ comments: u.comments, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
