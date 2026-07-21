@@ -22,6 +22,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
+import { AttachmentsPanel } from '@/components/shared/AttachmentsPanel';
 
 export const Route = createFileRoute('/operacoes/projetos')({
   component: OperacoesProjetos,
