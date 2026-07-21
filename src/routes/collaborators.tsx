@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Search, Users, Pencil, Trash2, Lock, Cake, Link as LinkIcon } from 'lucide-react';
+import { Plus, Search, Users, Pencil, Trash2, Lock, Cake, Link as LinkIcon, KeyRound } from 'lucide-react';
 import { InviteLinksDialog } from '@/components/collaborators/InviteLinksDialog';
 import { toast } from 'sonner';
 
@@ -136,6 +136,11 @@ function CollaboratorsPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Collaborator | null>(null);
   const [form, setForm] = useState<Partial<Collaborator>>(emptyForm);
+
+  const [pwdOpen, setPwdOpen] = useState(false);
+  const [pwdTarget, setPwdTarget] = useState<Collaborator | null>(null);
+  const [pwdValue, setPwdValue] = useState('');
+  const [pwdSaving, setPwdSaving] = useState(false);
 
   useEffect(() => {
     if (!profileLoading && !isAdmin) {
@@ -282,6 +287,57 @@ function CollaboratorsPage() {
     load();
   };
 
+  const openPwd = (c: Collaborator) => {
+    if (!c.email) {
+      toast.error('Colaborador sem e-mail vinculado — não é possível alterar a senha.');
+      return;
+    }
+    setPwdTarget(c);
+    setPwdValue('');
+    setPwdOpen(true);
+  };
+
+  const savePwd = async () => {
+    if (!pwdTarget?.email) return;
+    if (pwdValue.length < 6) {
+      toast.error('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+    if (role !== 'master') {
+      toast.error('Apenas o Administrador master pode alterar senhas.');
+      return;
+    }
+    setPwdSaving(true);
+    try {
+      // Descobre o user_id do auth pelo e-mail via profiles
+      const { data: prof, error: pErr } = await (supabase as any)
+        .from('profiles')
+        .select('id')
+        .ilike('email', pwdTarget.email)
+        .maybeSingle();
+      if (pErr || !prof?.id) {
+        toast.error('Usuário de login não encontrado para este e-mail.');
+        setPwdSaving(false);
+        return;
+      }
+      const { error } = await supabase.functions.invoke('admin-update-password', {
+        body: { user_id: prof.id, password: pwdValue },
+      });
+      if (error) {
+        toast.error('Erro ao alterar senha: ' + (error.message || 'tente novamente'));
+      } else {
+        toast.success('Senha alterada com sucesso.');
+        setPwdOpen(false);
+        setPwdTarget(null);
+        setPwdValue('');
+      }
+    } catch (e: any) {
+      toast.error('Erro ao alterar senha: ' + (e?.message ?? 'desconhecido'));
+    } finally {
+      setPwdSaving(false);
+    }
+  };
+
   const setField = (k: keyof Collaborator, v: any) => setForm(prev => ({ ...prev, [k]: v }));
 
   if (!isAdmin) return null;
@@ -368,11 +424,14 @@ function CollaboratorsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => startEdit(c)}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => startEdit(c)} title="Editar"><Pencil className="h-4 w-4" /></Button>
+                        {role === 'master' && c.email && (
+                          <Button size="sm" variant="ghost" onClick={() => openPwd(c)} title="Alterar senha"><KeyRound className="h-4 w-4" /></Button>
+                        )}
                         {c.status !== 'inativo' && (
                           <Button size="sm" variant="ghost" onClick={() => inactivate(c)} title="Inativar"><Lock className="h-4 w-4" /></Button>
                         )}
-                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(c)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(c)} title="Excluir"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   );
@@ -501,6 +560,37 @@ function CollaboratorsPage() {
         </DialogContent>
       </Dialog>
       <InviteLinksDialog open={invitesOpen} onOpenChange={setInvitesOpen} />
+
+      <Dialog open={pwdOpen} onOpenChange={(o) => { setPwdOpen(o); if (!o) { setPwdTarget(null); setPwdValue(''); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Alterar senha</DialogTitle>
+            <DialogDescription>
+              Definir nova senha para <span className="font-semibold">{pwdTarget?.full_name}</span>
+              {pwdTarget?.email ? <> ({pwdTarget.email})</> : null}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label>Nova senha</Label>
+            <Input
+              type="text"
+              autoFocus
+              value={pwdValue}
+              onChange={(e) => setPwdValue(e.target.value)}
+              placeholder="Mínimo de 6 caracteres"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              A senha será atualizada imediatamente. Comunique o colaborador em canal seguro.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPwdOpen(false)} disabled={pwdSaving}>Cancelar</Button>
+            <Button onClick={savePwd} disabled={pwdSaving || pwdValue.length < 6}>
+              {pwdSaving ? 'Alterando…' : 'Alterar senha'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
