@@ -49,17 +49,26 @@ function OperacoesPainel() {
   }, [store]);
 
   const maxByStatus = Math.max(1, ...Object.values(stats.byStatus));
-  const workload = store.users
-    .map(u => ({ user: u, count: stats.byAssignee[u.id] ?? 0 }))
-    .sort((a, b) => b.count - a.count);
-  const maxWorkload = Math.max(1, ...workload.map(w => w.count));
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+
+  // Demandas diárias por pessoa (tarefas de hoje + em atraso, não concluídas)
+  const dailyByUser = store.users.map(u => {
+    const items = store.tasks
+      .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.dueDate)
+      .map(t => ({ t, d: new Date(t.dueDate!) }))
+      .filter(({ d }) => d < tomorrow) // hoje ou atrasadas
+      .sort((a, b) => a.d.getTime() - b.d.getTime());
+    return { user: u, items };
+  }).sort((a, b) => b.items.length - a.items.length);
+
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
     .map(t => ({ t, d: new Date(t.dueDate!) }))
     .sort((a, b) => a.d.getTime() - b.d.getTime())
     .slice(0, 6);
+
 
   return (
     <motion.div
@@ -218,25 +227,29 @@ function OperacoesPainel() {
           </div>
         </div>
 
-        {/* Workload */}
+        {/* Demandas diárias por pessoa */}
         <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="font-display text-base font-semibold">Carga da alcateia</h2>
-              <p className="text-[11px] text-muted-foreground">Tarefas abertas por pessoa · o gargalo mora aqui</p>
+              <h2 className="font-display text-base font-semibold inline-flex items-center gap-2">
+                <CalendarClock className="h-4 w-4" /> Demandas diárias
+              </h2>
+              <p className="text-[11px] text-muted-foreground">
+                O que cada um precisa entregar hoje · atrasadas contam
+              </p>
             </div>
-            <Link to="/operacoes/performance" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground hover:text-foreground">
-              Ver performance <ArrowRight className="h-3 w-3" />
-            </Link>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              {today.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
+            </span>
           </div>
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
-            {workload.map(({ user: u, count }) => {
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {dailyByUser.map(({ user: u, items }) => {
               const cargo = store.cargos.find(c => c.id === u.cargoId);
               const Icon = cargo ? ICONS[cargo.icon] : Star;
-              const pct = Math.round((count / maxWorkload) * 100);
+              const overdueCount = items.filter(({ d }) => d < today).length;
               return (
                 <div key={u.id} className="rounded-lg border border-border/60 bg-background p-3">
-                  <div className="mb-2 flex items-center gap-2.5">
+                  <div className="mb-2.5 flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground font-mono text-[10.5px] font-bold text-background">
                       {u.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
                     </div>
@@ -248,16 +261,58 @@ function OperacoesPainel() {
                         </span>
                       )}
                     </div>
-                    <span className="font-mono text-[11px] font-semibold">{count}</span>
+                    <div className="text-right">
+                      <div className="font-mono text-[13px] font-semibold leading-none">{items.length}</div>
+                      {overdueCount > 0 && (
+                        <div className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-red-600 dark:text-red-400">
+                          {overdueCount} atr.
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
-                  </div>
+                  {items.length === 0 ? (
+                    <div className="rounded-md border border-dashed border-border/60 px-2 py-3 text-center text-[11px] text-muted-foreground">
+                      Sem demandas para hoje.
+                    </div>
+                  ) : (
+                    <ul className="space-y-1.5">
+                      {items.slice(0, 5).map(({ t, d }) => {
+                        const isOverdue = d < today;
+                        const meta = STATUS_META[t.status];
+                        return (
+                          <li key={t.id}>
+                            <Link
+                              to="/operacoes/projetos"
+                              className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 transition ${
+                                isOverdue
+                                  ? 'border-red-500/40 bg-red-500/5 hover:border-red-500/60'
+                                  : 'border-border/50 bg-background hover:border-foreground/40'
+                              }`}
+                            >
+                              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
+                              <span className="min-w-0 flex-1 truncate text-[11.5px]">{t.name}</span>
+                              <span className={`shrink-0 font-mono text-[9.5px] uppercase tracking-wider ${
+                                isOverdue ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
+                              }`}>
+                                {isOverdue ? 'atraso' : 'hoje'}
+                              </span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                      {items.length > 5 && (
+                        <li className="pt-0.5 text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                          + {items.length - 5} demandas
+                        </li>
+                      )}
+                    </ul>
+                  )}
                 </div>
               );
             })}
           </div>
         </div>
+
 
         {/* Upcoming deadlines */}
         <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
