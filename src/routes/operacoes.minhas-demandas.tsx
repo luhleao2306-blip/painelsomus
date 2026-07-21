@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, CARGO_COLOR_MAP, getTaskClientName, type OpTask,
+  useOpStore, STATUS_META, CARGO_COLOR_MAP, getTaskClientName, type OpTask, opStore,
 } from '@/lib/operacoes-store';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
   CalendarClock, CheckCircle2, Clock, AlertTriangle, ArrowLeft, Filter, Search,
+  Calendar, CheckCircle, ListChecks, MessageSquare, Plus, Trash2, GripVertical, ArrowUp, ArrowDown,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useProfile } from '@/hooks/use-profile';
 import { useProfile } from '@/hooks/use-profile';
 
 export const Route = createFileRoute('/operacoes/minhas-demandas')({
