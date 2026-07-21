@@ -629,11 +629,16 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                       onClick={() => onOpenTask(t.id)}
                       className="group cursor-grab rounded-md border border-border/60 bg-card p-2.5 transition-all hover:-translate-y-px hover:border-foreground/30 hover:shadow-md active:cursor-grabbing"
                     >
-                      {t.priority === 'alta' && (
-                        <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-red-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
-                          <span className="h-1 w-1 rounded-full bg-red-500" /> Alta
-                        </div>
-                      )}
+                      <div className="mb-1 flex items-center gap-1">
+                        <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                          {getTaskClientName(store, t)}
+                        </span>
+                        {t.priority === 'alta' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                            <span className="h-1 w-1 rounded-full bg-red-500" /> Alta
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[12px] leading-snug">{t.name}</p>
                       <div className="mt-2 flex items-center gap-1.5 text-[10px]">
                         {assignee && (
