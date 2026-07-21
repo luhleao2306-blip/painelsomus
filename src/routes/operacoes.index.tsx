@@ -49,17 +49,26 @@ function OperacoesPainel() {
   }, [store]);
 
   const maxByStatus = Math.max(1, ...Object.values(stats.byStatus));
-  const workload = store.users
-    .map(u => ({ user: u, count: stats.byAssignee[u.id] ?? 0 }))
-    .sort((a, b) => b.count - a.count);
-  const maxWorkload = Math.max(1, ...workload.map(w => w.count));
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+
+  // Demandas diárias por pessoa (tarefas de hoje + em atraso, não concluídas)
+  const dailyByUser = store.users.map(u => {
+    const items = store.tasks
+      .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.dueDate)
+      .map(t => ({ t, d: new Date(t.dueDate!) }))
+      .filter(({ d }) => d < tomorrow) // hoje ou atrasadas
+      .sort((a, b) => a.d.getTime() - b.d.getTime());
+    return { user: u, items };
+  }).sort((a, b) => b.items.length - a.items.length);
+
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
     .map(t => ({ t, d: new Date(t.dueDate!) }))
     .sort((a, b) => a.d.getTime() - b.d.getTime())
     .slice(0, 6);
+
 
   return (
     <motion.div
