@@ -31,21 +31,27 @@ export function BirthdayWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from('collaborators')
-      .select('id, full_name, display_name, birth_date, job_title, avatar_url, profile_id, profiles:profile_id(avatar_url, avatar_key)')
-      .eq('status', 'ativo')
-      .not('birth_date', 'is', null)
-      .then(({ data }) => {
-        const mapped = (data ?? []).map((r: any) => ({
-          ...r,
-          profile_avatar: r.profiles?.avatar_url ?? null,
-          avatar_key: r.profiles?.avatar_key ?? null,
-        })) as Birthday[];
+    (supabase as any)
+      .rpc('list_collaborators_public')
+      .then(({ data }: { data: any[] | null }) => {
+        const mapped = (data ?? [])
+          .filter((r) => r.status === 'ativo' && r.birth_date)
+          .map((r: any) => ({
+            id: r.id,
+            full_name: r.full_name,
+            display_name: r.display_name,
+            birth_date: r.birth_date,
+            job_title: r.job_title,
+            avatar_url: r.avatar_url,
+            profile_id: r.profile_id,
+            profile_avatar: r.profile_avatar_url ?? null,
+            avatar_key: r.profile_avatar_key ?? null,
+          })) as Birthday[];
         setRows(mapped);
         setLoading(false);
       });
   }, []);
+
 
   const upcoming = useMemo<Enriched[]>(() => {
     const today = new Date();
