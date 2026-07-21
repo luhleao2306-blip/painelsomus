@@ -6,9 +6,47 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+function jsonResponse(body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+}
+
+function friendlyAuthMessage(message: string) {
+  if (/password|pwned|leaked|compromised|hibp|breached/i.test(message)) {
+    return 'Essa senha foi recusada pela proteção de segurança. Gere uma senha mais forte e única.'
+  }
+  if (/not found|unable to validate|invalid/i.test(message)) {
+    return 'Usuário de login não encontrado para este colaborador.'
+  }
+  return message
+}
+
+async function findUserIdByEmail(supabaseClient: ReturnType<typeof createClient>, email: string) {
+  const normalizedEmail = email.trim().toLowerCase()
+  let page = 1
+  const perPage = 200
+
+  while (page <= 10) {
+    const { data, error } = await supabaseClient.auth.admin.listUsers({ page, perPage })
+    if (error) throw error
+    const match = data?.users?.find((user) => user.email?.toLowerCase() === normalizedEmail)
+    if (match?.id) return match.id
+    if (!data?.users || data.users.length < perPage) break
+    page += 1
+  }
+
+  return null
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
+  }
+
+  if (req.method !== 'POST') {
+    return jsonResponse({ error: 'Método não permitido' }, 405)
   }
 
   try {
@@ -19,47 +57,47 @@ serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'No authorization header' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ error: 'Sessão expirada. Faça login novamente e tente alterar a senha.' }, 401)
     }
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(authHeader.replace('Bearer ', ''))
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid token' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ error: 'Sessão inválida. Faça login novamente e tente alterar a senha.' }, 401)
     }
 
     const { data: profile } = await supabaseClient
       .from('profiles').select('role').eq('id', user.id).single()
 
     if (profile?.role !== 'master') {
-      return new Response(JSON.stringify({ error: 'Unauthorized: Only master admins can change passwords' }), {
-        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      return jsonResponse({ error: 'Apenas o Administrador master pode alterar senhas.' }, 403)
     }
 
-    const { user_id, password } = await req.json()
-    if (!user_id || !password || password.length < 6) {
-      return new Response(JSON.stringify({ error: 'user_id e senha (mín. 6 caracteres) são obrigatórios' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    const { user_id, email, password } = await req.json()
+    const cleanPassword = typeof password === 'string' ? password.trim() : ''
+    const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
+
+    if ((!user_id && !cleanEmail) || !cleanPassword || cleanPassword.length < 6) {
+      return jsonResponse({ error: 'Informe o colaborador e uma senha com no mínimo 6 caracteres.' }, 400)
     }
 
-    const { error } = await supabaseClient.auth.admin.updateUserById(user_id, { password })
+    let targetUserId = typeof user_id === 'string' && user_id.trim() ? user_id.trim() : null
+    if (!targetUserId && cleanEmail) {
+      targetUserId = await findUserIdByEmail(supabaseClient, cleanEmail)
+    }
+
+    if (!targetUserId) {
+      return jsonResponse({ error: 'Usuário de login não encontrado para este e-mail.' }, 404)
+    }
+
+    const { error } = await supabaseClient.auth.admin.updateUserById(targetUserId, { password: cleanPassword })
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      console.error('admin-update-password failed', { status: error.status, name: error.name, message: error.message })
+      return jsonResponse({ error: friendlyAuthMessage(error.message), raw_error: error.message }, error.status || 400)
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ success: true })
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    console.error('admin-update-password unexpected error', { message: error?.message })
+    return jsonResponse({ error: error?.message || 'Erro inesperado ao alterar senha' }, 500)
   }
 })
