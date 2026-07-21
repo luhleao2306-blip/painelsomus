@@ -338,8 +338,13 @@ function OperacoesPainel() {
                         );
                       })}
                       {items.length > 5 && (
-                        <li className="pt-0.5 text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                          + {items.length - 5} demandas
+                        <li className="pt-0.5 text-center">
+                          <Link
+                            to="/operacoes/projetos"
+                            className="inline-block w-full rounded-md border border-dashed border-border/50 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition hover:border-foreground/40 hover:bg-muted/30"
+                          >
+                            + {items.length - 5} demandas
+                          </Link>
                         </li>
                       )}
                     </ul>
