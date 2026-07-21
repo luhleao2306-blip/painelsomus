@@ -35,7 +35,7 @@ export type Cargo = {
 
 export type OpUser = { id: string; name: string; cargoId: string };
 
-export type OpComment = { id: string; authorId: string; text: string; createdAt: string };
+export type OpComment = { id: string; authorId: string; authorName?: string; text: string; createdAt: string };
 
 export type OpRecurrence = 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
 
