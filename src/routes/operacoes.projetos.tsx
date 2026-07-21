@@ -442,10 +442,13 @@ function TaskRow({
         onChange={e => opStore.updateTask(task.id, { status: e.target.checked ? 'concluido' : 'nao_iniciado' })}
         className="h-4 w-4 rounded border-border"
       />
-      <button onClick={onOpen} className="flex-1 truncate text-left text-[12.5px] hover:underline">
-        {task.name}
+      <button onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-1.5 text-left text-[12.5px] hover:underline">
+        <span className="shrink-0 rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+          {getTaskClientName(store, task)}
+        </span>
+        <span className="truncate">{task.name}</span>
         {task.checklist.length > 0 && (
-          <span className="ml-1.5 text-[10px] text-muted-foreground">({done}/{task.checklist.length})</span>
+          <span className="ml-1 shrink-0 text-[10px] text-muted-foreground">({done}/{task.checklist.length})</span>
         )}
       </button>
       <Select value={task.assigneeId ?? '__none'} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v === '__none' ? undefined : v })}>
