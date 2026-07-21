@@ -738,9 +738,14 @@ function CardView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
         const assignee = store.users.find(u => u.id === t.assigneeId);
         return (
           <button key={t.id} onClick={() => onOpenTask(t.id)} className="rounded-lg border border-border/60 bg-card p-3 text-left hover:shadow-md">
-            <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${meta.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${meta.color}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                {getTaskClientName(store, t)}
+              </span>
+            </div>
             <p className="mt-2 text-[12.5px] font-medium leading-snug">{t.name}</p>
             <div className="mt-2 flex items-center justify-between text-[10.5px] text-muted-foreground">
               <span>{assignee?.name.split(' ')[0] ?? 'Sem responsável'}</span>
