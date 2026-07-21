@@ -324,6 +324,9 @@ function OperacoesPainel() {
                               }`}
                             >
                               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
+                              <span className="shrink-0 rounded-full border border-border/50 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                                {getTaskClientName(store, t)}
+                              </span>
                               <span className="min-w-0 flex-1 truncate text-[11.5px]">{t.name}</span>
                               <span className={`shrink-0 font-mono text-[9.5px] uppercase tracking-wider ${
                                 isOverdue ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
