@@ -53,10 +53,15 @@ function MinhasDemandas() {
     return found ?? null;
   }, [profile, store.users]);
 
+  const effectiveUser = useMemo(() => {
+    if (manualUserId) return store.users.find(u => u.id === manualUserId) ?? null;
+    return opUser;
+  }, [manualUserId, opUser, store.users]);
+
   const tasks = useMemo(() => {
-    if (!opUser) return [];
+    if (!effectiveUser) return [];
     return store.tasks
-      .filter(t => t.assigneeId === opUser.id)
+      .filter(t => t.assigneeId === effectiveUser.id)
       .filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
         if (a.priority === 'alta' && b.priority !== 'alta') return -1;
@@ -65,7 +70,7 @@ function MinhasDemandas() {
         if (!b.dueDate) return -1;
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
-  }, [store.tasks, opUser, search]);
+  }, [store.tasks, effectiveUser, search]);
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
