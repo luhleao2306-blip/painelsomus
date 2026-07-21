@@ -424,11 +424,14 @@ function CollaboratorsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => startEdit(c)}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => startEdit(c)} title="Editar"><Pencil className="h-4 w-4" /></Button>
+                        {role === 'master' && c.email && (
+                          <Button size="sm" variant="ghost" onClick={() => openPwd(c)} title="Alterar senha"><KeyRound className="h-4 w-4" /></Button>
+                        )}
                         {c.status !== 'inativo' && (
                           <Button size="sm" variant="ghost" onClick={() => inactivate(c)} title="Inativar"><Lock className="h-4 w-4" /></Button>
                         )}
-                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(c)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(c)} title="Excluir"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   );
