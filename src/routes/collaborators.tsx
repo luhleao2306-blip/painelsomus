@@ -137,6 +137,11 @@ function CollaboratorsPage() {
   const [editing, setEditing] = useState<Collaborator | null>(null);
   const [form, setForm] = useState<Partial<Collaborator>>(emptyForm);
 
+  const [pwdOpen, setPwdOpen] = useState(false);
+  const [pwdTarget, setPwdTarget] = useState<Collaborator | null>(null);
+  const [pwdValue, setPwdValue] = useState('');
+  const [pwdSaving, setPwdSaving] = useState(false);
+
   useEffect(() => {
     if (!profileLoading && !isAdmin) {
       navigate({ to: '/dashboard' });
