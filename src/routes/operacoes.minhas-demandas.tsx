@@ -6,7 +6,7 @@ import {
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
   CalendarClock, CheckCircle2, Clock, AlertTriangle, ArrowLeft, Filter, Search,
-  Calendar, CheckCircle, ListChecks, MessageSquare, Plus, Trash2, GripVertical, ArrowUp, ArrowDown,
+  Calendar, CheckCircle, ListChecks, MessageSquare, Plus, Trash2, GripVertical, ArrowUp, ArrowDown, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
