@@ -26,12 +26,30 @@ function MinhasDemandas() {
   
   const opUser = useMemo(() => {
     if (!profile) return null;
-    const name = profile.full_name?.toLowerCase();
-    const email = profile.email?.toLowerCase();
-    
-    return store.users.find(u => u.name.toLowerCase() === name) || 
-           store.users.find(u => email?.includes(u.name.toLowerCase().replace(/\s/g, ''))) ||
-           store.users.find(u => u.id.includes(profile.id.slice(0, 4)));
+    const norm = (s?: string | null) =>
+      (s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const name = norm(profile.full_name);
+    const email = norm(profile.email);
+    const emailLocal = email.split('@')[0] ?? '';
+    const firstName = name.split(/\s+/)[0] ?? '';
+    if (!name && !email) return null;
+
+    // 1) full name exact
+    let found = store.users.find(u => norm(u.name) === name);
+    if (found) return found;
+    // 2) first name match (either side)
+    found = store.users.find(u => {
+      const un = norm(u.name);
+      const uf = un.split(/\s+/)[0];
+      return uf && firstName && (uf === firstName || un.startsWith(firstName) || name.startsWith(uf));
+    });
+    if (found) return found;
+    // 3) email local-part contains any part of user name
+    found = store.users.find(u => {
+      const parts = norm(u.name).split(/\s+/).filter(Boolean);
+      return parts.some(p => emailLocal.includes(p));
+    });
+    return found ?? null;
   }, [profile, store.users]);
 
   const tasks = useMemo(() => {
