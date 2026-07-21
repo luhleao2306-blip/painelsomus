@@ -4293,6 +4293,16 @@ export type Database = {
         Args: { _ip: string; _payload: Json; _token: string }
         Returns: string
       }
+      submit_public_form: {
+        Args: {
+          _answers: Json
+          _form_id: string
+          _form_name: string
+          _form_snapshot: Json
+          _token: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       collaborator_access_level:
