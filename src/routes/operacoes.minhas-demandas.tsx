@@ -23,21 +23,45 @@ function MinhasDemandas() {
   const { profile } = useProfile();
   const [search, setSearch] = useState('');
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
+  const [manualUserId, setManualUserId] = useState<string | null>(null);
   
   const opUser = useMemo(() => {
     if (!profile) return null;
-    const name = profile.full_name?.toLowerCase();
-    const email = profile.email?.toLowerCase();
-    
-    return store.users.find(u => u.name.toLowerCase() === name) || 
-           store.users.find(u => email?.includes(u.name.toLowerCase().replace(/\s/g, ''))) ||
-           store.users.find(u => u.id.includes(profile.id.slice(0, 4)));
+    const norm = (s?: string | null) =>
+      (s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const name = norm(profile.full_name);
+    const email = norm(profile.email);
+    const emailLocal = email.split('@')[0] ?? '';
+    const firstName = name.split(/\s+/)[0] ?? '';
+    if (!name && !email) return null;
+
+    // 1) full name exact
+    let found = store.users.find(u => norm(u.name) === name);
+    if (found) return found;
+    // 2) first name match (either side)
+    found = store.users.find(u => {
+      const un = norm(u.name);
+      const uf = un.split(/\s+/)[0];
+      return uf && firstName && (uf === firstName || un.startsWith(firstName) || name.startsWith(uf));
+    });
+    if (found) return found;
+    // 3) email local-part contains any part of user name
+    found = store.users.find(u => {
+      const parts = norm(u.name).split(/\s+/).filter(Boolean);
+      return parts.some(p => emailLocal.includes(p));
+    });
+    return found ?? null;
   }, [profile, store.users]);
 
+  const effectiveUser = useMemo(() => {
+    if (manualUserId) return store.users.find(u => u.id === manualUserId) ?? null;
+    return opUser;
+  }, [manualUserId, opUser, store.users]);
+
   const tasks = useMemo(() => {
-    if (!opUser) return [];
+    if (!effectiveUser) return [];
     return store.tasks
-      .filter(t => t.assigneeId === opUser.id)
+      .filter(t => t.assigneeId === effectiveUser.id)
       .filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
         if (a.priority === 'alta' && b.priority !== 'alta') return -1;
@@ -46,7 +70,7 @@ function MinhasDemandas() {
         if (!b.dueDate) return -1;
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
-  }, [store.tasks, opUser, search]);
+  }, [store.tasks, effectiveUser, search]);
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
@@ -91,15 +115,36 @@ function MinhasDemandas() {
         </div>
       </div>
 
-      {!opUser ? (
+      {/* User picker — always shown, defaults to detected user */}
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Ver demandas de</span>
+        <Select
+          value={effectiveUser?.id ?? ''}
+          onValueChange={(v) => setManualUserId(v)}
+        >
+          <SelectTrigger className="h-9 w-64 text-[12.5px] bg-white/[0.03] border-white/10">
+            <SelectValue placeholder="Selecione um colaborador..." />
+          </SelectTrigger>
+          <SelectContent>
+            {store.users.map(u => (
+              <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {!opUser && !manualUserId && (
+          <span className="text-[12px] text-amber-400">Seu perfil não foi vinculado automaticamente — selecione seu nome acima.</span>
+        )}
+      </div>
+
+      {!effectiveUser ? (
         <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center">
-          <p className="text-zinc-400">Não foi possível vincular seu perfil às demandas de operações.</p>
+          <p className="text-zinc-400">Selecione um colaborador acima para ver suas demandas.</p>
         </div>
       ) : tasks.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center bg-white/[0.01]">
           <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500/50 mb-3" />
           <h3 className="text-lg font-medium text-white">Tudo em dia!</h3>
-          <p className="text-zinc-400 text-sm">Você não possui demandas pendentes no momento.</p>
+          <p className="text-zinc-400 text-sm">{effectiveUser.name} não possui demandas pendentes.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 pb-20">
