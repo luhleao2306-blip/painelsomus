@@ -27,8 +27,13 @@ function MinhasDemandas() {
   // Como opStore tem usuários hardcoded, tentamos bater pelo nome
   const opUser = useMemo(() => {
     if (!profile) return null;
-    return store.users.find(u => u.name.toLowerCase() === profile.full_name?.toLowerCase()) || 
-           store.users.find(u => u.id.includes(profile.id.slice(0, 4))); // fallback
+    const name = profile.full_name?.toLowerCase();
+    const email = profile.email?.toLowerCase();
+    
+    // Tenta encontrar por nome completo ou por prefixo do email (ex: joaorodri)
+    return store.users.find(u => u.name.toLowerCase() === name) || 
+           store.users.find(u => email?.includes(u.name.toLowerCase().replace(/\s/g, ''))) ||
+           store.users.find(u => u.id.includes(profile.id.slice(0, 4)));
   }, [profile, store.users]);
 
   const tasks = useMemo(() => {
