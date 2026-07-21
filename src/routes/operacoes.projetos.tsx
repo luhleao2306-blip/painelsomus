@@ -764,13 +764,14 @@ function CardView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
 
 function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose: () => void }) {
   const store = useOpStore();
+  const { profile } = useProfile();
   const task = store.tasks.find(t => t.id === taskId) ?? null;
   const [newItem, setNewItem] = useState('');
   const [newComment, setNewComment] = useState('');
   const [newTag, setNewTag] = useState('');
   if (!task) return null;
   const meta = STATUS_META[task.status];
-  const currentUser = store.users[0]; // no-auth mock
+  const currentUser = profile ? { id: profile.id, name: profile.full_name ?? 'Usuário' } : null;
   return (
     <Dialog open={!!task} onOpenChange={o => !o && onClose()}>
       <DialogContent className="max-w-2xl">
