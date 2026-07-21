@@ -24,15 +24,13 @@ function MinhasDemandas() {
   const store = useOpStore();
   const { profile } = useProfile();
   const [search, setSearch] = useState('');
+  const [expandedTask, setExpandedTask] = useState<string | null>(null);
   
-  // Mapeia o perfil atual para o usuário do opStore (pelo nome ou id se possível)
-  // Como opStore tem usuários hardcoded, tentamos bater pelo nome
   const opUser = useMemo(() => {
     if (!profile) return null;
     const name = profile.full_name?.toLowerCase();
     const email = profile.email?.toLowerCase();
     
-    // Tenta encontrar por nome completo ou por prefixo do email (ex: joaorodri)
     return store.users.find(u => u.name.toLowerCase() === name) || 
            store.users.find(u => email?.includes(u.name.toLowerCase().replace(/\s/g, ''))) ||
            store.users.find(u => u.id.includes(profile.id.slice(0, 4)));
@@ -44,6 +42,9 @@ function MinhasDemandas() {
       .filter(t => t.assigneeId === opUser.id)
       .filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
+        // Prioridade alta primeiro, depois por data
+        if (a.priority === 'alta' && b.priority !== 'alta') return -1;
+        if (a.priority !== 'alta' && b.priority === 'alta') return 1;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
