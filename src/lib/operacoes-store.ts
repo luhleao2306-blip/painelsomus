@@ -787,3 +787,14 @@ export function getTaskClientName(
   return folder?.name ?? '—';
 }
 
+export function getTaskProjectName(
+  store: Pick<Store, 'sections' | 'projects'>,
+  task: Pick<OpTask, 'sectionId'>,
+): string | null {
+  const section = store.sections.find(s => s.id === task.sectionId);
+  if (!section) return null;
+  const project = store.projects.find(p => p.id === section.projectId);
+  return project?.name ?? null;
+}
+
+

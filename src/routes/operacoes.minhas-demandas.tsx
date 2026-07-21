@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, getTaskClientName, type OpTask, opStore,
+  useOpStore, STATUS_META, getTaskClientName, getTaskProjectName, type OpTask, opStore,
 } from '@/lib/operacoes-store';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
@@ -180,6 +180,11 @@ function MinhasDemandas() {
                         <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                           {getTaskClientName(store, t)}
                         </span>
+                        {getTaskProjectName(store, t) && (
+                          <span className="shrink-0 rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-sky-300">
+                            {getTaskProjectName(store, t)}
+                          </span>
+                        )}
                         {t.priority === 'alta' && (
                           <span className="shrink-0 rounded-full border border-red-500/20 bg-red-500/15 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-red-500 font-bold">
                             Prioridade Alta
