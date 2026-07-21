@@ -653,13 +653,8 @@ export const opStore = {
     bg(supabase.from('op_templates').delete().eq('id', id));
   },
   updateTemplate(id: string, patch: Partial<Omit<OpTemplate, 'id'>>) {
-    let updated: OpTemplate | null = null;
-    setState({ templates: state.templates.map(t => {
-      if (t.id !== id) return t;
-      updated = { ...t, ...patch };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_templates').update({ name: updated.name, sections: updated.sections, updated_at: new Date().toISOString() }).eq('id', id));
+    const u = patchTemplateLocal(id, t => ({ ...t, ...patch }));
+    if (u) bg(supabase.from('op_templates').update({ name: u.name, sections: u.sections, updated_at: new Date().toISOString() }).eq('id', id));
   },
   duplicateTemplate(id: string) {
     const tpl = state.templates.find(t => t.id === id);
@@ -681,13 +676,8 @@ export const opStore = {
     return id;
   },
   updateForm(id: string, patch: Partial<OpForm>) {
-    let updated: OpForm | null = null;
-    setState({ forms: state.forms.map(f => {
-      if (f.id !== id) return f;
-      updated = { ...f, ...patch };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_forms').update({ name: updated.name, fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', id));
+    const u = patchFormLocal(id, f => ({ ...f, ...patch }));
+    if (u) bg(supabase.from('op_forms').update({ name: u.name, fields: u.fields, updated_at: new Date().toISOString() }).eq('id', id));
   },
   removeForm(id: string) {
     setState({ forms: state.forms.filter(f => f.id !== id) });
@@ -695,22 +685,12 @@ export const opStore = {
   },
   addFormField(formId: string, field: Omit<OpFormField, 'id'>) {
     const withId = { ...field, id: uid() };
-    let updated: OpForm | null = null;
-    setState({ forms: state.forms.map(f => {
-      if (f.id !== formId) return f;
-      updated = { ...f, fields: [...f.fields, withId] };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_forms').update({ fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', formId));
+    const u = patchFormLocal(formId, f => ({ ...f, fields: [...f.fields, withId] }));
+    if (u) bg(supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId));
   },
   removeFormField(formId: string, fieldId: string) {
-    let updated: OpForm | null = null;
-    setState({ forms: state.forms.map(f => {
-      if (f.id !== formId) return f;
-      updated = { ...f, fields: f.fields.filter(x => x.id !== fieldId) };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_forms').update({ fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', formId));
+    const u = patchFormLocal(formId, f => ({ ...f, fields: f.fields.filter(x => x.id !== fieldId) }));
+    if (u) bg(supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId));
   },
   submitFormAnswer(formId: string, projectId: string | undefined, values: Record<string, any>) {
     const answer: OpFormAnswer = { id: uid(), formId, projectId, values, createdAt: new Date().toISOString() };
@@ -735,15 +715,10 @@ export const opStore = {
     if (patch.password && typeof window !== 'undefined') {
       patch = { ...patch, password: btoa(unescape(encodeURIComponent(patch.password))) };
     }
-    let updated: OpSenha | null = null;
-    setState({ senhas: state.senhas.map(s => {
-      if (s.id !== id) return s;
-      updated = { ...s, ...patch };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_senhas').update({
-      client_name: updated.clientName, service: updated.service, username: updated.username,
-      password: updated.password, notes: updated.notes ?? null, updated_at: new Date().toISOString(),
+    const u = patchSenhaLocal(id, s => ({ ...s, ...patch }));
+    if (u) bg(supabase.from('op_senhas').update({
+      client_name: u.clientName, service: u.service, username: u.username,
+      password: u.password, notes: u.notes ?? null, updated_at: new Date().toISOString(),
     }).eq('id', id));
   },
   removeSenha(id: string) {
