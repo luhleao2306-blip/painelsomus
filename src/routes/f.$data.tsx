@@ -60,10 +60,8 @@ function PublicFormPage() {
     let cancelled = false;
     (async () => {
       if (data.length <= 24) {
-        const { data: row, error } = await supabase
-          .from('public_form_shares')
-          .select('form')
-          .eq('token', data)
+        const { data: row, error } = await (supabase as any)
+          .rpc('get_public_form_share', { _token: data })
           .maybeSingle();
         if (cancelled) return;
         if (!error && row?.form) {
@@ -72,6 +70,7 @@ function PublicFormPage() {
           return;
         }
       }
+
       const legacy = decodeLegacyBase64(data);
       if (!cancelled) setForm(legacy);
     })();
