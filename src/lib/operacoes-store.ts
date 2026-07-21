@@ -415,7 +415,7 @@ if (typeof window !== 'undefined') {
 }
 
 // fire-and-forget helper
-const bg = (p: Promise<any>) => { p.catch(e => console.warn('[Operações] sync:', e?.message ?? e)); };
+const bg = (p: any) => { Promise.resolve(p).then((r: any) => { if (r?.error) console.warn('[Operações] sync:', r.error.message ?? r.error); }).catch((e: any) => console.warn('[Operações] sync:', e?.message ?? e)); };
 
 // ============= Public API =============
 
