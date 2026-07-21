@@ -115,15 +115,36 @@ function MinhasDemandas() {
         </div>
       </div>
 
-      {!opUser ? (
+      {/* User picker — always shown, defaults to detected user */}
+      <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Ver demandas de</span>
+        <Select
+          value={effectiveUser?.id ?? ''}
+          onValueChange={(v) => setManualUserId(v)}
+        >
+          <SelectTrigger className="h-9 w-64 text-[12.5px] bg-white/[0.03] border-white/10">
+            <SelectValue placeholder="Selecione um colaborador..." />
+          </SelectTrigger>
+          <SelectContent>
+            {store.users.map(u => (
+              <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {!opUser && !manualUserId && (
+          <span className="text-[12px] text-amber-400">Seu perfil não foi vinculado automaticamente — selecione seu nome acima.</span>
+        )}
+      </div>
+
+      {!effectiveUser ? (
         <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center">
-          <p className="text-zinc-400">Não foi possível vincular seu perfil às demandas de operações.</p>
+          <p className="text-zinc-400">Selecione um colaborador acima para ver suas demandas.</p>
         </div>
       ) : tasks.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center bg-white/[0.01]">
           <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500/50 mb-3" />
           <h3 className="text-lg font-medium text-white">Tudo em dia!</h3>
-          <p className="text-zinc-400 text-sm">Você não possui demandas pendentes no momento.</p>
+          <p className="text-zinc-400 text-sm">{effectiveUser.name} não possui demandas pendentes.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 pb-20">
