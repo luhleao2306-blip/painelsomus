@@ -10,7 +10,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP,
+  useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName,
   type OpStatus, type OpTask, type OpPriority,
 } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
@@ -442,10 +442,13 @@ function TaskRow({
         onChange={e => opStore.updateTask(task.id, { status: e.target.checked ? 'concluido' : 'nao_iniciado' })}
         className="h-4 w-4 rounded border-border"
       />
-      <button onClick={onOpen} className="flex-1 truncate text-left text-[12.5px] hover:underline">
-        {task.name}
+      <button onClick={onOpen} className="flex min-w-0 flex-1 items-center gap-1.5 text-left text-[12.5px] hover:underline">
+        <span className="shrink-0 rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+          {getTaskClientName(store, task)}
+        </span>
+        <span className="truncate">{task.name}</span>
         {task.checklist.length > 0 && (
-          <span className="ml-1.5 text-[10px] text-muted-foreground">({done}/{task.checklist.length})</span>
+          <span className="ml-1 shrink-0 text-[10px] text-muted-foreground">({done}/{task.checklist.length})</span>
         )}
       </button>
       <Select value={task.assigneeId ?? '__none'} onValueChange={v => opStore.updateTask(task.id, { assigneeId: v === '__none' ? undefined : v })}>
@@ -626,11 +629,16 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                       onClick={() => onOpenTask(t.id)}
                       className="group cursor-grab rounded-md border border-border/60 bg-card p-2.5 transition-all hover:-translate-y-px hover:border-foreground/30 hover:shadow-md active:cursor-grabbing"
                     >
-                      {t.priority === 'alta' && (
-                        <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-red-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
-                          <span className="h-1 w-1 rounded-full bg-red-500" /> Alta
-                        </div>
-                      )}
+                      <div className="mb-1 flex items-center gap-1">
+                        <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                          {getTaskClientName(store, t)}
+                        </span>
+                        {t.priority === 'alta' && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                            <span className="h-1 w-1 rounded-full bg-red-500" /> Alta
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[12px] leading-snug">{t.name}</p>
                       <div className="mt-2 flex items-center gap-1.5 text-[10px]">
                         {assignee && (
@@ -730,9 +738,14 @@ function CardView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
         const assignee = store.users.find(u => u.id === t.assigneeId);
         return (
           <button key={t.id} onClick={() => onOpenTask(t.id)} className="rounded-lg border border-border/60 bg-card p-3 text-left hover:shadow-md">
-            <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${meta.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${meta.color}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                {getTaskClientName(store, t)}
+              </span>
+            </div>
             <p className="mt-2 text-[12.5px] font-medium leading-snug">{t.name}</p>
             <div className="mt-2 flex items-center justify-between text-[10.5px] text-muted-foreground">
               <span>{assignee?.name.split(' ')[0] ?? 'Sem responsável'}</span>
@@ -761,6 +774,10 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
     <Dialog open={!!task} onOpenChange={o => !o && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
+          <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            <FolderKanban className="h-3 w-3" />
+            <span>Cliente: {getTaskClientName(store, task)}</span>
+          </div>
           <DialogTitle>
             <Input
               defaultValue={task.name}

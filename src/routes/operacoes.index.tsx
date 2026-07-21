@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, type OpStatus, opStore,
+  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus, opStore,
 } from '@/lib/operacoes-store';
 import { toast } from 'sonner';
 import { UploadCloud, Loader2 } from 'lucide-react';
@@ -324,6 +324,9 @@ function OperacoesPainel() {
                               }`}
                             >
                               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
+                              <span className="shrink-0 rounded-full border border-border/50 bg-muted/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground" title="Cliente">
+                                {getTaskClientName(store, t)}
+                              </span>
                               <span className="min-w-0 flex-1 truncate text-[11.5px]">{t.name}</span>
                               <span className={`shrink-0 font-mono text-[9.5px] uppercase tracking-wider ${
                                 isOverdue ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
@@ -389,6 +392,9 @@ function OperacoesPainel() {
                       <span className="text-[14px] font-bold leading-none">{d.getDate()}</span>
                     </div>
                     <div className="min-w-0 flex-1">
+                      <div className="mb-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
+                        {getTaskClientName(store, t)}
+                      </div>
                       <p className="truncate text-[12.5px] font-medium">{t.name}</p>
                       <div className="mt-1 flex items-center gap-1.5 text-[10.5px]">
                         <span className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 ${meta.color} border`}>
