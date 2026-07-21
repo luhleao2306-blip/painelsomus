@@ -56,8 +56,9 @@ const fetchRegisteredAssigneeNames = async () => {
   if (registeredAssigneeNamesCache) return registeredAssigneeNamesCache;
   const [profilesRes, collabsRes] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('status', 'active'),
-    (supabase as any).from('collaborators').select('full_name').eq('status', 'ativo'),
+    (supabase as any).rpc('list_collaborators_public'),
   ]);
+
   registeredAssigneeNamesCache = uniqueNames([
     ...((profilesRes.data ?? []) as any[]).map(p => p.full_name),
     ...((collabsRes.data ?? []) as any[]).map(c => c.full_name),
