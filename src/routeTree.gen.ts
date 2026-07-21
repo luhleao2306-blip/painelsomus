@@ -58,6 +58,7 @@ import { Route as OperacoesSenhasRouteImport } from './routes/operacoes.senhas'
 import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
 import { Route as OperacoesPerformanceRouteImport } from './routes/operacoes.performance'
 import { Route as OperacoesModelosRouteImport } from './routes/operacoes.modelos'
+import { Route as OperacoesMinhasDemandasRouteImport } from './routes/operacoes.minhas-demandas'
 import { Route as OperacoesFormulariosRouteImport } from './routes/operacoes.formularios'
 import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
@@ -334,6 +335,11 @@ const OperacoesModelosRoute = OperacoesModelosRouteImport.update({
   path: '/modelos',
   getParentRoute: () => OperacoesRoute,
 } as any)
+const OperacoesMinhasDemandasRoute = OperacoesMinhasDemandasRouteImport.update({
+  id: '/minhas-demandas',
+  path: '/minhas-demandas',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OperacoesFormulariosRoute = OperacoesFormulariosRouteImport.update({
   id: '/formularios',
   path: '/formularios',
@@ -548,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
@@ -623,6 +630,7 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
@@ -705,6 +713,7 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacoes/formularios': typeof OperacoesFormulariosRoute
+  '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
@@ -788,6 +797,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/$token'
     | '/operacoes/formularios'
+    | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
@@ -863,6 +873,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/$token'
     | '/operacoes/formularios'
+    | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
@@ -944,6 +955,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/$token'
     | '/operacoes/formularios'
+    | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
     | '/operacoes/projetos'
@@ -1366,6 +1378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperacoesModelosRouteImport
       parentRoute: typeof OperacoesRoute
     }
+    '/operacoes/minhas-demandas': {
+      id: '/operacoes/minhas-demandas'
+      path: '/minhas-demandas'
+      fullPath: '/operacoes/minhas-demandas'
+      preLoaderRoute: typeof OperacoesMinhasDemandasRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/operacoes/formularios': {
       id: '/operacoes/formularios'
       path: '/formularios'
@@ -1650,6 +1669,7 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
 
 interface OperacoesRouteChildren {
   OperacoesFormulariosRoute: typeof OperacoesFormulariosRoute
+  OperacoesMinhasDemandasRoute: typeof OperacoesMinhasDemandasRoute
   OperacoesModelosRoute: typeof OperacoesModelosRoute
   OperacoesPerformanceRoute: typeof OperacoesPerformanceRoute
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
@@ -1659,6 +1679,7 @@ interface OperacoesRouteChildren {
 
 const OperacoesRouteChildren: OperacoesRouteChildren = {
   OperacoesFormulariosRoute: OperacoesFormulariosRoute,
+  OperacoesMinhasDemandasRoute: OperacoesMinhasDemandasRoute,
   OperacoesModelosRoute: OperacoesModelosRoute,
   OperacoesPerformanceRoute: OperacoesPerformanceRoute,
   OperacoesProjetosRoute: OperacoesProjetosRoute,
@@ -1783,13 +1804,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
