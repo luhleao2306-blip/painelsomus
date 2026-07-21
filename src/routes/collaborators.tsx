@@ -560,6 +560,37 @@ function CollaboratorsPage() {
         </DialogContent>
       </Dialog>
       <InviteLinksDialog open={invitesOpen} onOpenChange={setInvitesOpen} />
+
+      <Dialog open={pwdOpen} onOpenChange={(o) => { setPwdOpen(o); if (!o) { setPwdTarget(null); setPwdValue(''); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Alterar senha</DialogTitle>
+            <DialogDescription>
+              Definir nova senha para <span className="font-semibold">{pwdTarget?.full_name}</span>
+              {pwdTarget?.email ? <> ({pwdTarget.email})</> : null}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <Label>Nova senha</Label>
+            <Input
+              type="text"
+              autoFocus
+              value={pwdValue}
+              onChange={(e) => setPwdValue(e.target.value)}
+              placeholder="Mínimo de 6 caracteres"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              A senha será atualizada imediatamente. Comunique o colaborador em canal seguro.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPwdOpen(false)} disabled={pwdSaving}>Cancelar</Button>
+            <Button onClick={savePwd} disabled={pwdSaving || pwdValue.length < 6}>
+              {pwdSaving ? 'Alterando…' : 'Alterar senha'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
