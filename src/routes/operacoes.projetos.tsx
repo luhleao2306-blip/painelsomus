@@ -908,8 +908,11 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
                   setNewComment('');
                 }
               }}>Enviar</Button>
+            </div>
           </div>
         </div>
+
+
 
         <div className="border-t pt-4">
           <label className="mb-2 block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
