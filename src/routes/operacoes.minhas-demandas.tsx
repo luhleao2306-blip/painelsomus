@@ -23,6 +23,7 @@ function MinhasDemandas() {
   const { profile } = useProfile();
   const [search, setSearch] = useState('');
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
+  const [manualUserId, setManualUserId] = useState<string | null>(null);
   
   const opUser = useMemo(() => {
     if (!profile) return null;
