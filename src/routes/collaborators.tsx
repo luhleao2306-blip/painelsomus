@@ -268,20 +268,36 @@ function CollaboratorsPage() {
   };
 
   const inactivate = async (c: Collaborator) => {
-    const { error } = await (supabase as any).from('collaborators').update({ status: 'inativo' }).eq('id', c.id);
-    if (error) return toast.error('Erro ao inativar');
+    if (String(c.id).startsWith('profile:')) {
+      const pid = String(c.id).slice('profile:'.length);
+      const { error } = await (supabase as any).from('profiles').update({ status: 'inactive' }).eq('id', pid);
+      if (error) return toast.error('Erro ao inativar: ' + error.message);
+    } else {
+      const { error } = await (supabase as any).from('collaborators').update({ status: 'inativo' }).eq('id', c.id);
+      if (error) return toast.error('Erro ao inativar: ' + error.message);
+    }
     toast.success('Colaborador inativado');
     load();
   };
 
   const remove = async (c: Collaborator) => {
     if (!window.confirm(`Excluir ${c.full_name}? Esta ação também remove o acesso (login) vinculado a este e-mail.`)) return;
-    const { error } = await (supabase as any).from('collaborators').delete().eq('id', c.id);
-    if (error) return toast.error('Erro ao excluir');
+    const isVirtual = String(c.id).startsWith('profile:');
+    if (!isVirtual) {
+      const { error } = await (supabase as any).from('collaborators').delete().eq('id', c.id);
+      if (error) return toast.error('Erro ao excluir: ' + error.message);
+    }
     if (c.email) {
       try {
-        await supabase.functions.invoke('admin-delete-user', { body: { email: c.email } });
-      } catch { /* best-effort */ }
+        const { error: fnErr } = await supabase.functions.invoke('admin-delete-user', { body: { email: c.email } });
+        if (fnErr && isVirtual) {
+          return toast.error('Erro ao excluir acesso: ' + (fnErr.message || 'tente novamente'));
+        }
+      } catch (e: any) {
+        if (isVirtual) return toast.error('Erro ao excluir acesso: ' + (e?.message ?? 'desconhecido'));
+      }
+    } else if (isVirtual) {
+      return toast.error('Colaborador sem e-mail vinculado — não é possível excluir.');
     }
     toast.success('Colaborador excluído');
     load();
