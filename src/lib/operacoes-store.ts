@@ -274,13 +274,25 @@ async function fetchAll() {
   };
 }
 
-async function migrateLegacyIfNeeded() {
-  if (typeof window === 'undefined') return;
+type MigrateResult = { ok: boolean; reason: 'no_window' | 'already_migrated' | 'no_local_data' | 'done' | 'error'; counts: Record<string, number> | null; error?: string };
+
+async function migrateLegacyIfNeeded(force = false): Promise<MigrateResult> {
+  if (typeof window === 'undefined') return { ok: false, reason: 'no_window', counts: null };
   try {
-    if (window.localStorage.getItem(MIGRATED_FLAG) === '1') return;
+    if (!force && window.localStorage.getItem(MIGRATED_FLAG) === '1') return { ok: false, reason: 'already_migrated', counts: null };
     const raw = window.localStorage.getItem(LEGACY_KEY);
-    if (!raw) { window.localStorage.setItem(MIGRATED_FLAG, '1'); return; }
+    if (!raw) { window.localStorage.setItem(MIGRATED_FLAG, '1'); return { ok: false, reason: 'no_local_data', counts: null }; }
     const legacy = JSON.parse(raw);
+    const counts: Record<string, number> = {
+      folders: legacy.folders?.length ?? 0,
+      projects: legacy.projects?.length ?? 0,
+      sections: legacy.sections?.length ?? 0,
+      tasks: legacy.tasks?.length ?? 0,
+      templates: legacy.templates?.length ?? 0,
+      forms: legacy.forms?.length ?? 0,
+      formAnswers: legacy.formAnswers?.length ?? 0,
+      senhas: legacy.senhas?.length ?? 0,
+    };
 
     // Push todas as entidades. Upsert evita erro se algo já foi migrado por outro usuário.
     if (Array.isArray(legacy.folders) && legacy.folders.length) {
