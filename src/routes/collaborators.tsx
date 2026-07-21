@@ -287,6 +287,57 @@ function CollaboratorsPage() {
     load();
   };
 
+  const openPwd = (c: Collaborator) => {
+    if (!c.email) {
+      toast.error('Colaborador sem e-mail vinculado — não é possível alterar a senha.');
+      return;
+    }
+    setPwdTarget(c);
+    setPwdValue('');
+    setPwdOpen(true);
+  };
+
+  const savePwd = async () => {
+    if (!pwdTarget?.email) return;
+    if (pwdValue.length < 6) {
+      toast.error('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+    if (role !== 'master') {
+      toast.error('Apenas o Administrador master pode alterar senhas.');
+      return;
+    }
+    setPwdSaving(true);
+    try {
+      // Descobre o user_id do auth pelo e-mail via profiles
+      const { data: prof, error: pErr } = await (supabase as any)
+        .from('profiles')
+        .select('id')
+        .ilike('email', pwdTarget.email)
+        .maybeSingle();
+      if (pErr || !prof?.id) {
+        toast.error('Usuário de login não encontrado para este e-mail.');
+        setPwdSaving(false);
+        return;
+      }
+      const { error } = await supabase.functions.invoke('admin-update-password', {
+        body: { user_id: prof.id, password: pwdValue },
+      });
+      if (error) {
+        toast.error('Erro ao alterar senha: ' + (error.message || 'tente novamente'));
+      } else {
+        toast.success('Senha alterada com sucesso.');
+        setPwdOpen(false);
+        setPwdTarget(null);
+        setPwdValue('');
+      }
+    } catch (e: any) {
+      toast.error('Erro ao alterar senha: ' + (e?.message ?? 'desconhecido'));
+    } finally {
+      setPwdSaving(false);
+    }
+  };
+
   const setField = (k: keyof Collaborator, v: any) => setForm(prev => ({ ...prev, [k]: v }));
 
   if (!isAdmin) return null;
