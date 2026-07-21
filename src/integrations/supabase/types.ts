@@ -4243,10 +4243,33 @@ export type Database = {
           valid: boolean
         }[]
       }
+      get_public_form_share: {
+        Args: { _token: string }
+        Returns: {
+          form: Json
+        }[]
+      }
       is_collab_admin: { Args: never; Returns: boolean }
       is_internal_user: { Args: never; Returns: boolean }
       is_manager: { Args: never; Returns: boolean }
       is_master: { Args: never; Returns: boolean }
+      list_collaborators_public: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          birth_date: string
+          department: string
+          display_name: string
+          full_name: string
+          id: string
+          job_title: string
+          profile_avatar_key: string
+          profile_avatar_url: string
+          profile_id: string
+          role_function: string
+          status: string
+        }[]
+      }
       recalc_task_time: { Args: { _task_id: string }; Returns: undefined }
       save_briefing_progress: {
         Args: { _dados: Json; _token: string }
