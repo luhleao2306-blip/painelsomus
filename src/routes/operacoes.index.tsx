@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, type OpStatus, opStore,
+  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus, opStore,
 } from '@/lib/operacoes-store';
 import { toast } from 'sonner';
 import { UploadCloud, Loader2 } from 'lucide-react';
