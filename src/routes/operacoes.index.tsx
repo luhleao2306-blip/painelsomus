@@ -19,6 +19,27 @@ const ICONS = { crown: Crown, megaphone: Megaphone, brush: Brush, diamond: Diamo
 
 function OperacoesPainel() {
   const store = useOpStore();
+  const [syncing, setSyncing] = useState(false);
+
+  async function handleForceSync() {
+    setSyncing(true);
+    try {
+      const res = await opStore.forceSyncLegacy();
+      if (res.ok && res.counts) {
+        const total = Object.values(res.counts).reduce((a, b) => a + b, 0);
+        toast.success(`Sincronização concluída — ${total} itens enviados para o Cloud.`);
+      } else if (res.reason === 'no_local_data') {
+        toast.info('Nada para sincronizar neste navegador.');
+      } else if (res.reason === 'error') {
+        toast.error(`Falhou: ${res.error ?? 'erro desconhecido'}`);
+      } else {
+        toast.info('Nenhum dado local pendente.');
+      }
+    } finally {
+      setSyncing(false);
+    }
+  }
+
 
   const stats = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
