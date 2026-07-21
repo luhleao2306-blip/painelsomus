@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 // ============= Types =============
 
@@ -29,21 +30,12 @@ export type Cargo = {
   id: string;
   name: string;
   icon: 'crown' | 'megaphone' | 'brush' | 'diamond' | 'bot' | 'zap' | 'rocket' | 'star';
-  color: string; // tailwind color name (yellow/green/gray/purple/orange/blue/red/pink)
+  color: string;
 };
 
-export type OpUser = {
-  id: string;
-  name: string;
-  cargoId: string;
-};
+export type OpUser = { id: string; name: string; cargoId: string };
 
-export type OpComment = {
-  id: string;
-  authorId: string;
-  text: string;
-  createdAt: string;
-};
+export type OpComment = { id: string; authorId: string; text: string; createdAt: string };
 
 export type OpRecurrence = 'nenhuma' | 'diaria' | 'semanal' | 'mensal' | 'anual';
 
@@ -60,14 +52,13 @@ export type OpTask = {
   tags: string[];
   checklist: { id: string; text: string; done: boolean }[];
   comments: OpComment[];
+  position?: number;
 };
-
 
 export type OpSection = { id: string; projectId: string; name: string; order: number };
 export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
 export type OpFolder = { id: string; name: string };
 
-// Modelos: um snapshot de estrutura (seções + tarefas com subtarefas opcionais)
 export type OpTemplateTask = { name: string; subtasks: string[] };
 export type OpTemplate = {
   id: string;
@@ -75,12 +66,11 @@ export type OpTemplate = {
   sections: { name: string; tasks: OpTemplateTask[] }[];
 };
 
-// Formulários
 export type OpFormField = {
   id: string;
   type: 'texto_curto' | 'texto_longo' | 'multipla_escolha' | 'data' | 'upload' | 'checkbox';
   label: string;
-  options?: string[]; // para multipla_escolha
+  options?: string[];
 };
 export type OpForm = { id: string; name: string; fields: OpFormField[] };
 export type OpFormAnswer = {
@@ -91,13 +81,12 @@ export type OpFormAnswer = {
   createdAt: string;
 };
 
-// Senhas
 export type OpSenha = {
   id: string;
   clientName: string;
   service: string;
   username: string;
-  password: string; // localStorage: apenas base64 (não é criptografia real; será migrado para Supabase Vault)
+  password: string;
   notes?: string;
 };
 
@@ -112,12 +101,37 @@ type Store = {
   forms: OpForm[];
   formAnswers: OpFormAnswer[];
   senhas: OpSenha[];
+  _hydrated: boolean;
 };
 
-const KEY = 'somus-operacoes-v2';
+const LEGACY_KEY = 'somus-operacoes-v2';
+const MIGRATED_FLAG = 'somus-operacoes-migrated-cloud';
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-// ============= Seed =============
+// ============= Directory (cargos + users) — mantido em memória =============
+// Estes são referências internas usadas para exibir "responsáveis"; ficam hardcoded.
+
+const CARGOS: Cargo[] = [
+  { id: 'c-ceo',    name: 'CEO',                icon: 'crown',     color: 'yellow' },
+  { id: 'c-cfo',    name: 'CFO',                icon: 'megaphone', color: 'green' },
+  { id: 'c-arte',   name: 'Diretor de Arte',    icon: 'brush',     color: 'gray' },
+  { id: 'c-mkt',    name: 'Head de Marketing',  icon: 'diamond',   color: 'purple' },
+  { id: 'c-tech',   name: 'Head de Tecnologia', icon: 'bot',       color: 'orange' },
+  { id: 'c-perf',   name: 'Head de Performance',icon: 'zap',       color: 'blue' },
+  { id: 'c-gp',     name: 'Gestor de Projetos', icon: 'diamond',   color: 'red' },
+  { id: 'c-asst',   name: 'Assistente',         icon: 'rocket',    color: 'red' },
+];
+const USERS: OpUser[] = [
+  { id: 'u-wilson',  name: 'Wilson',            cargoId: 'c-ceo' },
+  { id: 'u-lucius',  name: 'Lúcius Vieira',     cargoId: 'c-mkt' },
+  { id: 'u-guilherme', name: 'Guilherme Ferreira', cargoId: 'c-perf' },
+  { id: 'u-joao',    name: 'João Rodri',        cargoId: 'c-gp' },
+  { id: 'u-luis',    name: 'Luís Felipe',       cargoId: 'c-tech' },
+  { id: 'u-arthur',  name: 'Arthur Limeira',    cargoId: 'c-asst' },
+  { id: 'u-esaki',   name: 'Esaki',             cargoId: 'c-arte' },
+];
+
+// ============= Template semente (usado quando o banco estiver vazio) =============
 
 const t = (name: string, subtasks: string[] = []): OpTemplateTask => ({ name, subtasks });
 
@@ -167,202 +181,378 @@ const SDR_LP_TEMPLATE: OpTemplate = {
   ],
 };
 
-function seed(): Store {
-  const cargos: Cargo[] = [
-    { id: 'c-ceo',    name: 'CEO',                icon: 'crown',     color: 'yellow' },
-    { id: 'c-cfo',    name: 'CFO',                icon: 'megaphone', color: 'green' },
-    { id: 'c-arte',   name: 'Diretor de Arte',    icon: 'brush',     color: 'gray' },
-    { id: 'c-mkt',    name: 'Head de Marketing',  icon: 'diamond',   color: 'purple' },
-    { id: 'c-tech',   name: 'Head de Tecnologia', icon: 'bot',       color: 'orange' },
-    { id: 'c-perf',   name: 'Head de Performance',icon: 'zap',       color: 'blue' },
-    { id: 'c-gp',     name: 'Gestor de Projetos', icon: 'diamond',   color: 'red' },
-    { id: 'c-asst',   name: 'Assistente',         icon: 'rocket',    color: 'red' },
-  ];
-  const users: OpUser[] = [
-    { id: 'u-wilson',  name: 'Wilson',            cargoId: 'c-ceo' },
-    { id: 'u-lucius',  name: 'Lúcius Vieira',     cargoId: 'c-mkt' },
-    { id: 'u-guilherme', name: 'Guilherme Ferreira', cargoId: 'c-perf' },
-    { id: 'u-joao',    name: 'João Rodri',        cargoId: 'c-gp' },
-    { id: 'u-luis',    name: 'Luís Felipe',       cargoId: 'c-tech' },
-    { id: 'u-arthur',  name: 'Arthur Limeira',    cargoId: 'c-asst' },
-    { id: 'u-esaki',   name: 'Esaki',             cargoId: 'c-arte' },
-  ];
+// ============= State + listeners =============
 
-  // Cria pasta+projeto a partir do template
-  const folderId = uid();
-  const projectId = uid();
-  const sections: OpSection[] = SDR_LP_TEMPLATE.sections.map((s, i) => ({
-    id: uid(), projectId, name: s.name, order: i,
-  }));
-  const tasks: OpTask[] = [];
-  SDR_LP_TEMPLATE.sections.forEach((s, i) => {
-    s.tasks.forEach(tt => {
-      tasks.push({
-        id: uid(),
-        sectionId: sections[i].id,
-        name: tt.name,
-        status: 'nao_iniciado',
-        priority: 'media',
-        tags: [],
-        checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
-        comments: [],
-      });
-    });
-  });
+let state: Store = {
+  cargos: CARGOS,
+  users: USERS,
+  folders: [],
+  projects: [],
+  sections: [],
+  tasks: [],
+  templates: [SDR_LP_TEMPLATE], // fallback antes de hidratar
+  forms: [],
+  formAnswers: [],
+  senhas: [],
+  _hydrated: false,
+};
 
+const listeners = new Set<() => void>();
+function emit() { listeners.forEach(l => l()); }
+function setState(next: Partial<Store>) { state = { ...state, ...next }; emit(); }
+
+// ============= Row mappers =============
+
+const rowToFolder = (r: any): OpFolder => ({ id: r.id, name: r.name });
+const rowToProject = (r: any): OpProject => ({ id: r.id, folderId: r.folder_id, name: r.name, status: r.status });
+const rowToSection = (r: any): OpSection => ({ id: r.id, projectId: r.project_id, name: r.name, order: r.position });
+const rowToTask = (r: any): OpTask => ({
+  id: r.id,
+  sectionId: r.section_id,
+  name: r.name,
+  assigneeId: r.assignee_id ?? undefined,
+  startDate: r.start_date ?? undefined,
+  dueDate: r.due_date ?? undefined,
+  status: r.status,
+  priority: r.priority,
+  recurrence: r.recurrence ?? undefined,
+  tags: r.tags ?? [],
+  checklist: r.checklist ?? [],
+  comments: r.comments ?? [],
+  position: r.position ?? 0,
+});
+const rowToTemplate = (r: any): OpTemplate => ({ id: r.id, name: r.name, sections: r.sections ?? [] });
+const rowToForm = (r: any): OpForm => ({ id: r.id, name: r.name, fields: r.fields ?? [] });
+const rowToFormAnswer = (r: any): OpFormAnswer => ({
+  id: r.id, formId: r.form_id, projectId: r.project_id ?? undefined,
+  values: r.values ?? {}, createdAt: r.created_at,
+});
+const rowToSenha = (r: any): OpSenha => ({
+  id: r.id, clientName: r.client_name, service: r.service, username: r.username,
+  password: r.password, notes: r.notes ?? undefined,
+});
+
+const taskToRow = (t: OpTask): any => ({
+  id: t.id,
+  section_id: t.sectionId,
+  name: t.name,
+  assignee_id: t.assigneeId ?? null,
+  start_date: t.startDate ?? null,
+  due_date: t.dueDate ?? null,
+  status: t.status,
+  priority: t.priority,
+  recurrence: t.recurrence ?? null,
+  tags: t.tags ?? [],
+  checklist: t.checklist ?? [],
+  comments: t.comments ?? [],
+  position: t.position ?? 0,
+  updated_at: new Date().toISOString(),
+});
+
+// ============= Cloud sync =============
+
+async function fetchAll() {
+  const [f, p, s, tsk, tpl, frm, fa, sn] = await Promise.all([
+    supabase.from('op_folders').select('*'),
+    supabase.from('op_projects').select('*'),
+    supabase.from('op_sections').select('*').order('position', { ascending: true }),
+    supabase.from('op_tasks').select('*').order('position', { ascending: true }),
+    supabase.from('op_templates').select('*'),
+    supabase.from('op_forms').select('*'),
+    supabase.from('op_form_answers').select('*'),
+    supabase.from('op_senhas').select('*'),
+  ]);
   return {
-    cargos,
-    users,
-    folders: [{ id: folderId, name: 'SDR IA' }],
-    projects: [{ id: projectId, folderId, name: '[Cliente Exemplo] Agente IA SDR + LP', status: 'em_andamento' }],
-    sections,
-    tasks,
-    templates: [SDR_LP_TEMPLATE],
-    forms: [
-      {
-        id: 'form-briefing-cliente',
-        name: 'Briefing de Cliente',
-        fields: [
-          { id: uid(), type: 'texto_curto',      label: 'Nome do escritório' },
-          { id: uid(), type: 'texto_curto',      label: 'Segmento principal' },
-          { id: uid(), type: 'texto_longo',      label: 'Diferenciais e posicionamento' },
-          { id: uid(), type: 'multipla_escolha', label: 'Prazo de decisão', options: ['Imediato', '30 dias', '60 dias', '90+ dias'] },
-        ],
-      },
-    ],
-    formAnswers: [],
-    senhas: [],
+    folders: (f.data ?? []).map(rowToFolder),
+    projects: (p.data ?? []).map(rowToProject),
+    sections: (s.data ?? []).map(rowToSection),
+    tasks: (tsk.data ?? []).map(rowToTask),
+    templates: (tpl.data ?? []).map(rowToTemplate),
+    forms: (frm.data ?? []).map(rowToForm),
+    formAnswers: (fa.data ?? []).map(rowToFormAnswer),
+    senhas: (sn.data ?? []).map(rowToSenha),
   };
 }
 
-function load(): Store {
-  if (typeof window === 'undefined') {
-    return { cargos: [], users: [], folders: [], projects: [], sections: [], tasks: [], templates: [], forms: [], formAnswers: [], senhas: [] };
-  }
+async function migrateLegacyIfNeeded() {
+  if (typeof window === 'undefined') return;
   try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) {
-      const s = seed();
-      window.localStorage.setItem(KEY, JSON.stringify(s));
-      return s;
+    if (window.localStorage.getItem(MIGRATED_FLAG) === '1') return;
+    const raw = window.localStorage.getItem(LEGACY_KEY);
+    if (!raw) { window.localStorage.setItem(MIGRATED_FLAG, '1'); return; }
+    const legacy = JSON.parse(raw);
+
+    // Push todas as entidades. Upsert evita erro se algo já foi migrado por outro usuário.
+    if (Array.isArray(legacy.folders) && legacy.folders.length) {
+      await supabase.from('op_folders').upsert(
+        legacy.folders.map((f: any) => ({ id: f.id, name: f.name }))
+      );
     }
-    const parsed = JSON.parse(raw) as Store;
-    // Backward compat: normalize legacy template tasks (string[] -> OpTemplateTask[])
-    if (Array.isArray(parsed.templates)) {
-      parsed.templates = parsed.templates.map(tpl => ({
-        ...tpl,
-        sections: (tpl.sections ?? []).map((s: any) => ({
-          name: s.name,
-          tasks: (s.tasks ?? []).map((tt: any) =>
-            typeof tt === 'string' ? { name: tt, subtasks: [] } : { name: tt.name ?? '', subtasks: tt.subtasks ?? [] }
-          ),
-        })),
-      }));
+    if (Array.isArray(legacy.projects) && legacy.projects.length) {
+      await supabase.from('op_projects').upsert(
+        legacy.projects.map((p: any) => ({ id: p.id, folder_id: p.folderId, name: p.name, status: p.status }))
+      );
     }
-    return parsed;
-  } catch {
-    return { cargos: [], users: [], folders: [], projects: [], sections: [], tasks: [], templates: [], forms: [], formAnswers: [], senhas: [] };
+    if (Array.isArray(legacy.sections) && legacy.sections.length) {
+      await supabase.from('op_sections').upsert(
+        legacy.sections.map((s: any) => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order ?? 0 }))
+      );
+    }
+    if (Array.isArray(legacy.tasks) && legacy.tasks.length) {
+      await supabase.from('op_tasks').upsert(
+        legacy.tasks.map((t: any, i: number) => ({
+          id: t.id,
+          section_id: t.sectionId,
+          name: t.name,
+          assignee_id: t.assigneeId ?? null,
+          start_date: t.startDate ?? null,
+          due_date: t.dueDate ?? null,
+          status: t.status ?? 'nao_iniciado',
+          priority: t.priority ?? 'media',
+          recurrence: t.recurrence ?? null,
+          tags: t.tags ?? [],
+          checklist: t.checklist ?? [],
+          comments: t.comments ?? [],
+          position: t.position ?? i,
+        }))
+      );
+    }
+    if (Array.isArray(legacy.templates) && legacy.templates.length) {
+      await supabase.from('op_templates').upsert(
+        legacy.templates.map((tpl: any) => ({
+          id: tpl.id,
+          name: tpl.name,
+          sections: (tpl.sections ?? []).map((s: any) => ({
+            name: s.name,
+            tasks: (s.tasks ?? []).map((tt: any) =>
+              typeof tt === 'string' ? { name: tt, subtasks: [] } : { name: tt.name ?? '', subtasks: tt.subtasks ?? [] }
+            ),
+          })),
+        }))
+      );
+    }
+    if (Array.isArray(legacy.forms) && legacy.forms.length) {
+      await supabase.from('op_forms').upsert(
+        legacy.forms.map((f: any) => ({ id: f.id, name: f.name, fields: f.fields ?? [] }))
+      );
+    }
+    if (Array.isArray(legacy.formAnswers) && legacy.formAnswers.length) {
+      await supabase.from('op_form_answers').upsert(
+        legacy.formAnswers.map((a: any) => ({
+          id: a.id, form_id: a.formId, project_id: a.projectId ?? null,
+          values: a.values ?? {}, created_at: a.createdAt,
+        }))
+      );
+    }
+    if (Array.isArray(legacy.senhas) && legacy.senhas.length) {
+      await supabase.from('op_senhas').upsert(
+        legacy.senhas.map((s: any) => ({
+          id: s.id, client_name: s.clientName, service: s.service,
+          username: s.username, password: s.password, notes: s.notes ?? null,
+        }))
+      );
+    }
+    window.localStorage.setItem(MIGRATED_FLAG, '1');
+  } catch (e) {
+    console.warn('[Operações] migração legacy falhou:', e);
   }
 }
 
-let state: Store = load();
-const listeners = new Set<() => void>();
-
-function persist() {
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(KEY, JSON.stringify(state));
+async function seedTemplateIfEmpty() {
+  const { data } = await supabase.from('op_templates').select('id').limit(1);
+  if (!data || data.length === 0) {
+    await supabase.from('op_templates').upsert([{
+      id: SDR_LP_TEMPLATE.id,
+      name: SDR_LP_TEMPLATE.name,
+      sections: SDR_LP_TEMPLATE.sections,
+    }]);
   }
-  listeners.forEach(l => l());
 }
 
-// ============= Actions =============
+let hydratePromise: Promise<void> | null = null;
+async function hydrate() {
+  if (hydratePromise) return hydratePromise;
+  hydratePromise = (async () => {
+    try {
+      await migrateLegacyIfNeeded();
+      await seedTemplateIfEmpty();
+      const data = await fetchAll();
+      setState({ ...data, _hydrated: true });
+      subscribeRealtime();
+    } catch (e) {
+      console.warn('[Operações] hydrate falhou:', e);
+      setState({ _hydrated: true });
+    }
+  })();
+  return hydratePromise;
+}
+
+let realtimeChannel: any = null;
+function subscribeRealtime() {
+  if (realtimeChannel || typeof window === 'undefined') return;
+  const refresh = async () => {
+    try {
+      const data = await fetchAll();
+      setState({ ...data });
+    } catch {}
+  };
+  realtimeChannel = supabase
+    .channel('op-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_folders' },  refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_projects' }, refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_sections' }, refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_tasks' },    refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_templates' },refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_forms' },    refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_form_answers' }, refresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'op_senhas' },   refresh)
+    .subscribe();
+}
+
+// dispara na 1ª leitura do store no browser
+if (typeof window !== 'undefined') {
+  setTimeout(() => { hydrate(); }, 0);
+}
+
+// fire-and-forget helper
+const bg = (p: Promise<any>) => { p.catch(e => console.warn('[Operações] sync:', e?.message ?? e)); };
+
+// ============= Public API =============
 
 export const opStore = {
   subscribe(l: () => void) { listeners.add(l); return () => listeners.delete(l); },
   get() { return state; },
+  hydrate,
   reset() {
-    if (typeof window !== 'undefined') window.localStorage.removeItem(KEY);
-    state = load();
-    persist();
+    // limpa apenas flags locais; dados permanecem no Cloud
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(LEGACY_KEY);
+      window.localStorage.removeItem(MIGRATED_FLAG);
+    }
   },
 
   // Folders
-  addFolder(name: string) { state = { ...state, folders: [...state.folders, { id: uid(), name }] }; persist(); },
-  renameFolder(id: string, name: string) { state = { ...state, folders: state.folders.map(f => f.id === id ? { ...f, name } : f) }; persist(); },
+  addFolder(name: string) {
+    const id = uid();
+    setState({ folders: [...state.folders, { id, name }] });
+    bg(supabase.from('op_folders').insert({ id, name }));
+  },
+  renameFolder(id: string, name: string) {
+    setState({ folders: state.folders.map(f => f.id === id ? { ...f, name } : f) });
+    bg(supabase.from('op_folders').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+  },
   removeFolder(id: string) {
     const projIds = state.projects.filter(p => p.folderId === id).map(p => p.id);
     const secIds = state.sections.filter(s => projIds.includes(s.projectId)).map(s => s.id);
-    state = {
-      ...state,
+    setState({
       folders: state.folders.filter(f => f.id !== id),
       projects: state.projects.filter(p => p.folderId !== id),
       sections: state.sections.filter(s => !projIds.includes(s.projectId)),
       tasks: state.tasks.filter(t => !secIds.includes(t.sectionId)),
-    };
-    persist();
+    });
+    bg(supabase.from('op_folders').delete().eq('id', id));
   },
 
   // Projects
   addProject(folderId: string, name: string) {
     const id = uid();
-    state = { ...state, projects: [...state.projects, { id, folderId, name, status: 'nao_iniciado' }] };
-    persist();
+    setState({ projects: [...state.projects, { id, folderId, name, status: 'nao_iniciado' }] });
+    bg(supabase.from('op_projects').insert({ id, folder_id: folderId, name, status: 'nao_iniciado' }));
     return id;
   },
-  renameProject(id: string, name: string) { state = { ...state, projects: state.projects.map(p => p.id === id ? { ...p, name } : p) }; persist(); },
-  updateProjectStatus(id: string, s: OpProject['status']) { state = { ...state, projects: state.projects.map(p => p.id === id ? { ...p, status: s } : p) }; persist(); },
+  renameProject(id: string, name: string) {
+    setState({ projects: state.projects.map(p => p.id === id ? { ...p, name } : p) });
+    bg(supabase.from('op_projects').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+  },
+  updateProjectStatus(id: string, s: OpProject['status']) {
+    setState({ projects: state.projects.map(p => p.id === id ? { ...p, status: s } : p) });
+    bg(supabase.from('op_projects').update({ status: s, updated_at: new Date().toISOString() }).eq('id', id));
+  },
   removeProject(id: string) {
     const secIds = state.sections.filter(s => s.projectId === id).map(s => s.id);
-    state = {
-      ...state,
+    setState({
       projects: state.projects.filter(p => p.id !== id),
       sections: state.sections.filter(s => s.projectId !== id),
       tasks: state.tasks.filter(t => !secIds.includes(t.sectionId)),
-    };
-    persist();
+    });
+    bg(supabase.from('op_projects').delete().eq('id', id));
   },
 
   // Sections
   addSection(projectId: string, name: string) {
+    const id = uid();
     const order = state.sections.filter(s => s.projectId === projectId).length;
-    state = { ...state, sections: [...state.sections, { id: uid(), projectId, name, order }] };
-    persist();
+    setState({ sections: [...state.sections, { id, projectId, name, order }] });
+    bg(supabase.from('op_sections').insert({ id, project_id: projectId, name, position: order }));
   },
-  renameSection(id: string, name: string) { state = { ...state, sections: state.sections.map(s => s.id === id ? { ...s, name } : s) }; persist(); },
+  renameSection(id: string, name: string) {
+    setState({ sections: state.sections.map(s => s.id === id ? { ...s, name } : s) });
+    bg(supabase.from('op_sections').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+  },
   removeSection(id: string) {
-    state = { ...state, sections: state.sections.filter(s => s.id !== id), tasks: state.tasks.filter(t => t.sectionId !== id) };
-    persist();
+    setState({ sections: state.sections.filter(s => s.id !== id), tasks: state.tasks.filter(t => t.sectionId !== id) });
+    bg(supabase.from('op_sections').delete().eq('id', id));
   },
 
   // Tasks
   addTask(sectionId: string, name: string) {
-    state = {
-      ...state,
-      tasks: [...state.tasks, { id: uid(), sectionId, name, status: 'nao_iniciado', priority: 'media', tags: [], checklist: [], comments: [] }],
-    };
-    persist();
+    const id = uid();
+    const position = state.tasks.filter(t => t.sectionId === sectionId).length;
+    const task: OpTask = { id, sectionId, name, status: 'nao_iniciado', priority: 'media', tags: [], checklist: [], comments: [], position };
+    setState({ tasks: [...state.tasks, task] });
+    bg(supabase.from('op_tasks').insert(taskToRow(task)));
   },
   updateTask(id: string, patch: Partial<OpTask>) {
-    state = { ...state, tasks: state.tasks.map(t => t.id === id ? { ...t, ...patch } : t) };
-    persist();
+    let updated: OpTask | null = null;
+    setState({ tasks: state.tasks.map(t => {
+      if (t.id !== id) return t;
+      updated = { ...t, ...patch };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_tasks').update(taskToRow(updated)).eq('id', id));
   },
   addChecklistItem(taskId: string, text: string) {
-    state = { ...state, tasks: state.tasks.map(t => t.id === taskId ? { ...t, checklist: [...t.checklist, { id: uid(), text, done: false }] } : t) };
-    persist();
+    const item = { id: uid(), text, done: false };
+    let updated: OpTask | null = null;
+    setState({ tasks: state.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      updated = { ...t, checklist: [...t.checklist, item] };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   toggleChecklistItem(taskId: string, itemId: string) {
-    state = { ...state, tasks: state.tasks.map(t => t.id === taskId ? { ...t, checklist: t.checklist.map(i => i.id === itemId ? { ...i, done: !i.done } : i) } : t) };
-    persist();
+    let updated: OpTask | null = null;
+    setState({ tasks: state.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      updated = { ...t, checklist: t.checklist.map(i => i.id === itemId ? { ...i, done: !i.done } : i) };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   removeChecklistItem(taskId: string, itemId: string) {
-    state = { ...state, tasks: state.tasks.map(t => t.id === taskId ? { ...t, checklist: t.checklist.filter(i => i.id !== itemId) } : t) };
-    persist();
+    let updated: OpTask | null = null;
+    setState({ tasks: state.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      updated = { ...t, checklist: t.checklist.filter(i => i.id !== itemId) };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   addComment(taskId: string, authorId: string, text: string) {
-    state = { ...state, tasks: state.tasks.map(t => t.id === taskId ? { ...t, comments: [...t.comments, { id: uid(), authorId, text, createdAt: new Date().toISOString() }] } : t) };
-    persist();
+    const c: OpComment = { id: uid(), authorId, text, createdAt: new Date().toISOString() };
+    let updated: OpTask | null = null;
+    setState({ tasks: state.tasks.map(t => {
+      if (t.id !== taskId) return t;
+      updated = { ...t, comments: [...t.comments, c] };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_tasks').update({ comments: updated.comments, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
-  removeTask(id: string) { state = { ...state, tasks: state.tasks.filter(t => t.id !== id) }; persist(); },
+  removeTask(id: string) {
+    setState({ tasks: state.tasks.filter(t => t.id !== id) });
+    bg(supabase.from('op_tasks').delete().eq('id', id));
+  },
   moveTask(id: string, direction: 'up' | 'down') {
     const task = state.tasks.find(t => t.id === id);
     if (!task) return;
@@ -375,8 +565,16 @@ export const opStore = {
     const i1 = tasks.findIndex(t => t.id === task.id);
     const i2 = tasks.findIndex(t => t.id === other.id);
     [tasks[i1], tasks[i2]] = [tasks[i2], tasks[i1]];
-    state = { ...state, tasks };
-    persist();
+    // recompute positions for siblings
+    let pos = 0;
+    const withPos = tasks.map(t => {
+      if (t.sectionId !== task.sectionId) return t;
+      return { ...t, position: pos++ };
+    });
+    setState({ tasks: withPos });
+    // sync positions
+    const patches = withPos.filter(t => t.sectionId === task.sectionId);
+    patches.forEach(p => bg(supabase.from('op_tasks').update({ position: p.position }).eq('id', p.id)));
   },
   reorderTask(id: string, targetId: string, position: 'before' | 'after' = 'before') {
     if (id === targetId) return;
@@ -387,8 +585,17 @@ export const opStore = {
     const moved = { ...src, sectionId: tgt.sectionId };
     const idx = tasks.findIndex(t => t.id === targetId);
     tasks.splice(position === 'before' ? idx : idx + 1, 0, moved);
-    state = { ...state, tasks };
-    persist();
+    // recompute positions for target section
+    let pos = 0;
+    const withPos = tasks.map(t => {
+      if (t.sectionId !== tgt.sectionId) return t;
+      return { ...t, position: pos++ };
+    });
+    setState({ tasks: withPos });
+    bg(supabase.from('op_tasks').update({ section_id: tgt.sectionId, position: withPos.find(t => t.id === id)?.position ?? 0 }).eq('id', id));
+    withPos.filter(t => t.sectionId === tgt.sectionId && t.id !== id).forEach(p =>
+      bg(supabase.from('op_tasks').update({ position: p.position }).eq('id', p.id))
+    );
   },
 
   // Templates
@@ -399,94 +606,141 @@ export const opStore = {
     const newSections: OpSection[] = tpl.sections.map((s, i) => ({ id: uid(), projectId, name: s.name, order: i }));
     const newTasks: OpTask[] = [];
     tpl.sections.forEach((s, i) => {
-      s.tasks.forEach(tt => {
+      s.tasks.forEach((tt, pos) => {
         newTasks.push({
           id: uid(), sectionId: newSections[i].id, name: tt.name,
           status: 'nao_iniciado', priority: 'media', tags: [],
           checklist: (tt.subtasks ?? []).map(st => ({ id: uid(), text: st, done: false })),
-          comments: [],
+          comments: [], position: pos,
         });
       });
     });
-    state = {
-      ...state,
+    setState({
       projects: [...state.projects, { id: projectId, folderId, name: projectName, status: 'nao_iniciado' }],
       sections: [...state.sections, ...newSections],
       tasks: [...state.tasks, ...newTasks],
-    };
-    persist();
+    });
+    bg(supabase.from('op_projects').insert({ id: projectId, folder_id: folderId, name: projectName, status: 'nao_iniciado' }));
+    if (newSections.length) bg(supabase.from('op_sections').insert(newSections.map(s => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order }))));
+    if (newTasks.length) bg(supabase.from('op_tasks').insert(newTasks.map(taskToRow)));
     return projectId;
   },
   saveProjectAsTemplate(projectId: string, name: string) {
     const secs = state.sections.filter(s => s.projectId === projectId).sort((a, b) => a.order - b.order);
     const tpl: OpTemplate = {
-      id: uid(),
-      name,
+      id: uid(), name,
       sections: secs.map(s => ({
         name: s.name,
         tasks: state.tasks.filter(t => t.sectionId === s.id).map(t => ({
-          name: t.name,
-          subtasks: t.checklist.map(c => c.text),
+          name: t.name, subtasks: t.checklist.map(c => c.text),
         })),
       })),
     };
-    state = { ...state, templates: [...state.templates, tpl] };
-    persist();
+    setState({ templates: [...state.templates, tpl] });
+    bg(supabase.from('op_templates').insert({ id: tpl.id, name: tpl.name, sections: tpl.sections }));
   },
-  removeTemplate(id: string) { state = { ...state, templates: state.templates.filter(t => t.id !== id) }; persist(); },
+  removeTemplate(id: string) {
+    setState({ templates: state.templates.filter(t => t.id !== id) });
+    bg(supabase.from('op_templates').delete().eq('id', id));
+  },
   updateTemplate(id: string, patch: Partial<Omit<OpTemplate, 'id'>>) {
-    state = { ...state, templates: state.templates.map(t => t.id === id ? { ...t, ...patch } : t) };
-    persist();
+    let updated: OpTemplate | null = null;
+    setState({ templates: state.templates.map(t => {
+      if (t.id !== id) return t;
+      updated = { ...t, ...patch };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_templates').update({ name: updated.name, sections: updated.sections, updated_at: new Date().toISOString() }).eq('id', id));
   },
   duplicateTemplate(id: string) {
     const tpl = state.templates.find(t => t.id === id);
     if (!tpl) return null;
     const copy: OpTemplate = {
-      id: uid(),
-      name: `${tpl.name} (cópia)`,
+      id: uid(), name: `${tpl.name} (cópia)`,
       sections: tpl.sections.map(s => ({ name: s.name, tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })) })),
     };
-    state = { ...state, templates: [...state.templates, copy] };
-    persist();
+    setState({ templates: [...state.templates, copy] });
+    bg(supabase.from('op_templates').insert({ id: copy.id, name: copy.name, sections: copy.sections }));
     return copy.id;
   },
 
   // Forms
   addForm(name: string) {
     const id = uid();
-    state = { ...state, forms: [...state.forms, { id, name, fields: [] }] };
-    persist();
+    setState({ forms: [...state.forms, { id, name, fields: [] }] });
+    bg(supabase.from('op_forms').insert({ id, name, fields: [] }));
     return id;
   },
-  updateForm(id: string, patch: Partial<OpForm>) { state = { ...state, forms: state.forms.map(f => f.id === id ? { ...f, ...patch } : f) }; persist(); },
-  removeForm(id: string) { state = { ...state, forms: state.forms.filter(f => f.id !== id) }; persist(); },
+  updateForm(id: string, patch: Partial<OpForm>) {
+    let updated: OpForm | null = null;
+    setState({ forms: state.forms.map(f => {
+      if (f.id !== id) return f;
+      updated = { ...f, ...patch };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_forms').update({ name: updated.name, fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', id));
+  },
+  removeForm(id: string) {
+    setState({ forms: state.forms.filter(f => f.id !== id) });
+    bg(supabase.from('op_forms').delete().eq('id', id));
+  },
   addFormField(formId: string, field: Omit<OpFormField, 'id'>) {
-    state = { ...state, forms: state.forms.map(f => f.id === formId ? { ...f, fields: [...f.fields, { ...field, id: uid() }] } : f) };
-    persist();
+    const withId = { ...field, id: uid() };
+    let updated: OpForm | null = null;
+    setState({ forms: state.forms.map(f => {
+      if (f.id !== formId) return f;
+      updated = { ...f, fields: [...f.fields, withId] };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_forms').update({ fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', formId));
   },
   removeFormField(formId: string, fieldId: string) {
-    state = { ...state, forms: state.forms.map(f => f.id === formId ? { ...f, fields: f.fields.filter(x => x.id !== fieldId) } : f) };
-    persist();
+    let updated: OpForm | null = null;
+    setState({ forms: state.forms.map(f => {
+      if (f.id !== formId) return f;
+      updated = { ...f, fields: f.fields.filter(x => x.id !== fieldId) };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_forms').update({ fields: updated.fields, updated_at: new Date().toISOString() }).eq('id', formId));
   },
   submitFormAnswer(formId: string, projectId: string | undefined, values: Record<string, any>) {
-    state = { ...state, formAnswers: [...state.formAnswers, { id: uid(), formId, projectId, values, createdAt: new Date().toISOString() }] };
-    persist();
+    const answer: OpFormAnswer = { id: uid(), formId, projectId, values, createdAt: new Date().toISOString() };
+    setState({ formAnswers: [...state.formAnswers, answer] });
+    bg(supabase.from('op_form_answers').insert({
+      id: answer.id, form_id: formId, project_id: projectId ?? null, values, created_at: answer.createdAt,
+    }));
   },
 
   // Senhas
   addSenha(s: Omit<OpSenha, 'id' | 'password'> & { password: string }) {
     const encoded = typeof window !== 'undefined' ? btoa(unescape(encodeURIComponent(s.password))) : s.password;
-    state = { ...state, senhas: [...state.senhas, { ...s, id: uid(), password: encoded }] };
-    persist();
+    const id = uid();
+    const row: OpSenha = { ...s, id, password: encoded };
+    setState({ senhas: [...state.senhas, row] });
+    bg(supabase.from('op_senhas').insert({
+      id, client_name: row.clientName, service: row.service, username: row.username,
+      password: row.password, notes: row.notes ?? null,
+    }));
   },
   updateSenha(id: string, patch: Partial<Omit<OpSenha, 'id'>>) {
     if (patch.password && typeof window !== 'undefined') {
       patch = { ...patch, password: btoa(unescape(encodeURIComponent(patch.password))) };
     }
-    state = { ...state, senhas: state.senhas.map(s => s.id === id ? { ...s, ...patch } : s) };
-    persist();
+    let updated: OpSenha | null = null;
+    setState({ senhas: state.senhas.map(s => {
+      if (s.id !== id) return s;
+      updated = { ...s, ...patch };
+      return updated;
+    }) });
+    if (updated) bg(supabase.from('op_senhas').update({
+      client_name: updated.clientName, service: updated.service, username: updated.username,
+      password: updated.password, notes: updated.notes ?? null, updated_at: new Date().toISOString(),
+    }).eq('id', id));
   },
-  removeSenha(id: string) { state = { ...state, senhas: state.senhas.filter(s => s.id !== id) }; persist(); },
+  removeSenha(id: string) {
+    setState({ senhas: state.senhas.filter(s => s.id !== id) });
+    bg(supabase.from('op_senhas').delete().eq('id', id));
+  },
   revealPassword(pw: string) {
     try {
       return typeof window !== 'undefined' ? decodeURIComponent(escape(atob(pw))) : pw;
