@@ -336,11 +336,28 @@ function CollaboratorsPage() {
         setPwdSaving(false);
         return;
       }
-      const { error } = await supabase.functions.invoke('admin-update-password', {
+      const { data: resp, error } = await supabase.functions.invoke('admin-update-password', {
         body: { user_id: prof.id, password: pwdValue },
       });
-      if (error) {
-        toast.error('Erro ao alterar senha: ' + (error.message || 'tente novamente'));
+      // Read server-side reason even on non-2xx (FunctionsHttpError)
+      let serverMsg: string | null = null;
+      const ctxResp: Response | undefined = (error as any)?.context?.response;
+      if (ctxResp && typeof ctxResp.json === 'function') {
+        try { const j = await ctxResp.clone().json(); serverMsg = j?.error ?? j?.message ?? null; } catch { /* ignore */ }
+      }
+      if (!serverMsg && resp && (resp as any).error) serverMsg = (resp as any).error;
+
+      if (error || serverMsg) {
+        const raw = serverMsg || error?.message || 'tente novamente';
+        const friendly =
+          /pwned|leaked|compromised|weak.?password/i.test(raw)
+            ? 'Essa senha aparece em vazamentos conhecidos. Escolha outra mais forte.'
+          : /at least|mínim|min.*characters|6 characters/i.test(raw)
+            ? 'A senha é muito curta. Use pelo menos 6 caracteres.'
+          : /same as the old|same_password/i.test(raw)
+            ? 'A nova senha é igual à atual. Escolha uma diferente.'
+          : raw;
+        toast.error('Erro ao alterar senha: ' + friendly);
       } else {
         toast.success('Senha alterada com sucesso.');
         setPwdOpen(false);
