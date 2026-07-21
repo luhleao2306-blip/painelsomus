@@ -10,7 +10,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP,
+  useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName,
   type OpStatus, type OpTask, type OpPriority,
 } from '@/lib/operacoes-store';
 import { Button } from '@/components/ui/button';
