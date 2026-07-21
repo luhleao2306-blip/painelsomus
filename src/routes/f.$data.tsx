@@ -82,12 +82,12 @@ function PublicFormPage() {
     setSubmitting(true);
     try {
       if (token) {
-        const { error } = await supabase.from('public_form_submissions').insert({
-          token,
-          form_id: form.id,
-          form_name: form.name,
-          form_snapshot: { id: form.id, name: form.name, fields: form.fields } as any,
-          answers: values as any,
+        const { error } = await (supabase as any).rpc('submit_public_form', {
+          _token: token,
+          _form_id: form.id,
+          _form_name: form.name,
+          _form_snapshot: { id: form.id, name: form.name, fields: form.fields },
+          _answers: values,
         });
         if (error) throw error;
       }
