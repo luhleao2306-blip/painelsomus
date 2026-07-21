@@ -316,7 +316,7 @@ function OperacoesPainel() {
                         return (
                           <li key={t.id}>
                             <Link
-                              to="/operacoes/projetos"
+                              to="/operacoes/minhas-demandas"
                               className={`group flex items-center gap-2 rounded-md border px-2 py-1.5 transition ${
                                 isOverdue
                                   ? 'border-red-500/40 bg-red-500/5 hover:border-red-500/60'
@@ -340,7 +340,7 @@ function OperacoesPainel() {
                       {items.length > 5 && (
                         <li className="pt-0.5 text-center">
                           <Link
-                            to="/operacoes/projetos"
+                            to="/operacoes/minhas-demandas"
                             className="inline-block w-full rounded-md border border-dashed border-border/50 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition hover:border-foreground/40 hover:bg-muted/30"
                           >
                             + {items.length - 5} demandas
