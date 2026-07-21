@@ -466,6 +466,16 @@ export const opStore = {
   subscribe(l: () => void) { listeners.add(l); return () => listeners.delete(l); },
   get() { return state; },
   hydrate,
+  async forceSyncLegacy() {
+    const res = await migrateLegacyIfNeeded(true);
+    if (res.ok) {
+      try {
+        const data = await fetchAll();
+        setState({ ...data });
+      } catch (e) { console.warn('[Operações] refetch após sync falhou:', e); }
+    }
+    return res;
+  },
   reset() {
     // limpa apenas flags locais; dados permanecem no Cloud
     if (typeof window !== 'undefined') {
