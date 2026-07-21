@@ -315,7 +315,8 @@ function CollaboratorsPage() {
 
   const savePwd = async () => {
     if (!pwdTarget?.email) return;
-    if (pwdValue.length < 6) {
+    const nextPassword = pwdValue.trim();
+    if (nextPassword.length < 6) {
       toast.error('A senha deve ter no mínimo 6 caracteres.');
       return;
     }
@@ -325,19 +326,15 @@ function CollaboratorsPage() {
     }
     setPwdSaving(true);
     try {
-      // Descobre o user_id do auth pelo e-mail via profiles
-      const { data: prof, error: pErr } = await (supabase as any)
-        .from('profiles')
-        .select('id')
-        .ilike('email', pwdTarget.email)
-        .maybeSingle();
-      if (pErr || !prof?.id) {
-        toast.error('Usuário de login não encontrado para este e-mail.');
-        setPwdSaving(false);
-        return;
-      }
+      const profileId = String(pwdTarget.id).startsWith('profile:')
+        ? String(pwdTarget.id).slice('profile:'.length)
+        : undefined;
       const { data: resp, error } = await supabase.functions.invoke('admin-update-password', {
-        body: { user_id: prof.id, password: pwdValue },
+        body: {
+          user_id: profileId,
+          email: pwdTarget.email,
+          password: nextPassword,
+        },
       });
       // Read server-side reason even on non-2xx (FunctionsHttpError)
       let serverMsg: string | null = null;
@@ -356,6 +353,8 @@ function CollaboratorsPage() {
             ? 'A senha é muito curta. Use pelo menos 6 caracteres.'
           : /same as the old|same_password/i.test(raw)
             ? 'A nova senha é igual à atual. Escolha uma diferente.'
+          : /sessão|session|jwt|authorization/i.test(raw)
+            ? 'Sua sessão expirou. Faça login novamente e tente alterar a senha.'
           : raw;
         toast.error('Erro ao alterar senha: ' + friendly);
       } else {
