@@ -2,10 +2,11 @@ import { createFileRoute, Link, Outlet, useNavigate, useLocation } from '@tansta
 import { useEffect, useState } from 'react';
 import {
   ArrowLeft, Workflow, LayoutDashboard, FolderKanban, LayoutTemplate,
-  ClipboardList, TrendingUp, KeyRound, Sun, Moon,
+  ClipboardList, TrendingUp, KeyRound, Sun, Moon, Loader2,
 } from 'lucide-react';
 import somusLogoUrl from '@/assets/somus-logo.png';
 import { cn } from '@/lib/utils';
+import { useProfile } from '@/hooks/use-profile';
 
 export const Route = createFileRoute('/operacoes')({
   component: OperacoesLayout,
@@ -32,6 +33,7 @@ const THEME_KEY = 'op-theme';
 function OperacoesLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { profile, loading } = useProfile();
   const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
@@ -44,6 +46,26 @@ function OperacoesLayout() {
   useEffect(() => {
     try { localStorage.setItem(THEME_KEY, theme); } catch {}
   }, [theme]);
+
+  // Bloqueia acesso: apenas usuários internos (master, project_manager, consultant)
+  useEffect(() => {
+    if (loading) return;
+    const role = profile?.role;
+    const allowed = role === 'master' || role === 'project_manager' || role === 'consultant';
+    if (!allowed) navigate({ to: '/dashboard' as any, replace: true });
+  }, [loading, profile?.role, navigate]);
+
+  if (loading || !profile) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-background text-foreground">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  const role = profile.role;
+  if (role !== 'master' && role !== 'project_manager' && role !== 'consultant') {
+    return null;
+  }
 
   const isLight = theme === 'light';
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));

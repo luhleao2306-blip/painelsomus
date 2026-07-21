@@ -2540,6 +2540,272 @@ export type Database = {
         }
         Relationships: []
       }
+      op_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      op_form_answers: {
+        Row: {
+          created_at: string
+          form_id: string
+          id: string
+          project_id: string | null
+          values: Json
+        }
+        Insert: {
+          created_at?: string
+          form_id: string
+          id: string
+          project_id?: string | null
+          values?: Json
+        }
+        Update: {
+          created_at?: string
+          form_id?: string
+          id?: string
+          project_id?: string | null
+          values?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "op_form_answers_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "op_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      op_forms: {
+        Row: {
+          created_at: string
+          fields: Json
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fields?: Json
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      op_projects: {
+        Row: {
+          created_at: string
+          folder_id: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          folder_id?: string | null
+          id: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "op_projects_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "op_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      op_sections: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          position?: number
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "op_sections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "op_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      op_senhas: {
+        Row: {
+          client_name: string
+          created_at: string
+          id: string
+          notes: string | null
+          password: string
+          service: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          client_name: string
+          created_at?: string
+          id: string
+          notes?: string | null
+          password: string
+          service: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          password?: string
+          service?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      op_tasks: {
+        Row: {
+          assignee_id: string | null
+          checklist: Json
+          comments: Json
+          created_at: string
+          due_date: string | null
+          id: string
+          name: string
+          position: number
+          priority: string
+          recurrence: string | null
+          section_id: string
+          start_date: string | null
+          status: string
+          tags: Json
+          updated_at: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          checklist?: Json
+          comments?: Json
+          created_at?: string
+          due_date?: string | null
+          id: string
+          name: string
+          position?: number
+          priority?: string
+          recurrence?: string | null
+          section_id: string
+          start_date?: string | null
+          status?: string
+          tags?: Json
+          updated_at?: string
+        }
+        Update: {
+          assignee_id?: string | null
+          checklist?: Json
+          comments?: Json
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          name?: string
+          position?: number
+          priority?: string
+          recurrence?: string | null
+          section_id?: string
+          start_date?: string | null
+          status?: string
+          tags?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "op_tasks_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "op_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      op_templates: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sections: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+          sections?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sections?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pack_moods: {
         Row: {
           created_at: string
