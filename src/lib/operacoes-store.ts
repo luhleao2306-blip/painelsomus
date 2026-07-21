@@ -772,3 +772,18 @@ export const CARGO_COLOR_MAP: Record<string, string> = {
   red:    'bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300',
   pink:   'bg-pink-500/15 text-pink-700 border-pink-500/30 dark:text-pink-300',
 };
+
+// ============= Task → Client resolver =============
+// Folder = Cliente. Resolve o cliente de uma tarefa via section→project→folder.
+export function getTaskClientName(
+  store: Pick<Store, 'sections' | 'projects' | 'folders'>,
+  task: Pick<OpTask, 'sectionId'>,
+): string {
+  const section = store.sections.find(s => s.id === task.sectionId);
+  if (!section) return '—';
+  const project = store.projects.find(p => p.id === section.projectId);
+  if (!project) return '—';
+  const folder = store.folders.find(f => f.id === project.folderId);
+  return folder?.name ?? '—';
+}
+
