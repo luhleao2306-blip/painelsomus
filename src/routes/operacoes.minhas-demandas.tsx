@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProfile } from '@/hooks/use-profile';
-import { useProfile } from '@/hooks/use-profile';
 
 export const Route = createFileRoute('/operacoes/minhas-demandas')({
   component: MinhasDemandas,
