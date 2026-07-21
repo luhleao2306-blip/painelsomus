@@ -417,6 +417,35 @@ if (typeof window !== 'undefined') {
 // fire-and-forget helper
 const bg = (p: any) => { Promise.resolve(p).then((r: any) => { if (r?.error) console.warn('[Operações] sync:', r.error.message ?? r.error); }).catch((e: any) => console.warn('[Operações] sync:', e?.message ?? e)); };
 
+function patchTaskLocal(taskId: string, fn: (t: OpTask) => OpTask): OpTask | undefined {
+  let out: OpTask | undefined;
+  const tasks = state.tasks.map(t => {
+    if (t.id !== taskId) return t;
+    out = fn(t);
+    return out;
+  });
+  setState({ tasks });
+  return out;
+}
+function patchTemplateLocal(id: string, fn: (t: OpTemplate) => OpTemplate): OpTemplate | undefined {
+  let out: OpTemplate | undefined;
+  const templates = state.templates.map(t => { if (t.id !== id) return t; out = fn(t); return out; });
+  setState({ templates });
+  return out;
+}
+function patchFormLocal(id: string, fn: (f: OpForm) => OpForm): OpForm | undefined {
+  let out: OpForm | undefined;
+  const forms = state.forms.map(f => { if (f.id !== id) return f; out = fn(f); return out; });
+  setState({ forms });
+  return out;
+}
+function patchSenhaLocal(id: string, fn: (s: OpSenha) => OpSenha): OpSenha | undefined {
+  let out: OpSenha | undefined;
+  const senhas = state.senhas.map(s => { if (s.id !== id) return s; out = fn(s); return out; });
+  setState({ senhas });
+  return out;
+}
+
 // ============= Public API =============
 
 export const opStore = {
