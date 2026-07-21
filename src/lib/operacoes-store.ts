@@ -365,8 +365,10 @@ async function migrateLegacyIfNeeded(force = false): Promise<MigrateResult> {
       );
     }
     window.localStorage.setItem(MIGRATED_FLAG, '1');
-  } catch (e) {
+    return { ok: true, reason: 'done', counts };
+  } catch (e: any) {
     console.warn('[Operações] migração legacy falhou:', e);
+    return { ok: false, reason: 'error', counts: null, error: e?.message ?? String(e) };
   }
 }
 
