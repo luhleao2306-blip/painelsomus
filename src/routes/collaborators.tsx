@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Search, Users, Pencil, Trash2, Lock, Cake, Link as LinkIcon } from 'lucide-react';
+import { Plus, Search, Users, Pencil, Trash2, Lock, Cake, Link as LinkIcon, KeyRound } from 'lucide-react';
 import { InviteLinksDialog } from '@/components/collaborators/InviteLinksDialog';
 import { toast } from 'sonner';
 
