@@ -774,6 +774,10 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
     <Dialog open={!!task} onOpenChange={o => !o && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
+          <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            <FolderKanban className="h-3 w-3" />
+            <span>Cliente: {getTaskClientName(store, task)}</span>
+          </div>
           <DialogTitle>
             <Input
               defaultValue={task.name}
