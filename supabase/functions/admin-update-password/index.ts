@@ -14,13 +14,17 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
 }
 
 function friendlyAuthMessage(message: string) {
-  if (/password|pwned|leaked|compromised|hibp|breached/i.test(message)) {
+  if (/password|pwned|leaked|compromised|hibp|breached|weak|easy to guess/i.test(message)) {
     return 'Essa senha foi recusada pela proteção de segurança. Gere uma senha mais forte e única.'
   }
   if (/not found|unable to validate|invalid/i.test(message)) {
     return 'Usuário de login não encontrado para este colaborador.'
   }
   return message
+}
+
+function isExpectedPasswordValidation(message: string, status?: number) {
+  return status === 400 && /password|pwned|leaked|compromised|hibp|breached|weak|easy to guess/i.test(message)
 }
 
 async function findUserIdByEmail(supabaseClient: ReturnType<typeof createClient>, email: string) {
@@ -92,7 +96,11 @@ serve(async (req) => {
     const { error } = await supabaseClient.auth.admin.updateUserById(targetUserId, { password: cleanPassword })
     if (error) {
       console.error('admin-update-password failed', { status: error.status, name: error.name, message: error.message })
-      return jsonResponse({ error: friendlyAuthMessage(error.message), raw_error: error.message }, error.status || 400)
+      const body = { success: false, error: friendlyAuthMessage(error.message), raw_error: error.message }
+      if (isExpectedPasswordValidation(error.message, error.status)) {
+        return jsonResponse(body, 200)
+      }
+      return jsonResponse(body, error.status || 400)
     }
 
     return jsonResponse({ success: true })
