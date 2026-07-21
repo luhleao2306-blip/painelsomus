@@ -542,41 +542,21 @@ export const opStore = {
   },
   addChecklistItem(taskId: string, text: string) {
     const item = { id: uid(), text, done: false };
-    let updated: OpTask | null = null;
-    setState({ tasks: state.tasks.map(t => {
-      if (t.id !== taskId) return t;
-      updated = { ...t, checklist: [...t.checklist, item] };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    const u = patchTaskLocal(taskId, t => ({ ...t, checklist: [...t.checklist, item] }));
+    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   toggleChecklistItem(taskId: string, itemId: string) {
-    let updated: OpTask | null = null;
-    setState({ tasks: state.tasks.map(t => {
-      if (t.id !== taskId) return t;
-      updated = { ...t, checklist: t.checklist.map(i => i.id === itemId ? { ...i, done: !i.done } : i) };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    const u = patchTaskLocal(taskId, t => ({ ...t, checklist: t.checklist.map(i => i.id === itemId ? { ...i, done: !i.done } : i) }));
+    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   removeChecklistItem(taskId: string, itemId: string) {
-    let updated: OpTask | null = null;
-    setState({ tasks: state.tasks.map(t => {
-      if (t.id !== taskId) return t;
-      updated = { ...t, checklist: t.checklist.filter(i => i.id !== itemId) };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_tasks').update({ checklist: updated.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    const u = patchTaskLocal(taskId, t => ({ ...t, checklist: t.checklist.filter(i => i.id !== itemId) }));
+    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   addComment(taskId: string, authorId: string, text: string) {
     const c: OpComment = { id: uid(), authorId, text, createdAt: new Date().toISOString() };
-    let updated: OpTask | null = null;
-    setState({ tasks: state.tasks.map(t => {
-      if (t.id !== taskId) return t;
-      updated = { ...t, comments: [...t.comments, c] };
-      return updated;
-    }) });
-    if (updated) bg(supabase.from('op_tasks').update({ comments: updated.comments, updated_at: new Date().toISOString() }).eq('id', taskId));
+    const u = patchTaskLocal(taskId, t => ({ ...t, comments: [...t.comments, c] }));
+    if (u) bg(supabase.from('op_tasks').update({ comments: u.comments, updated_at: new Date().toISOString() }).eq('id', taskId));
   },
   removeTask(id: string) {
     setState({ tasks: state.tasks.filter(t => t.id !== id) });
