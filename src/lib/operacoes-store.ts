@@ -402,12 +402,15 @@ async function hydrate() {
 }
 
 let realtimeChannel: any = null;
+const pendingTemplateIds = new Set<string>();
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
   const refresh = async () => {
     try {
       const data = await fetchAll();
-      setState({ ...data });
+      // preserva templates duplicados que ainda não commitaram
+      const extras = state.templates.filter(t => pendingTemplateIds.has(t.id) && !data.templates.some(x => x.id === t.id));
+      setState({ ...data, templates: [...data.templates, ...extras] });
     } catch {}
   };
   realtimeChannel = supabase
@@ -684,11 +687,30 @@ export const opStore = {
     const tpl = state.templates.find(t => t.id === id);
     if (!tpl) return null;
     const copy: OpTemplate = {
-      id: uid(), name: `${tpl.name} (cópia)`,
-      sections: tpl.sections.map(s => ({ name: s.name, tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })) })),
+      id: uid(),
+      name: `${tpl.name} (cópia)`,
+      sections: tpl.sections.map(s => ({
+        name: s.name,
+        tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })),
+      })),
     };
+    // Marca como pendente para não ser removido por um refresh de realtime
+    // que rode antes do insert commitar no banco.
+    pendingTemplateIds.add(copy.id);
     setState({ templates: [...state.templates, copy] });
-    bg(supabase.from('op_templates').insert({ id: copy.id, name: copy.name, sections: copy.sections }));
+    (async () => {
+      const { error } = await supabase
+        .from('op_templates')
+        .upsert({ id: copy.id, name: copy.name, sections: copy.sections as any });
+      if (error) {
+        console.warn('[Operações] duplicateTemplate falhou:', error.message);
+        pendingTemplateIds.delete(copy.id);
+        setState({ templates: state.templates.filter(t => t.id !== copy.id) });
+      } else {
+        // libera após um pequeno delay para o próximo refresh já enxergar a linha
+        setTimeout(() => pendingTemplateIds.delete(copy.id), 4000);
+      }
+    })();
     return copy.id;
   },
 
