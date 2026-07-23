@@ -701,8 +701,8 @@ function GanttView({ projectId }: { projectId: string }) {
             <div className="border-b border-border/60 bg-muted/20 px-4 py-2 font-display text-[13px] font-semibold">{section.name}</div>
             <div className="divide-y divide-border/60">
               {items.map(t => {
-                const start = new Date(t.startDate ?? t.dueDate!).getTime();
-                const end = new Date(t.dueDate!).getTime();
+                const start = parseLocalDate(t.startDate ?? t.dueDate!)!.getTime();
+                const end = parseLocalDate(t.dueDate!)!.getTime();
                 const left = ((start - min) / span) * 100;
                 const width = Math.max(3, ((end - start) / span) * 100);
                 const meta = STATUS_META[t.status];
@@ -713,7 +713,7 @@ function GanttView({ projectId }: { projectId: string }) {
                       <div className="absolute inset-y-0 rounded-md" style={{ left: `${left}%`, width: `${width}%`, background: 'hsl(var(--primary) / 0.5)' }} />
                       <div className="absolute inset-y-0 flex items-center pl-2 text-[10px] text-primary-foreground" style={{ left: `${left}%` }}>
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${meta.dot} mr-1`} />
-                        {new Date(t.dueDate!).toLocaleDateString('pt-BR')}
+                        {formatLocalDate(t.dueDate!)}
                       </div>
                     </div>
                   </div>
