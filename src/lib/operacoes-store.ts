@@ -402,6 +402,7 @@ async function hydrate() {
 }
 
 let realtimeChannel: any = null;
+const pendingTemplateIds = new Set<string>();
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
   const refresh = async () => {
