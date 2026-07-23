@@ -934,13 +934,6 @@ function TaskDetailDialog({ taskId, onClose }: { taskId: string | null; onClose:
 
 
 
-        <div className="border-t pt-4">
-          <label className="mb-2 block text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Anexos
-          </label>
-          <AttachmentsPanel entityType="task" entityId={task.id} />
-        </div>
-
 
 
         <DialogFooter>
