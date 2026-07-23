@@ -688,8 +688,8 @@ function GanttView({ projectId }: { projectId: string }) {
   if (dated.length === 0) {
     return <div className="rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">Adicione datas de conclusão nas tarefas para ver o Gantt.</div>;
   }
-  const min = Math.min(...dated.map(t => new Date(t.startDate ?? t.dueDate!).getTime()));
-  const max = Math.max(...dated.map(t => new Date(t.dueDate!).getTime()));
+  const min = Math.min(...dated.map(t => parseLocalDate(t.startDate ?? t.dueDate!)!.getTime()));
+  const max = Math.max(...dated.map(t => parseLocalDate(t.dueDate!)!.getTime()));
   const span = Math.max(1, max - min);
   return (
     <div className="space-y-6">
