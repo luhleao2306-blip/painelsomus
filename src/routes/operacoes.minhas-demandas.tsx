@@ -150,8 +150,9 @@ function MinhasDemandas() {
       ) : (
         <div className="grid grid-cols-1 gap-4 pb-20">
           {tasks.map(t => {
-            const isOverdue = t.dueDate && new Date(t.dueDate) < today && t.status !== 'concluido';
-            const isToday = t.dueDate && new Date(t.dueDate).toDateString() === today.toDateString();
+            const dueLocal = parseLocalDate(t.dueDate);
+            const isOverdue = dueLocal && dueLocal < today && t.status !== 'concluido';
+            const isToday = dueLocal && dueLocal.toDateString() === today.toDateString();
             const meta = STATUS_META[t.status];
             const isExpanded = expandedTask === t.id;
             const done = t.checklist.filter(c => c.done).length;
