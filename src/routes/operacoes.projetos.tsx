@@ -751,7 +751,7 @@ function CardView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
             <p className="mt-2 text-[12.5px] font-medium leading-snug">{t.name}</p>
             <div className="mt-2 flex items-center justify-between text-[10.5px] text-muted-foreground">
               <span>{assignee?.name.split(' ')[0] ?? 'Sem responsável'}</span>
-              <span>{t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '—'}</span>
+              <span>{t.dueDate ? formatLocalDate(t.dueDate) : '—'}</span>
             </div>
           </button>
         );
