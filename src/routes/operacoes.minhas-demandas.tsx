@@ -332,7 +332,7 @@ function MinhasDemandas() {
                               </div>
                               <div>
                                  <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Início</div>
-                                 <div className="text-[13px] text-zinc-300">{t.startDate ? new Date(t.startDate).toLocaleDateString('pt-BR') : '—'}</div>
+                                 <div className="text-[13px] text-zinc-300">{t.startDate ? formatLocalDate(t.startDate) : '—'}</div>
                               </div>
                               {t.comments && t.comments.length > 0 && (
                                 <div>
