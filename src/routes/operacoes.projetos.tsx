@@ -658,7 +658,7 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                         )}
                         {t.dueDate && (
                           <span className={`ml-auto rounded-full px-1.5 py-0.5 ${overdue ? 'bg-red-500/15 text-red-600 dark:text-red-400 font-semibold' : 'bg-muted text-muted-foreground'}`}>
-                            {new Date(t.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                            {parseLocalDate(t.dueDate)!.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                           </span>
                         )}
                       </div>
