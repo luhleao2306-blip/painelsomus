@@ -35,7 +35,7 @@ function OperacoesPainel() {
       byStatus[t.status]++;
       if (t.status === 'concluido') done++;
       if (t.dueDate) {
-        const d = new Date(t.dueDate);
+        const d = parseLocalDate(t.dueDate)!;
         if (t.status !== 'concluido' && d < today) overdue++;
         else if (t.status !== 'concluido' && d >= today && d <= in7) dueSoon++;
       }
