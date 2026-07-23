@@ -69,7 +69,7 @@ function MinhasDemandas() {
         if (a.priority !== 'alta' && b.priority === 'alta') return 1;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        return parseLocalDate(a.dueDate)!.getTime() - parseLocalDate(b.dueDate)!.getTime();
       });
   }, [store.tasks, effectiveUser, search]);
 
