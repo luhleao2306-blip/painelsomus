@@ -622,7 +622,7 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                 )}
                 {items.map(t => {
                   const assignee = store.users.find(u => u.id === t.assigneeId);
-                  const overdue = !!t.dueDate && t.status !== 'concluido' && new Date(t.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+                  const overdue = !!t.dueDate && t.status !== 'concluido' && parseLocalDate(t.dueDate)! < new Date(new Date().setHours(0, 0, 0, 0));
                   return (
                     <div
                       key={t.id}
