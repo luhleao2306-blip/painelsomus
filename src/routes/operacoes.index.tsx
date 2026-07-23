@@ -8,6 +8,7 @@ import {
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { parseLocalDate } from '@/lib/date-utils';
 
 
 export const Route = createFileRoute('/operacoes/')({
@@ -34,7 +35,7 @@ function OperacoesPainel() {
       byStatus[t.status]++;
       if (t.status === 'concluido') done++;
       if (t.dueDate) {
-        const d = new Date(t.dueDate);
+        const d = parseLocalDate(t.dueDate)!;
         if (t.status !== 'concluido' && d < today) overdue++;
         else if (t.status !== 'concluido' && d >= today && d <= in7) dueSoon++;
       }
@@ -61,7 +62,7 @@ function OperacoesPainel() {
   const dailyByUser = store.users.map(u => {
     const items = store.tasks
       .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.dueDate)
-      .map(t => ({ t, d: new Date(t.dueDate!) }))
+      .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
       .filter(({ d }) => d < tomorrow) // hoje ou atrasadas
       .sort((a, b) => a.d.getTime() - b.d.getTime());
     return { user: u, items };
@@ -69,7 +70,7 @@ function OperacoesPainel() {
 
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
-    .map(t => ({ t, d: new Date(t.dueDate!) }))
+    .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
     .sort((a, b) => a.d.getTime() - b.d.getTime())
     .slice(0, 6);
 

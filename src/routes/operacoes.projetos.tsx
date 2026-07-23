@@ -13,6 +13,7 @@ import {
   useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName,
   type OpStatus, type OpTask, type OpPriority,
 } from '@/lib/operacoes-store';
+import { parseLocalDate, formatLocalDate } from '@/lib/date-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -621,7 +622,7 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                 )}
                 {items.map(t => {
                   const assignee = store.users.find(u => u.id === t.assigneeId);
-                  const overdue = !!t.dueDate && t.status !== 'concluido' && new Date(t.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+                  const overdue = !!t.dueDate && t.status !== 'concluido' && parseLocalDate(t.dueDate)! < new Date(new Date().setHours(0, 0, 0, 0));
                   return (
                     <div
                       key={t.id}
@@ -657,7 +658,7 @@ function KanbanView({ projectId, onOpenTask }: { projectId: string; onOpenTask: 
                         )}
                         {t.dueDate && (
                           <span className={`ml-auto rounded-full px-1.5 py-0.5 ${overdue ? 'bg-red-500/15 text-red-600 dark:text-red-400 font-semibold' : 'bg-muted text-muted-foreground'}`}>
-                            {new Date(t.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                            {parseLocalDate(t.dueDate)!.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                           </span>
                         )}
                       </div>
@@ -687,8 +688,8 @@ function GanttView({ projectId }: { projectId: string }) {
   if (dated.length === 0) {
     return <div className="rounded-lg border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">Adicione datas de conclusão nas tarefas para ver o Gantt.</div>;
   }
-  const min = Math.min(...dated.map(t => new Date(t.startDate ?? t.dueDate!).getTime()));
-  const max = Math.max(...dated.map(t => new Date(t.dueDate!).getTime()));
+  const min = Math.min(...dated.map(t => parseLocalDate(t.startDate ?? t.dueDate!)!.getTime()));
+  const max = Math.max(...dated.map(t => parseLocalDate(t.dueDate!)!.getTime()));
   const span = Math.max(1, max - min);
   return (
     <div className="space-y-6">
@@ -700,8 +701,8 @@ function GanttView({ projectId }: { projectId: string }) {
             <div className="border-b border-border/60 bg-muted/20 px-4 py-2 font-display text-[13px] font-semibold">{section.name}</div>
             <div className="divide-y divide-border/60">
               {items.map(t => {
-                const start = new Date(t.startDate ?? t.dueDate!).getTime();
-                const end = new Date(t.dueDate!).getTime();
+                const start = parseLocalDate(t.startDate ?? t.dueDate!)!.getTime();
+                const end = parseLocalDate(t.dueDate!)!.getTime();
                 const left = ((start - min) / span) * 100;
                 const width = Math.max(3, ((end - start) / span) * 100);
                 const meta = STATUS_META[t.status];
@@ -712,7 +713,7 @@ function GanttView({ projectId }: { projectId: string }) {
                       <div className="absolute inset-y-0 rounded-md" style={{ left: `${left}%`, width: `${width}%`, background: 'hsl(var(--primary) / 0.5)' }} />
                       <div className="absolute inset-y-0 flex items-center pl-2 text-[10px] text-primary-foreground" style={{ left: `${left}%` }}>
                         <span className={`inline-block h-1.5 w-1.5 rounded-full ${meta.dot} mr-1`} />
-                        {new Date(t.dueDate!).toLocaleDateString('pt-BR')}
+                        {formatLocalDate(t.dueDate!)}
                       </div>
                     </div>
                   </div>
@@ -750,7 +751,7 @@ function CardView({ projectId, onOpenTask }: { projectId: string; onOpenTask: (i
             <p className="mt-2 text-[12.5px] font-medium leading-snug">{t.name}</p>
             <div className="mt-2 flex items-center justify-between text-[10.5px] text-muted-foreground">
               <span>{assignee?.name.split(' ')[0] ?? 'Sem responsável'}</span>
-              <span>{t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '—'}</span>
+              <span>{t.dueDate ? formatLocalDate(t.dueDate) : '—'}</span>
             </div>
           </button>
         );

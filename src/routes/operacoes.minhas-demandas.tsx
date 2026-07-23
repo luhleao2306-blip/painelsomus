@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProfile } from '@/hooks/use-profile';
+import { parseLocalDate, formatLocalDate } from '@/lib/date-utils';
 
 export const Route = createFileRoute('/operacoes/minhas-demandas')({
   component: MinhasDemandas,
@@ -68,7 +69,7 @@ function MinhasDemandas() {
         if (a.priority !== 'alta' && b.priority === 'alta') return 1;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        return parseLocalDate(a.dueDate)!.getTime() - parseLocalDate(b.dueDate)!.getTime();
       });
   }, [store.tasks, effectiveUser, search]);
 
@@ -149,8 +150,9 @@ function MinhasDemandas() {
       ) : (
         <div className="grid grid-cols-1 gap-4 pb-20">
           {tasks.map(t => {
-            const isOverdue = t.dueDate && new Date(t.dueDate) < today && t.status !== 'concluido';
-            const isToday = t.dueDate && new Date(t.dueDate).toDateString() === today.toDateString();
+            const dueLocal = parseLocalDate(t.dueDate);
+            const isOverdue = dueLocal && dueLocal < today && t.status !== 'concluido';
+            const isToday = dueLocal && dueLocal.toDateString() === today.toDateString();
             const meta = STATUS_META[t.status];
             const isExpanded = expandedTask === t.id;
             const done = t.checklist.filter(c => c.done).length;
@@ -211,7 +213,7 @@ function MinhasDemandas() {
                     <div className="text-right hidden sm:block">
                       <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Prazo</div>
                       <div className={`font-mono text-[13px] font-medium tabular-nums ${isOverdue ? 'text-red-400' : 'text-zinc-300'}`}>
-                        {t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '—'}
+                        {t.dueDate ? formatLocalDate(t.dueDate) : '—'}
                       </div>
                     </div>
                     
@@ -330,7 +332,7 @@ function MinhasDemandas() {
                               </div>
                               <div>
                                  <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Início</div>
-                                 <div className="text-[13px] text-zinc-300">{t.startDate ? new Date(t.startDate).toLocaleDateString('pt-BR') : '—'}</div>
+                                 <div className="text-[13px] text-zinc-300">{t.startDate ? formatLocalDate(t.startDate) : '—'}</div>
                               </div>
                               {t.comments && t.comments.length > 0 && (
                                 <div>
