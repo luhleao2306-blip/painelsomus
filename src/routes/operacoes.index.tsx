@@ -62,7 +62,7 @@ function OperacoesPainel() {
   const dailyByUser = store.users.map(u => {
     const items = store.tasks
       .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.dueDate)
-      .map(t => ({ t, d: new Date(t.dueDate!) }))
+      .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
       .filter(({ d }) => d < tomorrow) // hoje ou atrasadas
       .sort((a, b) => a.d.getTime() - b.d.getTime());
     return { user: u, items };
@@ -70,7 +70,7 @@ function OperacoesPainel() {
 
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
-    .map(t => ({ t, d: new Date(t.dueDate!) }))
+    .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
     .sort((a, b) => a.d.getTime() - b.d.getTime())
     .slice(0, 6);
 
