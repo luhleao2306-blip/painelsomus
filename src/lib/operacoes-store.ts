@@ -403,14 +403,27 @@ async function hydrate() {
 
 let realtimeChannel: any = null;
 const pendingTemplateIds = new Set<string>();
+const pendingProjectIds = new Set<string>();
+const pendingSectionIds = new Set<string>();
+const pendingTaskIds = new Set<string>();
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
   const refresh = async () => {
     try {
       const data = await fetchAll();
-      // preserva templates duplicados que ainda não commitaram
-      const extras = state.templates.filter(t => pendingTemplateIds.has(t.id) && !data.templates.some(x => x.id === t.id));
-      setState({ ...data, templates: [...data.templates, ...extras] });
+      // Preserva entidades pendentes (ainda não commitadas no banco) para
+      // que o realtime não sobrescreva o que acabamos de inserir localmente.
+      const extraTemplates = state.templates.filter(t => pendingTemplateIds.has(t.id) && !data.templates.some(x => x.id === t.id));
+      const extraProjects  = state.projects.filter(p => pendingProjectIds.has(p.id)  && !data.projects.some(x => x.id === p.id));
+      const extraSections  = state.sections.filter(s => pendingSectionIds.has(s.id)  && !data.sections.some(x => x.id === s.id));
+      const extraTasks     = state.tasks.filter(t => pendingTaskIds.has(t.id)        && !data.tasks.some(x => x.id === t.id));
+      setState({
+        ...data,
+        templates: [...data.templates, ...extraTemplates],
+        projects:  [...data.projects,  ...extraProjects],
+        sections:  [...data.sections,  ...extraSections],
+        tasks:     [...data.tasks,     ...extraTasks],
+      });
     } catch {}
   };
   realtimeChannel = supabase
