@@ -407,7 +407,9 @@ function subscribeRealtime() {
   const refresh = async () => {
     try {
       const data = await fetchAll();
-      setState({ ...data });
+      // preserva templates duplicados que ainda não commitaram
+      const extras = state.templates.filter(t => pendingTemplateIds.has(t.id) && !data.templates.some(x => x.id === t.id));
+      setState({ ...data, templates: [...data.templates, ...extras] });
     } catch {}
   };
   realtimeChannel = supabase
