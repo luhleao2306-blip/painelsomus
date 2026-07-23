@@ -664,14 +664,50 @@ export const opStore = {
         });
       });
     });
+    // Marca como pendente para o realtime não sobrescrever antes do commit.
+    pendingProjectIds.add(projectId);
+    newSections.forEach(s => pendingSectionIds.add(s.id));
+    newTasks.forEach(t => pendingTaskIds.add(t.id));
     setState({
       projects: [...state.projects, { id: projectId, folderId, name: projectName, status: 'nao_iniciado' }],
       sections: [...state.sections, ...newSections],
       tasks: [...state.tasks, ...newTasks],
     });
-    bg(supabase.from('op_projects').insert({ id: projectId, folder_id: folderId, name: projectName, status: 'nao_iniciado' }));
-    if (newSections.length) bg(supabase.from('op_sections').insert(newSections.map(s => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order }))));
-    if (newTasks.length) bg(supabase.from('op_tasks').insert(newTasks.map(taskToRow)));
+    // Inserts em CADEIA (await), não em paralelo — as FKs exigem que
+    // op_projects commite antes de op_sections, e op_sections antes de op_tasks.
+    (async () => {
+      try {
+        const { error: e1 } = await supabase.from('op_projects')
+          .insert({ id: projectId, folder_id: folderId, name: projectName, status: 'nao_iniciado' });
+        if (e1) throw e1;
+        if (newSections.length) {
+          const { error: e2 } = await supabase.from('op_sections')
+            .insert(newSections.map(s => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order })));
+          if (e2) throw e2;
+        }
+        if (newTasks.length) {
+          const { error: e3 } = await supabase.from('op_tasks').insert(newTasks.map(taskToRow));
+          if (e3) throw e3;
+        }
+        // libera pendências após um pequeno delay para o próximo refresh já ver as linhas
+        setTimeout(() => {
+          pendingProjectIds.delete(projectId);
+          newSections.forEach(s => pendingSectionIds.delete(s.id));
+          newTasks.forEach(t => pendingTaskIds.delete(t.id));
+        }, 4000);
+      } catch (err: any) {
+        console.warn('[Operações] applyTemplate falhou:', err?.message ?? err);
+        // rollback local
+        pendingProjectIds.delete(projectId);
+        newSections.forEach(s => pendingSectionIds.delete(s.id));
+        newTasks.forEach(t => pendingTaskIds.delete(t.id));
+        setState({
+          projects: state.projects.filter(p => p.id !== projectId),
+          sections: state.sections.filter(s => s.projectId !== projectId),
+          tasks: state.tasks.filter(t => !newTasks.some(n => n.id === t.id)),
+        });
+      }
+    })();
     return projectId;
   },
   saveProjectAsTemplate(projectId: string, name: string) {
