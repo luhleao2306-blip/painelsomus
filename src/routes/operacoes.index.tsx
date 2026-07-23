@@ -1,15 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
-  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus, opStore,
+  useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus,
 } from '@/lib/operacoes-store';
-import { toast } from 'sonner';
-import { UploadCloud, Loader2 } from 'lucide-react';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
 
 export const Route = createFileRoute('/operacoes/')({
   component: OperacoesPainel,
@@ -19,26 +18,8 @@ const ICONS = { crown: Crown, megaphone: Megaphone, brush: Brush, diamond: Diamo
 
 function OperacoesPainel() {
   const store = useOpStore();
-  const [syncing, setSyncing] = useState(false);
 
-  async function handleForceSync() {
-    setSyncing(true);
-    try {
-      const res = await opStore.forceSyncLegacy();
-      if (res.ok && res.counts) {
-        const total = Object.values(res.counts).reduce((a, b) => a + b, 0);
-        toast.success(`Sincronização concluída — ${total} itens enviados para o Cloud.`);
-      } else if (res.reason === 'no_local_data') {
-        toast.info('Nada para sincronizar neste navegador.');
-      } else if (res.reason === 'error') {
-        toast.error(`Falhou: ${res.error ?? 'erro desconhecido'}`);
-      } else {
-        toast.info('Nenhum dado local pendente.');
-      }
-    } finally {
-      setSyncing(false);
-    }
-  }
+
 
 
   const stats = useMemo(() => {
@@ -143,16 +124,8 @@ function OperacoesPainel() {
               >
                 Novo projeto por modelo
               </Link>
-              <button
-                type="button"
-                onClick={handleForceSync}
-                disabled={syncing}
-                title="Envia dados de Operações que ainda estão no seu navegador para o Lovable Cloud, tornando-os visíveis para todo o time."
-                className="inline-flex items-center gap-1.5 rounded-md border border-amber-400/30 bg-amber-400/10 px-3.5 py-2 text-[12.5px] font-medium text-amber-200 transition hover:bg-amber-400/15 disabled:opacity-60"
-              >
-                {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="h-3.5 w-3.5" />}
-                {syncing ? 'Sincronizando…' : 'Sincronizar dados locais'}
-              </button>
+
+
 
             </div>
           </div>
