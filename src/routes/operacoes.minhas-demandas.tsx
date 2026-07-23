@@ -213,7 +213,7 @@ function MinhasDemandas() {
                     <div className="text-right hidden sm:block">
                       <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Prazo</div>
                       <div className={`font-mono text-[13px] font-medium tabular-nums ${isOverdue ? 'text-red-400' : 'text-zinc-300'}`}>
-                        {t.dueDate ? new Date(t.dueDate).toLocaleDateString('pt-BR') : '—'}
+                        {t.dueDate ? formatLocalDate(t.dueDate) : '—'}
                       </div>
                     </div>
                     
