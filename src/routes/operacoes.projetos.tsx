@@ -13,6 +13,7 @@ import {
   useOpStore, opStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName,
   type OpStatus, type OpTask, type OpPriority,
 } from '@/lib/operacoes-store';
+import { parseLocalDate, formatLocalDate } from '@/lib/date-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
