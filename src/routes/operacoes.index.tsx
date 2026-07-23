@@ -8,6 +8,7 @@ import {
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { parseLocalDate } from '@/lib/date-utils';
 
 
 export const Route = createFileRoute('/operacoes/')({
