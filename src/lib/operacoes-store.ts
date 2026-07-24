@@ -442,6 +442,7 @@ const deletingSectionIds = new Set<string>();
 const deletingTaskIds = new Set<string>();
 const deletingTemplateIds = new Set<string>();
 const deletingFormIds = new Set<string>();
+const deletingFormAnswerIds = new Set<string>();
 const deletingSenhaIds = new Set<string>();
 
 function mergePendingRows<T extends { id: string }>(cloudRows: T[], localRows: T[], pending: Set<string>, deleting?: Set<string>) {
@@ -486,7 +487,7 @@ function subscribeRealtime() {
         sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
         tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
         forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
-        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds),
+        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
         senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
         _lastSyncError: null,
       });
@@ -1007,11 +1008,12 @@ export const opStore = {
     const previous = { forms: state.forms, formAnswers: state.formAnswers };
     const answerIds = state.formAnswers.filter(answer => answer.formId === id).map(answer => answer.id);
     deletingFormIds.add(id);
+    answerIds.forEach(answerId => deletingFormAnswerIds.add(answerId));
     setState({ forms: state.forms.filter(f => f.id !== id) });
     bg(() => supabase.from('op_forms').delete().eq('id', id), {
       deleting: [
         { set: deletingFormIds, ids: [id] },
-        { set: pendingFormAnswerIds, ids: answerIds },
+        { set: deletingFormAnswerIds, ids: answerIds },
       ],
       rollback: () => setState(previous),
     });
