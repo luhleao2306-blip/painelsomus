@@ -411,11 +411,11 @@ async function hydrate() {
       await migrateLegacyIfNeeded();
       await seedTemplateIfEmpty();
       const data = await fetchAll();
-      setState({ ...data, _hydrated: true });
+      setState({ ...data, _hydrated: true, _lastSyncError: null });
       subscribeRealtime();
-    } catch (e) {
+    } catch (e: any) {
       console.warn('[Operações] hydrate falhou:', e);
-      setState({ _hydrated: true });
+      setState({ _hydrated: true, _lastSyncError: e?.message ?? 'Falha ao carregar Operações.' });
     }
   })();
   return hydratePromise;
@@ -443,8 +443,11 @@ function subscribeRealtime() {
         projects:  [...data.projects,  ...extraProjects],
         sections:  [...data.sections,  ...extraSections],
         tasks:     [...data.tasks,     ...extraTasks],
+        _lastSyncError: null,
       });
-    } catch {}
+    } catch (e: any) {
+      raiseSyncError(e?.message ?? 'Falha ao atualizar Operações em tempo real.');
+    }
   };
   realtimeChannel = supabase
     .channel('op-realtime')
@@ -464,8 +467,19 @@ if (typeof window !== 'undefined') {
   setTimeout(() => { hydrate(); }, 0);
 }
 
-// fire-and-forget helper
-const bg = (p: any) => { Promise.resolve(p).then((r: any) => { if (r?.error) console.warn('[Operações] sync:', r.error.message ?? r.error); }).catch((e: any) => console.warn('[Operações] sync:', e?.message ?? e)); };
+// Sincroniza com o Cloud e mostra erro real em vez de deixar a ação “sumir”.
+const bg = (p: any) => {
+  setState({ _syncing: true, _lastSyncError: null });
+  Promise.resolve(p)
+    .then((r: any) => {
+      if (r?.error) {
+        raiseSyncError(r.error.message ?? String(r.error));
+        return;
+      }
+      setState({ _syncing: false, _lastSyncError: null });
+    })
+    .catch((e: any) => raiseSyncError(e?.message ?? String(e)));
+};
 
 function patchTaskLocal(taskId: string, fn: (t: OpTask) => OpTask): OpTask | undefined {
   let out: OpTask | undefined;
