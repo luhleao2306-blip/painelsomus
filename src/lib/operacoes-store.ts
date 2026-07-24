@@ -522,7 +522,7 @@ const bg = (p: any, options?: SyncOptions) => {
       const failed = results.find((item: any) => item?.error);
       if (failed?.error) {
         if (count < 2) {
-          window.setTimeout(() => attempt(count + 1), 500 * (count + 1));
+          setTimeout(() => attempt(count + 1), 500 * (count + 1));
           return;
         }
         clearSyncOptions(options);
@@ -535,7 +535,7 @@ const bg = (p: any, options?: SyncOptions) => {
     })
     .catch((e: any) => {
       if (count < 2) {
-        window.setTimeout(() => attempt(count + 1), 500 * (count + 1));
+        setTimeout(() => attempt(count + 1), 500 * (count + 1));
         return;
       }
       clearSyncOptions(options);
