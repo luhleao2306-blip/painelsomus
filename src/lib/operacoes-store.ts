@@ -760,10 +760,13 @@ export const opStore = {
       updated = { ...t, ...patch };
       return updated;
     }) });
-    if (updated) bg(() => supabase.from('op_tasks').update(taskToRow(updated)).eq('id', id), {
+    if (updated) {
+      const taskForSync = updated;
+      bg(() => supabase.from('op_tasks').update(taskToRow(taskForSync)).eq('id', id), {
       pending: [{ set: pendingTaskIds, ids: [id] }],
       rollback: () => setState({ tasks: previous }),
-    });
+      });
+    }
   },
   addChecklistItem(taskId: string, text: string) {
     const item = { id: uid(), text, done: false };
