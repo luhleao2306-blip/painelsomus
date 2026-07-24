@@ -102,6 +102,8 @@ type Store = {
   formAnswers: OpFormAnswer[];
   senhas: OpSenha[];
   _hydrated: boolean;
+  _syncing: boolean;
+  _lastSyncError?: string | null;
 };
 
 const LEGACY_KEY = 'somus-operacoes-v2';
@@ -195,6 +197,8 @@ let state: Store = {
   formAnswers: [],
   senhas: [],
   _hydrated: false,
+  _syncing: false,
+  _lastSyncError: null,
 };
 
 const listeners = new Set<() => void>();
@@ -251,26 +255,42 @@ const taskToRow = (t: OpTask): any => ({
 
 // ============= Cloud sync =============
 
+function raiseSyncError(message: string) {
+  console.warn('[Operações] sync:', message);
+  setState({ _lastSyncError: message, _syncing: false });
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('operacoes-sync-error', { detail: { message } }));
+  }
+}
+
+async function assertResult<T>(label: string, query: PromiseLike<{ data: T | null; error: any }>) {
+  const result = await query;
+  if (result.error) {
+    throw new Error(`${label}: ${result.error.message ?? result.error}`);
+  }
+  return result.data;
+}
+
 async function fetchAll() {
   const [f, p, s, tsk, tpl, frm, fa, sn] = await Promise.all([
-    supabase.from('op_folders').select('*'),
-    supabase.from('op_projects').select('*'),
-    supabase.from('op_sections').select('*').order('position', { ascending: true }),
-    supabase.from('op_tasks').select('*').order('position', { ascending: true }),
-    supabase.from('op_templates').select('*'),
-    supabase.from('op_forms').select('*'),
-    supabase.from('op_form_answers').select('*'),
-    supabase.from('op_senhas').select('*'),
+    assertResult('Pastas', supabase.from('op_folders').select('*')),
+    assertResult('Projetos', supabase.from('op_projects').select('*')),
+    assertResult('Seções', supabase.from('op_sections').select('*').order('position', { ascending: true })),
+    assertResult('Tarefas', supabase.from('op_tasks').select('*').order('position', { ascending: true })),
+    assertResult('Modelos', supabase.from('op_templates').select('*')),
+    assertResult('Formulários', supabase.from('op_forms').select('*')),
+    assertResult('Respostas', supabase.from('op_form_answers').select('*')),
+    assertResult('Cofre de senhas', supabase.from('op_senhas').select('*')),
   ]);
   return {
-    folders: (f.data ?? []).map(rowToFolder),
-    projects: (p.data ?? []).map(rowToProject),
-    sections: (s.data ?? []).map(rowToSection),
-    tasks: (tsk.data ?? []).map(rowToTask),
-    templates: (tpl.data ?? []).map(rowToTemplate),
-    forms: (frm.data ?? []).map(rowToForm),
-    formAnswers: (fa.data ?? []).map(rowToFormAnswer),
-    senhas: (sn.data ?? []).map(rowToSenha),
+    folders: (f ?? []).map(rowToFolder),
+    projects: (p ?? []).map(rowToProject),
+    sections: (s ?? []).map(rowToSection),
+    tasks: (tsk ?? []).map(rowToTask),
+    templates: (tpl ?? []).map(rowToTemplate),
+    forms: (frm ?? []).map(rowToForm),
+    formAnswers: (fa ?? []).map(rowToFormAnswer),
+    senhas: (sn ?? []).map(rowToSenha),
   };
 }
 
