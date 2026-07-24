@@ -7,6 +7,7 @@ import {
 import somusLogoUrl from '@/assets/somus-logo.png';
 import { cn } from '@/lib/utils';
 import { useProfile } from '@/hooks/use-profile';
+import { useOpStore } from '@/lib/operacoes-store';
 
 export const Route = createFileRoute('/operacoes')({
   component: OperacoesLayout,
@@ -34,6 +35,7 @@ function OperacoesLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { profile, loading } = useProfile();
+  const opStoreState = useOpStore();
   const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
@@ -141,18 +143,21 @@ function OperacoesLayout() {
             <span
               className={cn(
                 'hidden items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] md:inline-flex',
-                isLight
-                  ? 'border border-black/10 bg-black/[0.02] text-zinc-600'
-                  : 'border border-white/15 bg-white/[0.04] text-zinc-300',
+                opStoreState._lastSyncError
+                  ? 'border border-destructive/30 bg-destructive/10 text-destructive'
+                  : isLight
+                    ? 'border border-black/10 bg-black/[0.02] text-zinc-600'
+                    : 'border border-white/15 bg-white/[0.04] text-zinc-300',
               )}
+              title={opStoreState._lastSyncError ?? undefined}
             >
               <span
                 className={cn(
                   'h-1.5 w-1.5 animate-pulse rounded-full',
-                  isLight ? 'bg-zinc-900' : 'bg-white',
+                  opStoreState._lastSyncError ? 'bg-destructive' : isLight ? 'bg-zinc-900' : 'bg-white',
                 )}
               />
-              Ao vivo
+              {opStoreState._lastSyncError ? 'Erro ao salvar' : opStoreState._syncing ? 'Salvando' : 'Ao vivo'}
             </span>
 
             <button
