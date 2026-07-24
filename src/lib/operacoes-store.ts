@@ -108,7 +108,12 @@ type Store = {
 
 const LEGACY_KEY = 'somus-operacoes-v2';
 const MIGRATED_FLAG = 'somus-operacoes-migrated-cloud';
-const uid = () => Math.random().toString(36).slice(2, 10);
+const uid = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+};
 
 // ============= Directory (cargos + users) — mantido em memória =============
 // Estes são referências internas usadas para exibir "responsáveis"; ficam hardcoded.
