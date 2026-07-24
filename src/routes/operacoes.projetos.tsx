@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Plus, Trash2, ChevronRight, ChevronDown, FolderKanban, LayoutList,
   KanbanSquare, GanttChart, LayoutGrid, Save, X, MessageSquare, Check, Tag,
@@ -41,6 +41,26 @@ function OperacoesProjetos() {
   );
   const [taskDetail, setTaskDetail] = useState<string | null>(null);
   const [showSaveTpl, setShowSaveTpl] = useState(false);
+
+  useEffect(() => {
+    if (!store.projects.length) {
+      setSelectedProject(null);
+      return;
+    }
+    if (!selectedProject || !store.projects.some(p => p.id === selectedProject)) {
+      setSelectedProject(store.projects[0].id);
+    }
+  }, [selectedProject, store.projects]);
+
+  useEffect(() => {
+    setOpenFolders(current => {
+      const next = { ...current };
+      store.folders.forEach(folder => {
+        if (!(folder.id in next)) next[folder.id] = true;
+      });
+      return next;
+    });
+  }, [store.folders]);
 
   const project = store.projects.find(p => p.id === selectedProject) ?? null;
   const sections = useMemo(
