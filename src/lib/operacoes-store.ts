@@ -601,64 +601,140 @@ export const opStore = {
   // Folders
   addFolder(name: string) {
     const id = uid();
+    const previous = state.folders;
+    pendingFolderIds.add(id);
     setState({ folders: [...state.folders, { id, name }] });
-    bg(supabase.from('op_folders').insert({ id, name }));
+    bg(() => supabase.from('op_folders').upsert({ id, name }), {
+      pending: [{ set: pendingFolderIds, ids: [id] }],
+      rollback: () => setState({ folders: previous }),
+    });
   },
   renameFolder(id: string, name: string) {
+    const previous = state.folders;
+    pendingFolderIds.add(id);
     setState({ folders: state.folders.map(f => f.id === id ? { ...f, name } : f) });
-    bg(supabase.from('op_folders').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+    bg(() => supabase.from('op_folders').update({ name, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingFolderIds, ids: [id] }],
+      rollback: () => setState({ folders: previous }),
+    });
   },
   removeFolder(id: string) {
+    const previous = {
+      folders: state.folders,
+      projects: state.projects,
+      sections: state.sections,
+      tasks: state.tasks,
+    };
     const projIds = state.projects.filter(p => p.folderId === id).map(p => p.id);
     const secIds = state.sections.filter(s => projIds.includes(s.projectId)).map(s => s.id);
+    const taskIds = state.tasks.filter(t => secIds.includes(t.sectionId)).map(t => t.id);
+    deletingFolderIds.add(id);
+    projIds.forEach(projectId => deletingProjectIds.add(projectId));
+    secIds.forEach(sectionId => deletingSectionIds.add(sectionId));
+    taskIds.forEach(taskId => deletingTaskIds.add(taskId));
     setState({
       folders: state.folders.filter(f => f.id !== id),
       projects: state.projects.filter(p => p.folderId !== id),
       sections: state.sections.filter(s => !projIds.includes(s.projectId)),
       tasks: state.tasks.filter(t => !secIds.includes(t.sectionId)),
     });
-    bg(supabase.from('op_folders').delete().eq('id', id));
+    bg(() => supabase.from('op_folders').delete().eq('id', id), {
+      deleting: [
+        { set: deletingFolderIds, ids: [id] },
+        { set: deletingProjectIds, ids: projIds },
+        { set: deletingSectionIds, ids: secIds },
+        { set: deletingTaskIds, ids: taskIds },
+      ],
+      rollback: () => setState(previous),
+    });
   },
 
   // Projects
   addProject(folderId: string, name: string) {
     const id = uid();
+    const previous = state.projects;
+    pendingProjectIds.add(id);
     setState({ projects: [...state.projects, { id, folderId, name, status: 'nao_iniciado' }] });
-    bg(supabase.from('op_projects').insert({ id, folder_id: folderId, name, status: 'nao_iniciado' }));
+    bg(() => supabase.from('op_projects').upsert({ id, folder_id: folderId, name, status: 'nao_iniciado' }), {
+      pending: [{ set: pendingProjectIds, ids: [id] }],
+      rollback: () => setState({ projects: previous }),
+    });
     return id;
   },
   renameProject(id: string, name: string) {
+    const previous = state.projects;
+    pendingProjectIds.add(id);
     setState({ projects: state.projects.map(p => p.id === id ? { ...p, name } : p) });
-    bg(supabase.from('op_projects').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+    bg(() => supabase.from('op_projects').update({ name, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingProjectIds, ids: [id] }],
+      rollback: () => setState({ projects: previous }),
+    });
   },
   updateProjectStatus(id: string, s: OpProject['status']) {
+    const previous = state.projects;
+    pendingProjectIds.add(id);
     setState({ projects: state.projects.map(p => p.id === id ? { ...p, status: s } : p) });
-    bg(supabase.from('op_projects').update({ status: s, updated_at: new Date().toISOString() }).eq('id', id));
+    bg(() => supabase.from('op_projects').update({ status: s, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingProjectIds, ids: [id] }],
+      rollback: () => setState({ projects: previous }),
+    });
   },
   removeProject(id: string) {
+    const previous = { projects: state.projects, sections: state.sections, tasks: state.tasks };
     const secIds = state.sections.filter(s => s.projectId === id).map(s => s.id);
+    const taskIds = state.tasks.filter(t => secIds.includes(t.sectionId)).map(t => t.id);
+    deletingProjectIds.add(id);
+    secIds.forEach(sectionId => deletingSectionIds.add(sectionId));
+    taskIds.forEach(taskId => deletingTaskIds.add(taskId));
     setState({
       projects: state.projects.filter(p => p.id !== id),
       sections: state.sections.filter(s => s.projectId !== id),
       tasks: state.tasks.filter(t => !secIds.includes(t.sectionId)),
     });
-    bg(supabase.from('op_projects').delete().eq('id', id));
+    bg(() => supabase.from('op_projects').delete().eq('id', id), {
+      deleting: [
+        { set: deletingProjectIds, ids: [id] },
+        { set: deletingSectionIds, ids: secIds },
+        { set: deletingTaskIds, ids: taskIds },
+      ],
+      rollback: () => setState(previous),
+    });
   },
 
   // Sections
   addSection(projectId: string, name: string) {
     const id = uid();
     const order = state.sections.filter(s => s.projectId === projectId).length;
+    const previous = state.sections;
+    pendingSectionIds.add(id);
     setState({ sections: [...state.sections, { id, projectId, name, order }] });
-    bg(supabase.from('op_sections').insert({ id, project_id: projectId, name, position: order }));
+    bg(() => supabase.from('op_sections').upsert({ id, project_id: projectId, name, position: order }), {
+      pending: [{ set: pendingSectionIds, ids: [id] }],
+      rollback: () => setState({ sections: previous }),
+    });
   },
   renameSection(id: string, name: string) {
+    const previous = state.sections;
+    pendingSectionIds.add(id);
     setState({ sections: state.sections.map(s => s.id === id ? { ...s, name } : s) });
-    bg(supabase.from('op_sections').update({ name, updated_at: new Date().toISOString() }).eq('id', id));
+    bg(() => supabase.from('op_sections').update({ name, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingSectionIds, ids: [id] }],
+      rollback: () => setState({ sections: previous }),
+    });
   },
   removeSection(id: string) {
+    const previous = { sections: state.sections, tasks: state.tasks };
+    const taskIds = state.tasks.filter(t => t.sectionId === id).map(t => t.id);
+    deletingSectionIds.add(id);
+    taskIds.forEach(taskId => deletingTaskIds.add(taskId));
     setState({ sections: state.sections.filter(s => s.id !== id), tasks: state.tasks.filter(t => t.sectionId !== id) });
-    bg(supabase.from('op_sections').delete().eq('id', id));
+    bg(() => supabase.from('op_sections').delete().eq('id', id), {
+      deleting: [
+        { set: deletingSectionIds, ids: [id] },
+        { set: deletingTaskIds, ids: taskIds },
+      ],
+      rollback: () => setState(previous),
+    });
   },
 
   // Tasks
@@ -666,39 +742,75 @@ export const opStore = {
     const id = uid();
     const position = state.tasks.filter(t => t.sectionId === sectionId).length;
     const task: OpTask = { id, sectionId, name, status: 'nao_iniciado', priority: 'media', tags: [], checklist: [], comments: [], position };
+    const previous = state.tasks;
+    pendingTaskIds.add(id);
     setState({ tasks: [...state.tasks, task] });
-    bg(supabase.from('op_tasks').insert(taskToRow(task)));
+    bg(() => supabase.from('op_tasks').upsert(taskToRow(task)), {
+      pending: [{ set: pendingTaskIds, ids: [id] }],
+      rollback: () => setState({ tasks: previous }),
+    });
+    return id;
   },
   updateTask(id: string, patch: Partial<OpTask>) {
     let updated: OpTask | null = null;
+    const previous = state.tasks;
+    pendingTaskIds.add(id);
     setState({ tasks: state.tasks.map(t => {
       if (t.id !== id) return t;
       updated = { ...t, ...patch };
       return updated;
     }) });
-    if (updated) bg(supabase.from('op_tasks').update(taskToRow(updated)).eq('id', id));
+    if (updated) bg(() => supabase.from('op_tasks').update(taskToRow(updated)).eq('id', id), {
+      pending: [{ set: pendingTaskIds, ids: [id] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   addChecklistItem(taskId: string, text: string) {
     const item = { id: uid(), text, done: false };
+    const previous = state.tasks;
+    pendingTaskIds.add(taskId);
     const u = patchTaskLocal(taskId, t => ({ ...t, checklist: [...t.checklist, item] }));
-    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    if (u) bg(() => supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId), {
+      pending: [{ set: pendingTaskIds, ids: [taskId] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   toggleChecklistItem(taskId: string, itemId: string) {
+    const previous = state.tasks;
+    pendingTaskIds.add(taskId);
     const u = patchTaskLocal(taskId, t => ({ ...t, checklist: t.checklist.map(i => i.id === itemId ? { ...i, done: !i.done } : i) }));
-    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    if (u) bg(() => supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId), {
+      pending: [{ set: pendingTaskIds, ids: [taskId] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   removeChecklistItem(taskId: string, itemId: string) {
+    const previous = state.tasks;
+    pendingTaskIds.add(taskId);
     const u = patchTaskLocal(taskId, t => ({ ...t, checklist: t.checklist.filter(i => i.id !== itemId) }));
-    if (u) bg(supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId));
+    if (u) bg(() => supabase.from('op_tasks').update({ checklist: u.checklist, updated_at: new Date().toISOString() }).eq('id', taskId), {
+      pending: [{ set: pendingTaskIds, ids: [taskId] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   addComment(taskId: string, authorId: string, text: string, authorName?: string) {
     const c: OpComment = { id: uid(), authorId, authorName, text, createdAt: new Date().toISOString() };
+    const previous = state.tasks;
+    pendingTaskIds.add(taskId);
     const u = patchTaskLocal(taskId, t => ({ ...t, comments: [...t.comments, c] }));
-    if (u) bg(supabase.from('op_tasks').update({ comments: u.comments, updated_at: new Date().toISOString() }).eq('id', taskId));
+    if (u) bg(() => supabase.from('op_tasks').update({ comments: u.comments, updated_at: new Date().toISOString() }).eq('id', taskId), {
+      pending: [{ set: pendingTaskIds, ids: [taskId] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   removeTask(id: string) {
+    const previous = state.tasks;
+    deletingTaskIds.add(id);
     setState({ tasks: state.tasks.filter(t => t.id !== id) });
-    bg(supabase.from('op_tasks').delete().eq('id', id));
+    bg(() => supabase.from('op_tasks').delete().eq('id', id), {
+      deleting: [{ set: deletingTaskIds, ids: [id] }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   moveTask(id: string, direction: 'up' | 'down') {
     const task = state.tasks.find(t => t.id === id);
