@@ -515,11 +515,16 @@ if (typeof window !== 'undefined') {
 // Sincroniza com o Cloud e mostra erro real em vez de deixar a ação “sumir”.
 const bg = (p: any, options?: SyncOptions) => {
   setState({ _syncing: true, _lastSyncError: null });
-  Promise.resolve(p)
+  const run = () => (typeof p === 'function' ? p() : p);
+  const attempt = (count = 0) => Promise.resolve(run())
     .then((r: any) => {
       const results = Array.isArray(r) ? r : [r];
       const failed = results.find((item: any) => item?.error);
       if (failed?.error) {
+        if (count < 2) {
+          window.setTimeout(() => attempt(count + 1), 500 * (count + 1));
+          return;
+        }
         clearSyncOptions(options);
         options?.rollback?.();
         raiseSyncError(failed.error.message ?? String(failed.error));
@@ -529,10 +534,15 @@ const bg = (p: any, options?: SyncOptions) => {
       setState({ _syncing: false, _lastSyncError: null });
     })
     .catch((e: any) => {
+      if (count < 2) {
+        window.setTimeout(() => attempt(count + 1), 500 * (count + 1));
+        return;
+      }
       clearSyncOptions(options);
       options?.rollback?.();
       raiseSyncError(e?.message ?? String(e));
     });
+  attempt();
 };
 
 function patchTaskLocal(taskId: string, fn: (t: OpTask) => OpTask): OpTask | undefined {
