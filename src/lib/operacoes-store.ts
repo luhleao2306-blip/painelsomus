@@ -422,27 +422,67 @@ async function hydrate() {
 }
 
 let realtimeChannel: any = null;
+const pendingFolderIds = new Set<string>();
 const pendingTemplateIds = new Set<string>();
 const pendingProjectIds = new Set<string>();
 const pendingSectionIds = new Set<string>();
 const pendingTaskIds = new Set<string>();
+const pendingFormIds = new Set<string>();
+const pendingFormAnswerIds = new Set<string>();
+const pendingSenhaIds = new Set<string>();
+
+const deletingFolderIds = new Set<string>();
+const deletingProjectIds = new Set<string>();
+const deletingSectionIds = new Set<string>();
+const deletingTaskIds = new Set<string>();
+const deletingTemplateIds = new Set<string>();
+const deletingFormIds = new Set<string>();
+const deletingSenhaIds = new Set<string>();
+
+function mergePendingRows<T extends { id: string }>(cloudRows: T[], localRows: T[], pending: Set<string>, deleting?: Set<string>) {
+  const localById = new Map(localRows.map(row => [row.id, row]));
+  const merged = cloudRows
+    .filter(row => !deleting?.has(row.id))
+    .map(row => (pending.has(row.id) ? (localById.get(row.id) ?? row) : row));
+  localRows.forEach(row => {
+    if (pending.has(row.id) && !merged.some(item => item.id === row.id)) {
+      merged.push(row);
+    }
+  });
+  return merged;
+}
+
+function clearIds(set: Set<string>, ids: string[]) {
+  ids.forEach(id => set.delete(id));
+}
+
+type PendingBucket = { set: Set<string>; ids: string[] };
+type SyncOptions = {
+  pending?: PendingBucket[];
+  deleting?: PendingBucket[];
+  rollback?: () => void;
+};
+
+function clearSyncOptions(options?: SyncOptions) {
+  options?.pending?.forEach(bucket => clearIds(bucket.set, bucket.ids));
+  options?.deleting?.forEach(bucket => clearIds(bucket.set, bucket.ids));
+}
+
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
   const refresh = async () => {
     try {
       const data = await fetchAll();
-      // Preserva entidades pendentes (ainda não commitadas no banco) para
-      // que o realtime não sobrescreva o que acabamos de inserir localmente.
-      const extraTemplates = state.templates.filter(t => pendingTemplateIds.has(t.id) && !data.templates.some(x => x.id === t.id));
-      const extraProjects  = state.projects.filter(p => pendingProjectIds.has(p.id)  && !data.projects.some(x => x.id === p.id));
-      const extraSections  = state.sections.filter(s => pendingSectionIds.has(s.id)  && !data.sections.some(x => x.id === s.id));
-      const extraTasks     = state.tasks.filter(t => pendingTaskIds.has(t.id)        && !data.tasks.some(x => x.id === t.id));
       setState({
         ...data,
-        templates: [...data.templates, ...extraTemplates],
-        projects:  [...data.projects,  ...extraProjects],
-        sections:  [...data.sections,  ...extraSections],
-        tasks:     [...data.tasks,     ...extraTasks],
+        folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
+        templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
+        projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
+        sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
+        tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
+        forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
+        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds),
+        senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
         _lastSyncError: null,
       });
     } catch (e: any) {
@@ -468,17 +508,26 @@ if (typeof window !== 'undefined') {
 }
 
 // Sincroniza com o Cloud e mostra erro real em vez de deixar a ação “sumir”.
-const bg = (p: any) => {
+const bg = (p: any, options?: SyncOptions) => {
   setState({ _syncing: true, _lastSyncError: null });
   Promise.resolve(p)
     .then((r: any) => {
-      if (r?.error) {
-        raiseSyncError(r.error.message ?? String(r.error));
+      const results = Array.isArray(r) ? r : [r];
+      const failed = results.find((item: any) => item?.error);
+      if (failed?.error) {
+        clearSyncOptions(options);
+        options?.rollback?.();
+        raiseSyncError(failed.error.message ?? String(failed.error));
         return;
       }
+      clearSyncOptions(options);
       setState({ _syncing: false, _lastSyncError: null });
     })
-    .catch((e: any) => raiseSyncError(e?.message ?? String(e)));
+    .catch((e: any) => {
+      clearSyncOptions(options);
+      options?.rollback?.();
+      raiseSyncError(e?.message ?? String(e));
+    });
 };
 
 function patchTaskLocal(taskId: string, fn: (t: OpTask) => OpTask): OpTask | undefined {
