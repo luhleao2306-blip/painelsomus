@@ -818,6 +818,7 @@ export const opStore = {
   moveTask(id: string, direction: 'up' | 'down') {
     const task = state.tasks.find(t => t.id === id);
     if (!task) return;
+    const previous = state.tasks;
     const siblings = state.tasks.filter(t => t.sectionId === task.sectionId);
     const idx = siblings.findIndex(t => t.id === id);
     const swapWith = direction === 'up' ? idx - 1 : idx + 1;
@@ -836,13 +837,18 @@ export const opStore = {
     setState({ tasks: withPos });
     // sync positions
     const patches = withPos.filter(t => t.sectionId === task.sectionId);
-    patches.forEach(p => bg(supabase.from('op_tasks').update({ position: p.position }).eq('id', p.id)));
+    patches.forEach(p => pendingTaskIds.add(p.id));
+    bg(() => Promise.all(patches.map(p => supabase.from('op_tasks').update({ position: p.position }).eq('id', p.id))), {
+      pending: [{ set: pendingTaskIds, ids: patches.map(p => p.id) }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
   reorderTask(id: string, targetId: string, position: 'before' | 'after' = 'before') {
     if (id === targetId) return;
     const src = state.tasks.find(t => t.id === id);
     const tgt = state.tasks.find(t => t.id === targetId);
     if (!src || !tgt) return;
+    const previous = state.tasks;
     const tasks = state.tasks.filter(t => t.id !== id);
     const moved = { ...src, sectionId: tgt.sectionId };
     const idx = tasks.findIndex(t => t.id === targetId);
@@ -854,10 +860,15 @@ export const opStore = {
       return { ...t, position: pos++ };
     });
     setState({ tasks: withPos });
-    bg(supabase.from('op_tasks').update({ section_id: tgt.sectionId, position: withPos.find(t => t.id === id)?.position ?? 0 }).eq('id', id));
-    withPos.filter(t => t.sectionId === tgt.sectionId && t.id !== id).forEach(p =>
-      bg(supabase.from('op_tasks').update({ position: p.position }).eq('id', p.id))
-    );
+    const patches = withPos.filter(t => t.sectionId === tgt.sectionId);
+    patches.forEach(p => pendingTaskIds.add(p.id));
+    bg(() => Promise.all(patches.map(p => supabase
+      .from('op_tasks')
+      .update(p.id === id ? { section_id: tgt.sectionId, position: p.position } : { position: p.position })
+      .eq('id', p.id))), {
+      pending: [{ set: pendingTaskIds, ids: patches.map(p => p.id) }],
+      rollback: () => setState({ tasks: previous }),
+    });
   },
 
   // Templates
@@ -886,41 +897,31 @@ export const opStore = {
       sections: [...state.sections, ...newSections],
       tasks: [...state.tasks, ...newTasks],
     });
-    // Inserts em CADEIA (await), não em paralelo — as FKs exigem que
-    // op_projects commite antes de op_sections, e op_sections antes de op_tasks.
-    (async () => {
-      try {
-        const { error: e1 } = await supabase.from('op_projects')
-          .insert({ id: projectId, folder_id: folderId, name: projectName, status: 'nao_iniciado' });
-        if (e1) throw e1;
-        if (newSections.length) {
-          const { error: e2 } = await supabase.from('op_sections')
-            .insert(newSections.map(s => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order })));
-          if (e2) throw e2;
-        }
-        if (newTasks.length) {
-          const { error: e3 } = await supabase.from('op_tasks').insert(newTasks.map(taskToRow));
-          if (e3) throw e3;
-        }
-        // libera pendências após um pequeno delay para o próximo refresh já ver as linhas
-        setTimeout(() => {
-          pendingProjectIds.delete(projectId);
-          newSections.forEach(s => pendingSectionIds.delete(s.id));
-          newTasks.forEach(t => pendingTaskIds.delete(t.id));
-        }, 4000);
-      } catch (err: any) {
-        console.warn('[Operações] applyTemplate falhou:', err?.message ?? err);
-        // rollback local
-        pendingProjectIds.delete(projectId);
-        newSections.forEach(s => pendingSectionIds.delete(s.id));
-        newTasks.forEach(t => pendingTaskIds.delete(t.id));
-        setState({
-          projects: state.projects.filter(p => p.id !== projectId),
-          sections: state.sections.filter(s => s.projectId !== projectId),
-          tasks: state.tasks.filter(t => !newTasks.some(n => n.id === t.id)),
-        });
+    bg(async () => {
+      const r1 = await supabase.from('op_projects')
+        .upsert({ id: projectId, folder_id: folderId, name: projectName, status: 'nao_iniciado' });
+      if (r1.error) return r1;
+      if (newSections.length) {
+        const r2 = await supabase.from('op_sections')
+          .upsert(newSections.map(s => ({ id: s.id, project_id: s.projectId, name: s.name, position: s.order })));
+        if (r2.error) return r2;
       }
-    })();
+      if (newTasks.length) {
+        return supabase.from('op_tasks').upsert(newTasks.map(taskToRow));
+      }
+      return r1;
+    }, {
+      pending: [
+        { set: pendingProjectIds, ids: [projectId] },
+        { set: pendingSectionIds, ids: newSections.map(s => s.id) },
+        { set: pendingTaskIds, ids: newTasks.map(t => t.id) },
+      ],
+      rollback: () => setState({
+        projects: state.projects.filter(p => p.id !== projectId),
+        sections: state.sections.filter(s => s.projectId !== projectId),
+        tasks: state.tasks.filter(t => !newTasks.some(n => n.id === t.id)),
+      }),
+    });
     return projectId;
   },
   saveProjectAsTemplate(projectId: string, name: string) {
@@ -934,16 +935,31 @@ export const opStore = {
         })),
       })),
     };
+    const previous = state.templates;
+    pendingTemplateIds.add(tpl.id);
     setState({ templates: [...state.templates, tpl] });
-    bg(supabase.from('op_templates').insert({ id: tpl.id, name: tpl.name, sections: tpl.sections }));
+    bg(() => supabase.from('op_templates').upsert({ id: tpl.id, name: tpl.name, sections: tpl.sections }), {
+      pending: [{ set: pendingTemplateIds, ids: [tpl.id] }],
+      rollback: () => setState({ templates: previous }),
+    });
   },
   removeTemplate(id: string) {
+    const previous = state.templates;
+    deletingTemplateIds.add(id);
     setState({ templates: state.templates.filter(t => t.id !== id) });
-    bg(supabase.from('op_templates').delete().eq('id', id));
+    bg(() => supabase.from('op_templates').delete().eq('id', id), {
+      deleting: [{ set: deletingTemplateIds, ids: [id] }],
+      rollback: () => setState({ templates: previous }),
+    });
   },
   updateTemplate(id: string, patch: Partial<Omit<OpTemplate, 'id'>>) {
+    const previous = state.templates;
+    pendingTemplateIds.add(id);
     const u = patchTemplateLocal(id, t => ({ ...t, ...patch }));
-    if (u) bg(supabase.from('op_templates').update({ name: u.name, sections: u.sections, updated_at: new Date().toISOString() }).eq('id', id));
+    if (u) bg(() => supabase.from('op_templates').update({ name: u.name, sections: u.sections, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingTemplateIds, ids: [id] }],
+      rollback: () => setState({ templates: previous }),
+    });
   },
   duplicateTemplate(id: string) {
     const tpl = state.templates.find(t => t.id === id);
@@ -956,56 +972,80 @@ export const opStore = {
         tasks: s.tasks.map(t => ({ name: t.name, subtasks: [...(t.subtasks ?? [])] })),
       })),
     };
-    // Marca como pendente para não ser removido por um refresh de realtime
-    // que rode antes do insert commitar no banco.
+    const previous = state.templates;
     pendingTemplateIds.add(copy.id);
     setState({ templates: [...state.templates, copy] });
-    (async () => {
-      const { error } = await supabase
-        .from('op_templates')
-        .upsert({ id: copy.id, name: copy.name, sections: copy.sections as any });
-      if (error) {
-        console.warn('[Operações] duplicateTemplate falhou:', error.message);
-        pendingTemplateIds.delete(copy.id);
-        setState({ templates: state.templates.filter(t => t.id !== copy.id) });
-      } else {
-        // libera após um pequeno delay para o próximo refresh já enxergar a linha
-        setTimeout(() => pendingTemplateIds.delete(copy.id), 4000);
-      }
-    })();
+    bg(() => supabase.from('op_templates').upsert({ id: copy.id, name: copy.name, sections: copy.sections as any }), {
+      pending: [{ set: pendingTemplateIds, ids: [copy.id] }],
+      rollback: () => setState({ templates: previous }),
+    });
     return copy.id;
   },
 
   // Forms
   addForm(name: string) {
     const id = uid();
+    const previous = state.forms;
+    pendingFormIds.add(id);
     setState({ forms: [...state.forms, { id, name, fields: [] }] });
-    bg(supabase.from('op_forms').insert({ id, name, fields: [] }));
+    bg(() => supabase.from('op_forms').upsert({ id, name, fields: [] }), {
+      pending: [{ set: pendingFormIds, ids: [id] }],
+      rollback: () => setState({ forms: previous }),
+    });
     return id;
   },
   updateForm(id: string, patch: Partial<OpForm>) {
+    const previous = state.forms;
+    pendingFormIds.add(id);
     const u = patchFormLocal(id, f => ({ ...f, ...patch }));
-    if (u) bg(supabase.from('op_forms').update({ name: u.name, fields: u.fields, updated_at: new Date().toISOString() }).eq('id', id));
+    if (u) bg(() => supabase.from('op_forms').update({ name: u.name, fields: u.fields, updated_at: new Date().toISOString() }).eq('id', id), {
+      pending: [{ set: pendingFormIds, ids: [id] }],
+      rollback: () => setState({ forms: previous }),
+    });
   },
   removeForm(id: string) {
+    const previous = { forms: state.forms, formAnswers: state.formAnswers };
+    const answerIds = state.formAnswers.filter(answer => answer.formId === id).map(answer => answer.id);
+    deletingFormIds.add(id);
     setState({ forms: state.forms.filter(f => f.id !== id) });
-    bg(supabase.from('op_forms').delete().eq('id', id));
+    bg(() => supabase.from('op_forms').delete().eq('id', id), {
+      deleting: [
+        { set: deletingFormIds, ids: [id] },
+        { set: pendingFormAnswerIds, ids: answerIds },
+      ],
+      rollback: () => setState(previous),
+    });
   },
   addFormField(formId: string, field: Omit<OpFormField, 'id'>) {
     const withId = { ...field, id: uid() };
+    const previous = state.forms;
+    pendingFormIds.add(formId);
     const u = patchFormLocal(formId, f => ({ ...f, fields: [...f.fields, withId] }));
-    if (u) bg(supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId));
+    if (u) bg(() => supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId), {
+      pending: [{ set: pendingFormIds, ids: [formId] }],
+      rollback: () => setState({ forms: previous }),
+    });
   },
   removeFormField(formId: string, fieldId: string) {
+    const previous = state.forms;
+    pendingFormIds.add(formId);
     const u = patchFormLocal(formId, f => ({ ...f, fields: f.fields.filter(x => x.id !== fieldId) }));
-    if (u) bg(supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId));
+    if (u) bg(() => supabase.from('op_forms').update({ fields: u.fields, updated_at: new Date().toISOString() }).eq('id', formId), {
+      pending: [{ set: pendingFormIds, ids: [formId] }],
+      rollback: () => setState({ forms: previous }),
+    });
   },
   submitFormAnswer(formId: string, projectId: string | undefined, values: Record<string, any>) {
     const answer: OpFormAnswer = { id: uid(), formId, projectId, values, createdAt: new Date().toISOString() };
+    const previous = state.formAnswers;
+    pendingFormAnswerIds.add(answer.id);
     setState({ formAnswers: [...state.formAnswers, answer] });
-    bg(supabase.from('op_form_answers').insert({
+    bg(() => supabase.from('op_form_answers').upsert({
       id: answer.id, form_id: formId, project_id: projectId ?? null, values, created_at: answer.createdAt,
-    }));
+    }), {
+      pending: [{ set: pendingFormAnswerIds, ids: [answer.id] }],
+      rollback: () => setState({ formAnswers: previous }),
+    });
   },
 
   // Senhas
@@ -1013,25 +1053,40 @@ export const opStore = {
     const encoded = typeof window !== 'undefined' ? btoa(unescape(encodeURIComponent(s.password))) : s.password;
     const id = uid();
     const row: OpSenha = { ...s, id, password: encoded };
+    const previous = state.senhas;
+    pendingSenhaIds.add(id);
     setState({ senhas: [...state.senhas, row] });
-    bg(supabase.from('op_senhas').insert({
+    bg(() => supabase.from('op_senhas').upsert({
       id, client_name: row.clientName, service: row.service, username: row.username,
       password: row.password, notes: row.notes ?? null,
-    }));
+    }), {
+      pending: [{ set: pendingSenhaIds, ids: [id] }],
+      rollback: () => setState({ senhas: previous }),
+    });
   },
   updateSenha(id: string, patch: Partial<Omit<OpSenha, 'id'>>) {
     if (patch.password && typeof window !== 'undefined') {
       patch = { ...patch, password: btoa(unescape(encodeURIComponent(patch.password))) };
     }
+    const previous = state.senhas;
+    pendingSenhaIds.add(id);
     const u = patchSenhaLocal(id, s => ({ ...s, ...patch }));
-    if (u) bg(supabase.from('op_senhas').update({
+    if (u) bg(() => supabase.from('op_senhas').update({
       client_name: u.clientName, service: u.service, username: u.username,
       password: u.password, notes: u.notes ?? null, updated_at: new Date().toISOString(),
-    }).eq('id', id));
+    }).eq('id', id), {
+      pending: [{ set: pendingSenhaIds, ids: [id] }],
+      rollback: () => setState({ senhas: previous }),
+    });
   },
   removeSenha(id: string) {
+    const previous = state.senhas;
+    deletingSenhaIds.add(id);
     setState({ senhas: state.senhas.filter(s => s.id !== id) });
-    bg(supabase.from('op_senhas').delete().eq('id', id));
+    bg(() => supabase.from('op_senhas').delete().eq('id', id), {
+      deleting: [{ set: deletingSenhaIds, ids: [id] }],
+      rollback: () => setState({ senhas: previous }),
+    });
   },
   revealPassword(pw: string) {
     try {
