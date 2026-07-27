@@ -402,12 +402,16 @@ export function MainLayout({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar variant="inset" collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
           <SidebarHeader className="px-4 pt-5 pb-3">
-            <div className="flex items-center gap-2.5 px-1">
+            <Link
+              to={'/tv' as any}
+              title="Abrir Painel de TV"
+              className="flex items-center gap-2.5 px-1 rounded-md hover:bg-sidebar-accent/50 transition-colors"
+            >
               <img src={somusLogoUrl} alt="Somus" className="h-7 w-auto object-contain dark:invert" />
               <span className="truncate font-display text-[13px] font-semibold tracking-tight text-foreground group-data-[collapsible=icon]:hidden">
                 Portal Interno
               </span>
-            </div>
+            </Link>
           </SidebarHeader>
           <SidebarContent
             className="px-2 py-2"
