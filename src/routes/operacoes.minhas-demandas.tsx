@@ -91,7 +91,7 @@ function MinhasDemandas() {
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao Painel
           </Link>
-          <h1 className="font-display text-3xl font-semibold tracking-tight text-white flex items-center gap-3">
+          <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground flex items-center gap-3">
             <CalendarClock className="h-7 w-7 text-foreground/80" /> 
             Minhas <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">Demandas</span>
           </h1>
