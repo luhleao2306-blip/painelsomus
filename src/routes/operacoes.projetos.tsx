@@ -330,7 +330,7 @@ function OperacoesProjetos() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto px-6 py-4">
+            <div className="flex-1 overflow-auto py-4">
               {view === 'lista' && <ListView projectId={project.id} onOpenTask={setTaskDetail} />}
               {view === 'kanban' && <KanbanView projectId={project.id} onOpenTask={setTaskDetail} />}
               {view === 'gantt' && <GanttView projectId={project.id} />}
