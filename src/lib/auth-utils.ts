@@ -24,10 +24,10 @@ export async function getProfile(userId?: string): Promise<ProfileRow | null> {
 
 export function getRedirectPath(role: string): string {
   switch (role) {
-    case 'master': return '/dashboard';
-    case 'project_manager': return '/dashboard';
-    case 'consultant': return '/dashboard';
-    case 'client': return '/dashboard';
+    case 'master': return '/operacoes';
+    case 'project_manager': return '/operacoes';
+    case 'consultant': return '/operacoes';
+    case 'client': return '/agenda';
     default: return '/login';
   }
 }
