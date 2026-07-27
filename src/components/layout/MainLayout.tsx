@@ -150,23 +150,15 @@ const navigationSections: NavSection[] = [
       { title: 'Colaboradores', icon: UserCog, href: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
-  {
-    label: 'Comercial',
-    items: [
-      { title: 'Dashboard Comercial', icon: LayoutDashboard, href: '/comercial', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Funil Comercial', icon: Workflow, href: '/comercial/prospeccoes', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Metas', icon: Trophy, href: '/comercial/metas', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Performance Comercial', icon: TrendingUp, href: '/sales-performance', roles: ['master', 'project_manager', 'consultant'] },
-    ],
-  },
+  // Seções "Comercial" e "Financeiro" ocultas temporariamente da sidebar.
+  // As rotas e o banco de dados permanecem intactos para reativação futura.
   {
     label: 'Financeiro',
     items: [
-      { title: 'DRE', icon: DollarSign, href: '/financeiro', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Indicadores', icon: TrendingUp, href: '/financeiro/indicadores', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Contratos', icon: FileSignature, href: '/contracts', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
+
   {
     label: 'Alcateia',
     items: [
