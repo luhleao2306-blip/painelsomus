@@ -144,7 +144,7 @@ function MinhasDemandas() {
       ) : tasks.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-12 text-center bg-muted/20">
           <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-500/50 mb-3" />
-          <h3 className="text-lg font-medium text-white">Tudo em dia!</h3>
+          <h3 className="text-lg font-medium text-foreground">Tudo em dia!</h3>
           <p className="text-muted-foreground text-sm">{effectiveUser.name} não possui demandas pendentes.</p>
         </div>
       ) : (
