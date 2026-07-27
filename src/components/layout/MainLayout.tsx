@@ -108,12 +108,6 @@ const getRoleName = (r: UserRole, email?: string | null) => {
 };
 
 const navigationSections: NavSection[] = [
-  {
-    label: 'Visão Geral',
-    items: [
-      { title: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', roles: ['client'] },
-    ],
-  },
 
   {
     label: 'Operação',
@@ -234,7 +228,7 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
 ];
 
 function getHomeForRole(role: UserRole): string {
-  if (role === 'client') return '/dashboard';
+  if (role === 'client') return '/agenda';
   return '/operacoes';
 }
 

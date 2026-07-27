@@ -38,7 +38,7 @@ function OperacoesLayout() {
     if (loading) return;
     const role = profile?.role;
     const allowed = role === 'master' || role === 'project_manager' || role === 'consultant';
-    if (!allowed) navigate({ to: '/dashboard' as any, replace: true });
+    if (!allowed) navigate({ to: '/agenda' as any, replace: true });
   }, [loading, profile?.role, navigate]);
 
   if (loading || !profile) {
