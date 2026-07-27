@@ -193,7 +193,6 @@ const navigationSections: NavSection[] = [
     items: [
       { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'] },
 
-      { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
