@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TvRouteImport } from './routes/tv'
 import { Route as TimeReportRouteImport } from './routes/time-report'
 import { Route as TeamPerformanceRouteImport } from './routes/team-performance'
 import { Route as TasksRouteImport } from './routes/tasks'
@@ -88,6 +89,11 @@ import { Route as ClienteTrilhasTrackIdRouteImport } from './routes/cliente.tril
 import { Route as ClientesClienteIdProjetosProjetoIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId'
 import { Route as ClientesClienteIdProjetosProjetoIdAtasAtaIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId.atas.$ataId'
 
+const TvRoute = TvRouteImport.update({
+  id: '/tv',
+  path: '/tv',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TimeReportRoute = TimeReportRouteImport.update({
   id: '/time-report',
   path: '/time-report',
@@ -515,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
   '/time-report': typeof TimeReportRoute
+  '/tv': typeof TvRoute
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
@@ -589,6 +596,7 @@ export interface FileRoutesByTo {
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
   '/time-report': typeof TimeReportRoute
+  '/tv': typeof TvRoute
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
@@ -670,6 +678,7 @@ export interface FileRoutesById {
   '/tasks': typeof TasksRoute
   '/team-performance': typeof TeamPerformanceRoute
   '/time-report': typeof TimeReportRoute
+  '/tv': typeof TvRoute
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
@@ -752,6 +761,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team-performance'
     | '/time-report'
+    | '/tv'
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
@@ -826,6 +836,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team-performance'
     | '/time-report'
+    | '/tv'
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
@@ -906,6 +917,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/team-performance'
     | '/time-report'
+    | '/tv'
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
@@ -987,6 +999,7 @@ export interface RootRouteChildren {
   TasksRoute: typeof TasksRoute
   TeamPerformanceRoute: typeof TeamPerformanceRoute
   TimeReportRoute: typeof TimeReportRoute
+  TvRoute: typeof TvRoute
   AlcateiaPlaylistRoute: typeof AlcateiaPlaylistRoute
   AtasAtaIdRoute: typeof AtasAtaIdRoute
   BriefingTokenRoute: typeof BriefingTokenRoute
@@ -1009,6 +1022,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tv': {
+      id: '/tv'
+      path: '/tv'
+      fullPath: '/tv'
+      preLoaderRoute: typeof TvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/time-report': {
       id: '/time-report'
       path: '/time-report'
@@ -1739,6 +1759,7 @@ const rootRouteChildren: RootRouteChildren = {
   TasksRoute: TasksRoute,
   TeamPerformanceRoute: TeamPerformanceRoute,
   TimeReportRoute: TimeReportRoute,
+  TvRoute: TvRoute,
   AlcateiaPlaylistRoute: AlcateiaPlaylistRoute,
   AtasAtaIdRoute: AtasAtaIdRoute,
   BriefingTokenRoute: BriefingTokenRoute,
