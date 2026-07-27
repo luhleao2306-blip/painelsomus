@@ -124,7 +124,7 @@ const navigationSections: NavSection[] = [
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
 
-      { title: 'Senhas', icon: KeyRound, href: '/passwords', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
   {
