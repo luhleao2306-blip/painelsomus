@@ -39,7 +39,7 @@ function TvDashboard() {
     return () => clearInterval(id);
   }, []);
 
-  const { buckets, kpis, byAssignee } = useMemo(() => {
+  const { buckets, kpis, allActive } = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
     const in7 = new Date(today); in7.setDate(today.getDate() + 7);
@@ -48,11 +48,12 @@ function TvDashboard() {
     const doHoje: OpTask[] = [];
     const doAmanha: OpTask[] = [];
     const doSemana: OpTask[] = [];
+    const allActive: OpTask[] = [];
     let done = 0;
-    const byA: Record<string, { total: number; overdue: number; hoje: number }> = {};
 
     for (const t of store.tasks) {
       if (t.status === 'concluido') { done++; continue; }
+      allActive.push(t);
       if (!t.dueDate) continue;
       const d = parseLocalDate(t.dueDate); if (!d) continue;
       const bucketPush =
@@ -62,16 +63,14 @@ function TvDashboard() {
         d <= in7 ? doSemana : null;
       if (!bucketPush) continue;
       bucketPush.push(t);
-      if (t.assigneeId) {
-        const a = byA[t.assigneeId] ??= { total: 0, overdue: 0, hoje: 0 };
-        a.total++;
-        if (bucketPush === overdue) a.overdue++;
-        if (bucketPush === doHoje) a.hoje++;
-      }
     }
 
-    const sortByDate = (a: OpTask, b: OpTask) => (a.dueDate ?? '').localeCompare(b.dueDate ?? '');
-    [overdue, doHoje, doAmanha, doSemana].forEach(arr => arr.sort(sortByDate));
+    const sortByDate = (a: OpTask, b: OpTask) => {
+      const da = a.dueDate ?? '9999-12-31';
+      const db = b.dueDate ?? '9999-12-31';
+      return da.localeCompare(db);
+    };
+    [overdue, doHoje, doAmanha, doSemana, allActive].forEach(arr => arr.sort(sortByDate));
 
     const buckets: Bucket[] = [
       { key: 'atrasado', label: 'Atrasadas',   icon: AlertTriangle, headerBg: 'bg-red-50',     headerText: 'text-red-700',     countText: 'text-red-600',     cardBorder: 'border-red-100',     tasks: overdue },
@@ -82,13 +81,10 @@ function TvDashboard() {
     return {
       buckets,
       kpis: { total: store.tasks.length, done, overdue: overdue.length, hoje: doHoje.length },
-      byAssignee: Object.entries(byA)
-        .map(([id, v]) => ({ user: store.users.find(u => u.id === id), ...v }))
-        .filter(x => x.user)
-        .sort((a, b) => b.overdue - a.overdue || b.hoje - a.hoje || b.total - a.total)
-        .slice(0, 8),
+      allActive,
     };
   }, [store, now]);
+
 
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
