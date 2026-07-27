@@ -45,6 +45,7 @@ import {
 
 import { useProfile, UserRole } from '@/hooks/use-profile';
 import { NotificationsPopover } from '@/components/layout/NotificationsPopover';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -481,6 +482,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
               <Badge variant="secondary" className="hidden h-6 border-none bg-primary/10 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-primary sm:inline-flex">
                 {getRoleName(role, profile?.email)}
               </Badge>
+              <ThemeToggle />
               <NotificationsPopover />
             </div>
           </header>

@@ -12,6 +12,7 @@ import { DataProvider } from "@/contexts/DataContext";
 import { PackMoodProvider } from "@/hooks/use-pack-mood";
 import { Toaster } from "@/components/ui/sonner";
 import { MentionAcknowledgmentModal } from "@/components/layout/MentionAcknowledgmentModal";
+import { ThemeProvider, themeInitScript } from "@/components/theme/theme-provider";
 
 import appCss from "../styles.css?url";
 
@@ -108,6 +109,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
         {children}
@@ -122,15 +124,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ProfileProvider>
-        <DataProvider>
-          <PackMoodProvider>
-            <Outlet />
-            <MentionAcknowledgmentModal />
-            <Toaster />
-          </PackMoodProvider>
-        </DataProvider>
-      </ProfileProvider>
+      <ThemeProvider>
+        <ProfileProvider>
+          <DataProvider>
+            <PackMoodProvider>
+              <Outlet />
+              <MentionAcknowledgmentModal />
+              <Toaster />
+            </PackMoodProvider>
+          </DataProvider>
+        </ProfileProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
