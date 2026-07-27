@@ -237,8 +237,8 @@ function LoginPage() {
         {/* Bottom: footer */}
         <div className="relative z-10">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-background/40 border-t border-background/10 pt-5">
-            <span>&copy; 2026 Somus Consultoria</span>
-            <span>v1.0 · Acesso restrito</span>
+            <span>&copy; 2026 Somus Group</span>
+            <span>v3.0 · Acesso restrito</span>
           </div>
         </div>
       </div>
