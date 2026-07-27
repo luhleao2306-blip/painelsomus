@@ -234,10 +234,11 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
 ];
 
-function getHomeForRole(_role: UserRole): string {
-  return '/dashboard';
-
+function getHomeForRole(role: UserRole): string {
+  if (role === 'client') return '/dashboard';
+  return '/operacoes';
 }
+
 
 function CollapsibleNavSection({
   section,
