@@ -117,9 +117,9 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
-      { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['client'] },
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
@@ -132,8 +132,8 @@ const navigationSections: NavSection[] = [
     items: [
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant'] },
+
       { title: 'Metas Estratégicas', icon: Target, href: '/portal-cliente', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['master', 'project_manager', 'consultant'] },
     ],
