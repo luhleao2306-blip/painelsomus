@@ -6,10 +6,11 @@ import {
 } from '@/lib/operacoes-store';
 import {
   Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
-  Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles,
+  Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles, ListTodo,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { parseLocalDate } from '@/lib/date-utils';
+import { PersonalChecklistPanel } from '@/components/dashboard/PersonalChecklistPanel';
 
 
 export const Route = createFileRoute('/operacoes/')({
