@@ -13,8 +13,9 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  --font-sans: "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-  --font-display: "Sora", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-sans: "Inter Tight", "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --font-display: "Inter Tight", "Sora", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  --font-serif: "Instrument Serif", "Times New Roman", Georgia, serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
