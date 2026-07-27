@@ -277,7 +277,7 @@ function MinhasDemandas() {
                                       <div className={`mt-0.5 h-4 w-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
                                         item.done ? 'bg-emerald-500 border-emerald-500' : 'border-border'
                                       }`}>
-                                        {item.done && <CheckCircle className="h-3 w-3 text-white" />}
+                                        {item.done && <CheckCircle className="h-3 w-3 text-primary-foreground" />}
                                       </div>
                                       <span className={`text-[13.5px] leading-relaxed ${item.done ? 'line-through' : ''}`}>
                                         {item.text}
