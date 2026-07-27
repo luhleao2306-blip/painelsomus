@@ -399,7 +399,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <Sidebar variant="inset" collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
+        <Sidebar variant={isOperationsArea ? "sidebar" : "inset"} collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
           <SidebarHeader className="px-4 pt-5 pb-3">
             <Link
               to={'/tv' as any}
