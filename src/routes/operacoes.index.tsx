@@ -439,28 +439,28 @@ function ProgressRing({ value }: { value: number }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const off = c - (value / 100) * c;
+  const gradientId = `opring-${Math.random().toString(36).slice(2, 9)}`;
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="rotate-[-90deg]">
         <defs>
-          <linearGradient id="opring" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="100%" stopColor="#a1a1aa" />
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" className="[stop-color:var(--foreground)]" />
+            <stop offset="100%" className="[stop-color:var(--muted-foreground)]" />
           </linearGradient>
         </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none" stroke="rgba(255,255,255,0.08)" />
+        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke} className="fill-none" stroke="color-mix(in oklab, var(--foreground) 10%, transparent)" />
         <circle
           cx={size / 2} cy={size / 2} r={r} strokeWidth={stroke}
           strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
           className="fill-none transition-all"
-          stroke="url(#opring)"
-          style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.3))' }}
+          stroke={`url(#${gradientId})`}
+          style={{ filter: 'drop-shadow(0 0 6px color-mix(in oklab, var(--foreground) 30%, transparent))' }}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold text-white">
+      <div className="absolute inset-0 flex items-center justify-center font-display text-[18px] font-semibold text-foreground">
         {value}%
       </div>
     </div>
-
   );
 }
