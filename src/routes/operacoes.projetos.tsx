@@ -24,7 +24,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/hooks/use-profile-wrapper';
 
 export const Route = createFileRoute('/operacoes/projetos')({
   component: OperacoesProjetos,

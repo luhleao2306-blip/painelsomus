@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useProfile } from '@/hooks/use-profile-wrapper';
 import { useMemo } from 'react';
 import {
   useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus,

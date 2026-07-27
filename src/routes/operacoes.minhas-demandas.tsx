@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/hooks/use-profile-wrapper';
 import { parseLocalDate, formatLocalDate } from '@/lib/date-utils';
 
 export const Route = createFileRoute('/operacoes/minhas-demandas')({

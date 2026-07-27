@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import somusLogoUrl from '@/assets/somus-logo.png';
 import { cn } from '@/lib/utils';
-import { useProfile } from '@/hooks/use-profile';
+import { useProfile } from '@/hooks/use-profile-wrapper';
 import { useOpStore } from '@/lib/operacoes-store';
 
 export const Route = createFileRoute('/operacoes')({
