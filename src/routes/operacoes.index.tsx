@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { parseLocalDate } from '@/lib/date-utils';
-import { PersonalChecklistPanel } from '@/components/dashboard/PersonalChecklistPanel';
 
 
 export const Route = createFileRoute('/operacoes/')({
@@ -235,11 +234,6 @@ function OperacoesPainel() {
               );
             })}
           </div>
-        </div>
-
-        {/* Meu Checklist pessoal */}
-        <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
-          <PersonalChecklistPanel />
         </div>
 
         {/* Demandas diárias por pessoa */}

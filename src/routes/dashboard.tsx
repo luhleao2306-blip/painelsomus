@@ -88,17 +88,8 @@ const isAssignedToCurrentUser = (task: Task, profileId?: string, profileName?: s
 };
 
 function DashboardPage() {
-  const { role, profile, loading: profileLoading } = useProfile();
-  const navigate = useNavigate();
+  const { role, profile } = useProfile();
   const { filteredTasks, filteredProjects } = useData();
-
-  // Internal users (não-clientes) usam a aba Operações como dashboard
-  useEffect(() => {
-    if (profileLoading) return;
-    if (role && role !== 'client') {
-      navigate({ to: '/operacoes' as any, replace: true });
-    }
-  }, [profileLoading, role, navigate]);
   const [profiles, setProfiles] = useState<ProfileLite[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
