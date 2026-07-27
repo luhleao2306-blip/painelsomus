@@ -237,7 +237,7 @@
    ============================================================ */
 .op-scope {
   color-scheme: light;
-  --background: oklch(0.985 0 0);
+  --background: oklch(1 0 0);
   --foreground: oklch(0.16 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.16 0 0);
@@ -260,21 +260,12 @@
   --op-glow: 0 0 0 1px color-mix(in oklab, black 8%, transparent),
              0 12px 32px -18px rgba(0,0,0,0.18);
 
-  background-color: oklch(0.985 0 0);
+  background-color: #ffffff;
 }
 
-/* Subtle grid backdrop */
+/* Operações deve ficar integrado ao portal, sem “caixa” cinza ou textura no modo claro. */
 .op-scope::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(to right, color-mix(in oklab, black 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, black 5%, transparent) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 80% 50% at 50% 20%, black 30%, transparent 70%);
+  content: none;
 }
 .op-scope > * { position: relative; z-index: 1; }
 

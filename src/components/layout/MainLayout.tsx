@@ -383,8 +383,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
     .filter(section => section.items.length > 0);
 
 
-
-
+  const isOperationsArea = location.pathname.startsWith('/operacoes');
 
   const handleLogout = async () => {
     try {
@@ -400,7 +399,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <Sidebar variant="inset" collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
+        <Sidebar variant={isOperationsArea ? "sidebar" : "inset"} collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
           <SidebarHeader className="px-4 pt-5 pb-3">
             <Link
               to={'/tv' as any}
@@ -462,10 +461,14 @@ export function MainLayout({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <div className="mx-auto w-full max-w-[1400px]">
-              {children}
-            </div>
+          <main className={isOperationsArea ? 'flex-1 overflow-y-auto bg-background p-0' : 'flex-1 overflow-y-auto bg-background px-4 py-6 sm:px-6 lg:px-8 lg:py-8'}>
+            {isOperationsArea ? (
+              children
+            ) : (
+              <div className="mx-auto w-full max-w-[1400px]">
+                {children}
+              </div>
+            )}
           </main>
           {role !== 'client' && <PackMoodDialog />}
         </SidebarInset>
