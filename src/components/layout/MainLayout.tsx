@@ -117,17 +117,13 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Tarefas', icon: Briefcase, href: '/projects', roles: ['master', 'project_manager', 'consultant', 'client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
       { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['client'] },
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
-      
-      { title: 'Relatório de Tempo', icon: Timer, href: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Performance do Time', icon: TrendingUp, href: '/team-performance', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Missões', icon: Crosshair, href: '/missoes', roles: ['master', 'project_manager', 'consultant'] },
+
       { title: 'Senhas', icon: KeyRound, href: '/passwords', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
