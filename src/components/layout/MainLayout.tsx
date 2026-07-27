@@ -124,7 +124,7 @@ const navigationSections: NavSection[] = [
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
 
-      { title: 'Senhas', icon: KeyRound, href: '/passwords', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
   {
@@ -234,7 +234,7 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/system-docs', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/settings', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/passwords', roles: ['master', 'project_manager', 'consultant'] },
+  
   { prefix: '/briefings', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/team-performance', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/missoes', roles: ['master', 'project_manager', 'consultant'] },

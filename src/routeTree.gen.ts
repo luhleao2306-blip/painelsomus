@@ -22,7 +22,6 @@ import { Route as ProjectsOverviewRouteImport } from './routes/projects-overview
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as PortalClienteRouteImport } from './routes/portal-cliente'
-import { Route as PasswordsRouteImport } from './routes/passwords'
 import { Route as OperacoesRouteImport } from './routes/operacoes'
 import { Route as MissoesRouteImport } from './routes/missoes'
 import { Route as MeetingsRouteImport } from './routes/meetings'
@@ -153,11 +152,6 @@ const ProcessesRoute = ProcessesRouteImport.update({
 const PortalClienteRoute = PortalClienteRouteImport.update({
   id: '/portal-cliente',
   path: '/portal-cliente',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PasswordsRoute = PasswordsRouteImport.update({
-  id: '/passwords',
-  path: '/passwords',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OperacoesRoute = OperacoesRouteImport.update({
@@ -515,7 +509,6 @@ export interface FileRoutesByFullPath {
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
   '/operacoes': typeof OperacoesRouteWithChildren
-  '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
@@ -593,7 +586,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
-  '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
@@ -674,7 +666,6 @@ export interface FileRoutesById {
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
   '/operacoes': typeof OperacoesRouteWithChildren
-  '/passwords': typeof PasswordsRoute
   '/portal-cliente': typeof PortalClienteRoute
   '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
@@ -758,7 +749,6 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/missoes'
     | '/operacoes'
-    | '/passwords'
     | '/portal-cliente'
     | '/processes'
     | '/projects'
@@ -836,7 +826,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/meetings'
     | '/missoes'
-    | '/passwords'
     | '/portal-cliente'
     | '/processes'
     | '/projects'
@@ -916,7 +905,6 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/missoes'
     | '/operacoes'
-    | '/passwords'
     | '/portal-cliente'
     | '/processes'
     | '/projects'
@@ -999,7 +987,6 @@ export interface RootRouteChildren {
   MeetingsRoute: typeof MeetingsRoute
   MissoesRoute: typeof MissoesRoute
   OperacoesRoute: typeof OperacoesRouteWithChildren
-  PasswordsRoute: typeof PasswordsRoute
   PortalClienteRoute: typeof PortalClienteRoute
   ProcessesRoute: typeof ProcessesRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
@@ -1124,13 +1111,6 @@ declare module '@tanstack/react-router' {
       path: '/portal-cliente'
       fullPath: '/portal-cliente'
       preLoaderRoute: typeof PortalClienteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/passwords': {
-      id: '/passwords'
-      path: '/passwords'
-      fullPath: '/passwords'
-      preLoaderRoute: typeof PasswordsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/operacoes': {
@@ -1767,7 +1747,6 @@ const rootRouteChildren: RootRouteChildren = {
   MeetingsRoute: MeetingsRoute,
   MissoesRoute: MissoesRoute,
   OperacoesRoute: OperacoesRouteWithChildren,
-  PasswordsRoute: PasswordsRoute,
   PortalClienteRoute: PortalClienteRoute,
   ProcessesRoute: ProcessesRoute,
   ProjectsRoute: ProjectsRouteWithChildren,

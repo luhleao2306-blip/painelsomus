@@ -25,7 +25,7 @@ const NAV = [
   { to: '/operacoes/modelos',      label: 'Modelos',       icon: LayoutTemplate },
   { to: '/operacoes/formularios',  label: 'Formulários',   icon: ClipboardList },
   { to: '/operacoes/performance',  label: 'Performance',   icon: TrendingUp },
-  { to: '/operacoes/senhas',       label: 'Senhas',        icon: KeyRound },
+  
 ] as const;
 
 type Theme = 'dark' | 'light';

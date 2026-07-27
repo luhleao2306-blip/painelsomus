@@ -38,7 +38,7 @@ export const MODULES: ModuleDef[] = [
   { key: '/knowledge-trail', label: 'Trilha da Alcateia', group: 'Conhecimento' },
 
   { key: '/system-docs', label: 'Documentação do Sistema', group: 'Sistema' },
-  { key: '/passwords', label: 'Senhas', group: 'Sistema' },
+  { key: '/operacoes/senhas', label: 'Cofre de Senhas', group: 'Sistema' },
 ];
 
 export type Override = { user_id: string; module_key: string; granted: boolean };
