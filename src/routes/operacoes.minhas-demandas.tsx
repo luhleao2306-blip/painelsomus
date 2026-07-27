@@ -203,7 +203,7 @@ function MinhasDemandas() {
                           </span>
                         )}
                       </div>
-                      <h3 className={`font-medium text-[17px] transition-colors ${t.status === 'concluido' ? 'text-muted-foreground line-through' : 'text-foreground group-hover:text-white'}`}>
+                      <h3 className={`font-medium text-[17px] transition-colors ${t.status === 'concluido' ? 'text-muted-foreground line-through' : 'text-foreground group-hover:text-foreground'}`}>
                         {t.name}
                       </h3>
                     </div>
