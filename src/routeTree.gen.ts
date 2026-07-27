@@ -38,7 +38,6 @@ import { Route as ComercialRouteImport } from './routes/comercial'
 import { Route as CollaboratorsRouteImport } from './routes/collaborators'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as BriefingsRouteImport } from './routes/briefings'
-import { Route as BolaoRouteImport } from './routes/bolao'
 import { Route as AgendaRouteImport } from './routes/agenda'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
@@ -232,11 +231,6 @@ const ClientsRoute = ClientsRouteImport.update({
 const BriefingsRoute = BriefingsRouteImport.update({
   id: '/briefings',
   path: '/briefings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BolaoRoute = BolaoRouteImport.update({
-  id: '/bolao',
-  path: '/bolao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgendaRoute = AgendaRouteImport.update({
@@ -492,7 +486,6 @@ const ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
-  '/bolao': typeof BolaoRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
@@ -573,7 +566,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
-  '/bolao': typeof BolaoRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
@@ -649,7 +641,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/agenda': typeof AgendaRoute
-  '/bolao': typeof BolaoRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
@@ -732,7 +723,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/agenda'
-    | '/bolao'
     | '/briefings'
     | '/clients'
     | '/collaborators'
@@ -813,7 +803,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/agenda'
-    | '/bolao'
     | '/briefings'
     | '/clients'
     | '/collaborators'
@@ -888,7 +877,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/agenda'
-    | '/bolao'
     | '/briefings'
     | '/clients'
     | '/collaborators'
@@ -970,7 +958,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgendaRoute: typeof AgendaRoute
-  BolaoRoute: typeof BolaoRoute
   BriefingsRoute: typeof BriefingsRoute
   ClientsRoute: typeof ClientsRouteWithChildren
   CollaboratorsRoute: typeof CollaboratorsRoute
@@ -1223,13 +1210,6 @@ declare module '@tanstack/react-router' {
       path: '/briefings'
       fullPath: '/briefings'
       preLoaderRoute: typeof BriefingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bolao': {
-      id: '/bolao'
-      path: '/bolao'
-      fullPath: '/bolao'
-      preLoaderRoute: typeof BolaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agenda': {
@@ -1730,7 +1710,6 @@ const ClientesClienteIdProjetosProjetoIdRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgendaRoute: AgendaRoute,
-  BolaoRoute: BolaoRoute,
   BriefingsRoute: BriefingsRoute,
   ClientsRoute: ClientsRouteWithChildren,
   CollaboratorsRoute: CollaboratorsRoute,

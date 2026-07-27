@@ -172,7 +172,6 @@ const navigationSections: NavSection[] = [
       { title: 'Loja da Alcateia', icon: ShoppingBag, href: '/gamificacao/loja', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Resgates', icon: Gift, href: '/gamificacao/resgates', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Reconhecimentos', icon: Star, href: '/gamificacao/estrela-do-lider', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Somus Bolão', icon: Trophy, href: '/bolao', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
 
