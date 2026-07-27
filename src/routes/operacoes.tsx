@@ -33,6 +33,8 @@ function OperacoesLayout() {
   const { pathname } = useLocation();
   const { profile, loading } = useProfile();
   const opStoreState = useOpStore();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   // Bloqueia acesso: apenas usuários internos (master, project_manager, consultant)
   useEffect(() => {
