@@ -45,6 +45,7 @@ import {
 
 import { useProfile, UserRole } from '@/hooks/use-profile';
 import { NotificationsPopover } from '@/components/layout/NotificationsPopover';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
