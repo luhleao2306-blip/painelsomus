@@ -178,31 +178,56 @@ function TvDashboard() {
         ))}
       </div>
 
-      {/* Leaderboard responsáveis */}
+      {/* Demandas gerais */}
       <div className="px-10 pt-6 pb-8">
-        <div className="somus-eyebrow text-muted-foreground mb-3">Carga por responsável</div>
-        <div className="grid grid-cols-4 gap-3">
-          {byAssignee.map(({ user, total, overdue, hoje }) => (
-            <div key={user!.id} className="rounded-xl border border-border bg-card px-4 py-3 flex items-center justify-between shadow-sm">
-              <div className="min-w-0">
-                <div className="font-medium truncate text-foreground">{user!.name}</div>
-                <div className="text-[11px] text-muted-foreground">
-                  {overdue > 0 && <span className="text-red-600">{overdue} atrasada{overdue > 1 ? 's' : ''}</span>}
-                  {overdue > 0 && hoje > 0 && ' • '}
-                  {hoje > 0 && <span className="text-amber-600">{hoje} hoje</span>}
-                  {overdue === 0 && hoje === 0 && <span>sem urgência</span>}
-                </div>
-              </div>
-              <div className="font-serif text-3xl tabular-nums text-foreground">{total}</div>
-            </div>
-          ))}
-          {byAssignee.length === 0 && (
-            <div className="col-span-4 text-center text-sm text-muted-foreground py-4">
-              Nenhuma demanda atribuída para os próximos dias.
-            </div>
-          )}
+        <div className="flex items-baseline justify-between mb-3">
+          <div className="somus-eyebrow text-muted-foreground">Demandas gerais</div>
+          <div className="text-xs text-muted-foreground tabular-nums">{allActive.length} ativas</div>
         </div>
+        {allActive.length === 0 ? (
+          <div className="text-center text-sm text-muted-foreground py-6 rounded-xl border border-border bg-card">
+            Nenhuma demanda ativa.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-2.5">
+            {allActive.slice(0, 24).map(t => {
+              const assignee = store.users.find(u => u.id === t.assigneeId);
+              const client = getTaskClientName(store, t);
+              const meta = STATUS_META[t.status];
+              const d = t.dueDate ? parseLocalDate(t.dueDate) : null;
+              const today = new Date(); today.setHours(0, 0, 0, 0);
+              const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+              let dateTone = 'text-muted-foreground border-border bg-background';
+              let dateLabel = d ? d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : 'sem prazo';
+              if (d) {
+                if (d < today) { dateTone = 'text-red-700 border-red-200 bg-red-50'; }
+                else if (d.getTime() === today.getTime()) { dateTone = 'text-amber-800 border-amber-200 bg-amber-50'; dateLabel = 'Hoje'; }
+                else if (d.getTime() === tomorrow.getTime()) { dateTone = 'text-blue-700 border-blue-200 bg-blue-50'; dateLabel = 'Amanhã'; }
+              }
+              return (
+                <div key={t.id} className="rounded-lg border border-border bg-card px-3.5 py-2.5 shadow-sm flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium leading-snug truncate text-foreground">{t.name}</div>
+                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <span className="truncate">{client}</span>
+                      <span className="opacity-40">•</span>
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border ${meta.color}`}>{meta.label}</span>
+                      {assignee && (<><span className="opacity-40">•</span><span className="truncate">{assignee.name}</span></>)}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 text-[11px] tabular-nums px-2 py-1 rounded border ${dateTone}`}>{dateLabel}</span>
+                </div>
+              );
+            })}
+            {allActive.length > 24 && (
+              <div className="col-span-full text-center text-xs text-muted-foreground pt-1">
+                + {allActive.length - 24} demandas
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
     </div>
   );
 }
