@@ -155,7 +155,17 @@ function OperacoesPainel() {
         <Kpi icon={<CheckCircle2 className="h-4 w-4" />} label="Prazo em 7 dias" value={stats.dueSoon} tone={stats.dueSoon > 0 ? 'warning' : 'default'} hint="entregas próximas" />
       </div>
 
+      {/* Meu check-list */}
+      <div className="mb-6 rounded-2xl border border-border/70 bg-card p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <ListTodo className="h-4 w-4 text-primary" />
+          <h2 className="font-display text-base font-semibold">Meu check-list</h2>
+        </div>
+        <PersonalChecklistPanel />
+      </div>
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+
         {/* Status distribution */}
         <div className="lg:col-span-5 rounded-2xl border border-border/70 bg-card p-5">
           <div className="mb-4 flex items-center justify-between">
