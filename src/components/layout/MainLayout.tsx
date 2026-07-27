@@ -77,7 +77,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import somusLogoUrl from '@/assets/somus-logo.png';
 import { GlobalSearch } from '@/components/layout/GlobalSearch';
-import { MindsetBanner } from '@/components/layout/MindsetBanner';
+
 import { PackEnergyIndicator } from '@/components/pack/PackEnergyIndicator';
 import { PackMoodDialog } from '@/components/pack/PackMoodDialog';
 import {
@@ -467,7 +467,6 @@ export function MainLayout({ children }: { children: ReactNode }) {
 
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <div className="mx-auto w-full max-w-[1400px]">
-              {role !== 'client' && !location.pathname.startsWith('/somus-ia') && <MindsetBanner />}
               {children}
             </div>
           </main>
