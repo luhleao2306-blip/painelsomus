@@ -146,17 +146,6 @@ export function DashboardWidgets({ userId }: { userId: string }) {
         </CardContent>
       </Card>
 
-      {/* Check-list pessoal */}
-      <Card className="border-border/50 shadow-sm lg:col-span-2">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-bold flex items-center gap-2">
-            <ListTodo className="h-4 w-4 text-primary" /> Meu check-list
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PersonalChecklistPanel />
-        </CardContent>
-      </Card>
 
       {/* Últimos pontos do time */}
       <Card className="border-border/50 shadow-sm">
