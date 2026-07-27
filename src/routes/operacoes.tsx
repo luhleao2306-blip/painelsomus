@@ -4,11 +4,9 @@ import {
   LayoutDashboard, FolderKanban, LayoutTemplate,
   ClipboardList, TrendingUp, Loader2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useProfile } from '@/hooks/use-profile-wrapper';
 import { useOpStore } from '@/lib/operacoes-store';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useTheme } from '@/components/theme/theme-provider';
 
 export const Route = createFileRoute('/operacoes')({
   component: OperacoesLayout,
