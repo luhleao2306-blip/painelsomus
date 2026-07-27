@@ -482,6 +482,7 @@ export function MainLayout({ children }: { children: ReactNode }) {
               <Badge variant="secondary" className="hidden h-6 border-none bg-primary/10 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-primary sm:inline-flex">
                 {getRoleName(role, profile?.email)}
               </Badge>
+              <ThemeToggle />
               <NotificationsPopover />
             </div>
           </header>
