@@ -118,6 +118,7 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
