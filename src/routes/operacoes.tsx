@@ -57,7 +57,7 @@ function OperacoesLayout() {
 
   return (
     <MainLayout>
-      <div className={cn('op-scope flex min-h-full w-full flex-col bg-background text-foreground', isLight && 'op-light')}>
+      <div className="op-scope flex min-h-full w-full flex-col bg-background text-foreground">
         <div className="sticky top-0 z-20 border-b border-border/60 bg-background/85 backdrop-blur-xl">
           <div className="flex items-center gap-3 px-4 py-2 lg:px-6">
             <nav className="flex flex-1 items-center gap-0.5 overflow-x-auto">
