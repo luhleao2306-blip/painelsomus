@@ -81,7 +81,7 @@ function MinhasDemandas() {
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="mx-auto max-w-[1200px] px-6 py-8 lg:px-10"
+      className="py-8"
     >
       <div className="mb-8 flex items-center justify-between">
         <div>

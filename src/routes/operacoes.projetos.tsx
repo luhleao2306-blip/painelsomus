@@ -237,7 +237,7 @@ function OperacoesProjetos() {
           </div>
         ) : (
           <>
-            <div className="border-b border-border/60 px-6 pt-4 pb-3">
+            <div className="border-b border-border/60 pt-4 pb-3">
               <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="mb-0.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">

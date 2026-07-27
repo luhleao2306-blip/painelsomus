@@ -82,7 +82,7 @@ function OperacoesPainel() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10"
+      className="py-8"
     >
       {/* HERO */}
       <div className="relative mb-8 overflow-hidden rounded-2xl border border-border/70 bg-card p-8">

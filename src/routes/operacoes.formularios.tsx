@@ -88,7 +88,7 @@ function OperacoesFormularios() {
   const submissionsByToken = (t: string) => submissions.filter(s => s.token === t);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+    <div className="py-8">
       <OpPageHeader
         eyebrow="Coleta de campo"
         title="Formulários"

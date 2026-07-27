@@ -62,7 +62,7 @@ function OperacoesSenhas() {
   const activeVault = openVault ? vaults.find(v => v.clientName === openVault) : null;
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-8 lg:px-10">
+    <div className="py-8">
       <OpPageHeader
         eyebrow="Cofre da alcateia"
         title="Cofre de Senhas"
