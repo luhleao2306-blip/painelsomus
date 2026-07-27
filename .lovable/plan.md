@@ -1,10 +1,11 @@
-## Ação
-Alterar o background do Painel de Operações para off-white no modo claro, mantendo o tema escuro no modo noturno, e garantir cards brancos com sombra.
+## Objetivo
+Na TV (`/tv`), substituir o painel **Carga por responsável** por **Demandas gerais**.
 
-## Arquivos
-- `src/styles.css` — ajustar tokens `.op-scope` para refletir o tema global.
-- `src/routes/operacoes.tsx` — garantir que o escopo use a paleta correta conforme o tema.
-- `src/routes/operacoes.index.tsx` — corrigir cores fixas do hero/KPIs para tokens do tema.
+## Mudança
+- `src/routes/tv.tsx`: remover o bloco de leaderboard por responsável e no lugar exibir uma lista de **Demandas gerais** — todas as demandas ativas (não concluídas), ordenadas por prazo (mais próximas primeiro), mostrando: título, cliente, projeto, responsável e data (com destaque para atrasadas/hoje).
+- Manter a mesma identidade visual (fundo branco, Inter Tight / Instrument Serif, tokens semânticos) e o auto-refresh de 30s.
 
-## Resultado
-Fundo off-white no modo claro e escuro no modo noturno, com cards brancos e sombra.
+## Detalhes técnicos
+- Fonte de dados continua `useOpStore` (mesmas tarefas já usadas nos buckets).
+- Lista rolável dentro do card para caber na TV; limitar a ~20-30 itens visíveis para legibilidade.
+- Badges de status de prazo reutilizando as cores dos buckets (vermelho = atrasada, âmbar = hoje, azul = amanhã, neutro = futura).
