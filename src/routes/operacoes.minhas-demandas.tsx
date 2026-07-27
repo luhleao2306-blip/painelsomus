@@ -176,7 +176,7 @@ function MinhasDemandas() {
                   className="cursor-pointer p-5 flex items-center justify-between gap-4"
                 >
                   <div className="flex flex-1 items-center gap-5 min-w-0">
-                    <div className={`h-3 w-3 shrink-0 rounded-full ${meta.dot} shadow-[0_0_12px_rgba(255,255,255,0.1)]`} />
+                    <div className={`h-3 w-3 shrink-0 rounded-full ${meta.dot} shadow-[0_0_12px_rgba(0,0,0,0.12)]`} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                         <span className="shrink-0 rounded-full border border-border bg-muted/50 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
