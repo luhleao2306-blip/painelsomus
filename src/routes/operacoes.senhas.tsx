@@ -133,7 +133,7 @@ function VaultCard({ vault, onOpen, onAdd }: { vault: Vault; onOpen: () => void;
   return (
     <button
       onClick={onOpen}
-      className="group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-b from-card to-card/40 p-4 text-left transition-all hover:border-foreground/30 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_20px_40px_-20px_rgba(0,0,0,0.6)]"
+      className="group relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-b from-card to-card/40 p-4 text-left transition-all hover:border-foreground/30 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.2)]"
     >
       <div className="pointer-events-none absolute -top-24 -right-16 h-40 w-40 rounded-full bg-foreground/[0.04] blur-2xl" />
 
