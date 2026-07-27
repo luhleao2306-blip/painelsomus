@@ -118,6 +118,7 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
@@ -192,7 +193,6 @@ const navigationSections: NavSection[] = [
     items: [
       { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'] },
 
-      { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
