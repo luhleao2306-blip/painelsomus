@@ -12,6 +12,7 @@ import { DataProvider } from "@/contexts/DataContext";
 import { PackMoodProvider } from "@/hooks/use-pack-mood";
 import { Toaster } from "@/components/ui/sonner";
 import { MentionAcknowledgmentModal } from "@/components/layout/MentionAcknowledgmentModal";
+import { ThemeProvider, themeInitScript } from "@/components/theme/theme-provider";
 
 import appCss from "../styles.css?url";
 
