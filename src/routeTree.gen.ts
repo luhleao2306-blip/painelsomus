@@ -60,7 +60,6 @@ import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projet
 import { Route as OperacoesPerformanceRouteImport } from './routes/operacoes.performance'
 import { Route as OperacoesModelosRouteImport } from './routes/operacoes.modelos'
 import { Route as OperacoesMinhasDemandasRouteImport } from './routes/operacoes.minhas-demandas'
-import { Route as OperacoesFormulariosRouteImport } from './routes/operacoes.formularios'
 import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as GamificacaoResgatesRouteImport } from './routes/gamificacao.resgates'
@@ -347,11 +346,6 @@ const OperacoesMinhasDemandasRoute = OperacoesMinhasDemandasRouteImport.update({
   path: '/minhas-demandas',
   getParentRoute: () => OperacoesRoute,
 } as any)
-const OperacoesFormulariosRoute = OperacoesFormulariosRouteImport.update({
-  id: '/formularios',
-  path: '/formularios',
-  getParentRoute: () => OperacoesRoute,
-} as any)
 const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
   id: '/onboarding/$token',
   path: '/onboarding/$token',
@@ -566,7 +560,6 @@ export interface FileRoutesByFullPath {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
-  '/operacoes/formularios': typeof OperacoesFormulariosRoute
   '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
@@ -644,7 +637,6 @@ export interface FileRoutesByTo {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
-  '/operacoes/formularios': typeof OperacoesFormulariosRoute
   '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
@@ -729,7 +721,6 @@ export interface FileRoutesById {
   '/gamificacao/resgates': typeof GamificacaoResgatesRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/$token': typeof OnboardingTokenRoute
-  '/operacoes/formularios': typeof OperacoesFormulariosRoute
   '/operacoes/minhas-demandas': typeof OperacoesMinhasDemandasRoute
   '/operacoes/modelos': typeof OperacoesModelosRoute
   '/operacoes/performance': typeof OperacoesPerformanceRoute
@@ -815,7 +806,6 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
-    | '/operacoes/formularios'
     | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
@@ -893,7 +883,6 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
-    | '/operacoes/formularios'
     | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
@@ -977,7 +966,6 @@ export interface FileRouteTypes {
     | '/gamificacao/resgates'
     | '/invite/$token'
     | '/onboarding/$token'
-    | '/operacoes/formularios'
     | '/operacoes/minhas-demandas'
     | '/operacoes/modelos'
     | '/operacoes/performance'
@@ -1418,13 +1406,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperacoesMinhasDemandasRouteImport
       parentRoute: typeof OperacoesRoute
     }
-    '/operacoes/formularios': {
-      id: '/operacoes/formularios'
-      path: '/formularios'
-      fullPath: '/operacoes/formularios'
-      preLoaderRoute: typeof OperacoesFormulariosRouteImport
-      parentRoute: typeof OperacoesRoute
-    }
     '/onboarding/$token': {
       id: '/onboarding/$token'
       path: '/onboarding/$token'
@@ -1708,7 +1689,6 @@ const GamificacaoRouteWithChildren = GamificacaoRoute._addFileChildren(
 )
 
 interface OperacoesRouteChildren {
-  OperacoesFormulariosRoute: typeof OperacoesFormulariosRoute
   OperacoesMinhasDemandasRoute: typeof OperacoesMinhasDemandasRoute
   OperacoesModelosRoute: typeof OperacoesModelosRoute
   OperacoesPerformanceRoute: typeof OperacoesPerformanceRoute
@@ -1718,7 +1698,6 @@ interface OperacoesRouteChildren {
 }
 
 const OperacoesRouteChildren: OperacoesRouteChildren = {
-  OperacoesFormulariosRoute: OperacoesFormulariosRoute,
   OperacoesMinhasDemandasRoute: OperacoesMinhasDemandasRoute,
   OperacoesModelosRoute: OperacoesModelosRoute,
   OperacoesPerformanceRoute: OperacoesPerformanceRoute,
