@@ -146,12 +146,12 @@ function FormulariosPage() {
       </div>
 
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative ml-auto w-full sm:w-64">
+      <div className="flex items-center gap-2">
+        <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-8"
-            placeholder="Buscar cliente ou contato..."
+            placeholder="Buscar resposta..."
             value={q}
             onChange={e => setQ(e.target.value)}
           />
@@ -161,14 +161,22 @@ function FormulariosPage() {
 
 
 
-        <Card className="divide-y">
-          {loadingSubs && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
-          {!loadingSubs && submissions.length === 0 && (
-            <p className="p-8 text-center text-sm text-muted-foreground">
-              Nenhuma resposta recebida ainda.
-            </p>
-          )}
-          {submissions.map(s => (
+      <Card className="divide-y">
+        {loadingSubs && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
+        {!loadingSubs && submissions.length === 0 && (
+          <p className="p-8 text-center text-sm text-muted-foreground">
+            Nenhuma resposta recebida ainda.
+          </p>
+        )}
+        {submissions
+          .filter(s => {
+            if (!q) return true;
+            const respondent = submissionRespondent(s).toLowerCase();
+            const formName = (s.form_name ?? '').toLowerCase();
+            const term = q.toLowerCase();
+            return respondent.includes(term) || formName.includes(term);
+          })
+          .map(s => (
             <div key={s.id} className="flex flex-wrap items-center gap-3 p-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -192,7 +200,7 @@ function FormulariosPage() {
               </div>
             </div>
           ))}
-        </Card>
+      </Card>
       
 
       <Dialog open={!!viewingSub} onOpenChange={o => !o && setViewingSub(null)}>
