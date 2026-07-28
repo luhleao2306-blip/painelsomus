@@ -27,6 +27,13 @@ import {
   exportVisaoPDF,
   type ClientFormRequest,
 } from '@/lib/client-forms';
+import {
+  usePublicSubmissions,
+  submissionFields,
+  submissionRespondent,
+  exportSubmissionPDF,
+  type PublicSubmission,
+} from '@/lib/client-forms';
 import { FORM_TEMPLATES, VISAO_SECTIONS, HORIZONS } from '@/lib/visao-form';
 
 export const Route = createFileRoute('/formularios')({
@@ -72,6 +79,8 @@ function FormulariosPage() {
   const [tab, setTab] = useState<'all' | 'pending' | 'submitted'>('all');
   const [q, setQ] = useState('');
   const [viewing, setViewing] = useState<ClientFormRequest | null>(null);
+  const { data: submissions = [], isLoading: loadingSubs } = usePublicSubmissions();
+  const [viewingSub, setViewingSub] = useState<PublicSubmission | null>(null);
 
   const [templateKey, setTemplateKey] = useState<string>(FORM_TEMPLATES[0].key);
   const [clientId, setClientId] = useState<string>('none');
@@ -262,6 +271,73 @@ function FormulariosPage() {
           </div>
         ))}
       </Card>
+
+
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="font-display text-xl">Respostas recebidas pelos links públicos</h2>
+          <p className="text-sm text-muted-foreground">
+            Tudo que for preenchido nos links de formulário (/f/…) cai aqui automaticamente.
+          </p>
+        </div>
+        <Card className="divide-y">
+          {loadingSubs && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
+          {!loadingSubs && submissions.length === 0 && (
+            <p className="p-8 text-center text-sm text-muted-foreground">
+              Nenhuma resposta recebida ainda.
+            </p>
+          )}
+          {submissions.map(s => (
+            <div key={s.id} className="flex flex-wrap items-center gap-3 p-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="truncate font-medium">{submissionRespondent(s)}</p>
+                  <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15">
+                    Respondido
+                  </Badge>
+                </div>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {s.form_name ?? 'Formulário'} · enviado em{' '}
+                  {new Date(s.submitted_at).toLocaleString('pt-BR')}
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button size="sm" variant="ghost" onClick={() => setViewingSub(s)} title="Ver respostas">
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => exportSubmissionPDF(s)} title="Exportar PDF">
+                  <FileDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </Card>
+      </section>
+
+      <Dialog open={!!viewingSub} onOpenChange={o => !o && setViewingSub(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{viewingSub ? submissionRespondent(viewingSub) : ''}</DialogTitle>
+            <DialogDescription>{viewingSub?.form_name ?? 'Formulário'}</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[65vh] pr-4">
+            <div className="space-y-2">
+              {viewingSub &&
+                submissionFields(viewingSub).map((f, i) => (
+                  <Field key={i} label={f.label} value={f.value} />
+                ))}
+            </div>
+          </ScrollArea>
+          <DialogFooter>
+            {viewingSub && (
+              <Button onClick={() => exportSubmissionPDF(viewingSub)}>
+                <FileDown className="mr-1.5 h-4 w-4" /> Exportar PDF
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={openNew} onOpenChange={setOpenNew}>
         <DialogContent>

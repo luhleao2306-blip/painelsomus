@@ -201,3 +201,108 @@ export function exportVisaoPDF(req: ClientFormRequest) {
   const name = (req.client_name || 'formulario').replace(/\s+/g, '_');
   doc.save(`${name}_${req.template_key}.pdf`);
 }
+
+/* ------------------------- Respostas de links públicos ------------------------- */
+
+export type PublicSubmission = {
+  id: string;
+  token: string;
+  form_id: string | null;
+  form_name: string | null;
+  form_snapshot: any;
+  answers: Record<string, any>;
+  submitted_at: string;
+};
+
+export function usePublicSubmissions() {
+  return useQuery({
+    queryKey: ['public-form-submissions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('public_form_submissions')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as PublicSubmission[];
+    },
+  });
+}
+
+export function submissionFields(sub: PublicSubmission): { label: string; value: string }[] {
+  const fields: any[] = sub.form_snapshot?.fields ?? [];
+  if (fields.length > 0) {
+    return fields.map(f => ({
+      label: f.label ?? f.name ?? f.id,
+      value: formatAnswer(sub.answers?.[f.id] ?? sub.answers?.[f.label]),
+    }));
+  }
+  return Object.entries(sub.answers ?? {}).map(([k, v]) => ({ label: k, value: formatAnswer(v) }));
+}
+
+function formatAnswer(v: any): string {
+  if (v === null || v === undefined || v === '') return '—';
+  if (Array.isArray(v)) return v.join(', ');
+  if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+  return String(v);
+}
+
+/** Nome do respondente inferido das respostas (nome / empresa / cliente / e-mail). */
+export function submissionRespondent(sub: PublicSubmission): string {
+  const entries = submissionFields(sub);
+  const hit = (re: RegExp) =>
+    entries.find(e => re.test(e.label.toLowerCase()) && e.value !== '—')?.value;
+  return (
+    hit(/(empresa|escrit|cliente|raz[aã]o)/) ||
+    hit(/nome/) ||
+    hit(/e-?mail/) ||
+    'Não identificado'
+  );
+}
+
+export function exportSubmissionPDF(sub: PublicSubmission) {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const marginX = 48;
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  let y = 60;
+
+  const write = (text: string, size: number, bold: boolean, color = 0) => {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFontSize(size);
+    doc.setTextColor(color);
+    doc.splitTextToSize(text || '—', pageW - marginX * 2).forEach((ln: string) => {
+      if (y > pageH - 60) { doc.addPage(); y = 60; }
+      doc.text(ln, marginX, y);
+      y += size + 4;
+    });
+    doc.setTextColor(0);
+  };
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('SOMUS', marginX, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(sub.form_name ?? 'Formulário', pageW - marginX, y, { align: 'right' });
+  doc.setTextColor(0);
+  y += 22;
+  doc.setDrawColor(220);
+  doc.line(marginX, y, pageW - marginX, y);
+  y += 26;
+
+  write(submissionRespondent(sub), 14, true);
+  write(new Date(sub.submitted_at).toLocaleString('pt-BR'), 9, false, 120);
+  y += 12;
+
+  for (const f of submissionFields(sub)) {
+    write(f.label, 9, true, 110);
+    write(f.value, 11, false);
+    y += 6;
+  }
+
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text('Somus Group · portal.somus.group', pageW / 2, pageH - 24, { align: 'center' });
+  doc.save(`${submissionRespondent(sub).replace(/\s+/g, '_')}_${sub.form_name ?? 'formulario'}.pdf`);
+}
