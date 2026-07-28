@@ -275,10 +275,50 @@ function FormulariosPage() {
             </ScrollArea>
             <DialogFooter>
               {viewingSub && (
-                <Button onClick={() => exportSubmissionPDF(viewingSub)}>
-                  <FileDown className="mr-1.5 h-4 w-4" /> Exportar PDF
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    className="text-destructive"
+                    onClick={() => {
+                      setDeletingSub(viewingSub);
+                      setViewingSub(null);
+                    }}
+                  >
+                    <Trash2 className="mr-1.5 h-4 w-4" /> Excluir
+                  </Button>
+                  <Button onClick={() => exportSubmissionPDF(viewingSub)}>
+                    <FileDown className="mr-1.5 h-4 w-4" /> Exportar PDF
+                  </Button>
+                </>
               )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!deletingSub} onOpenChange={o => !o && setDeletingSub(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Excluir resposta</DialogTitle>
+              <DialogDescription>
+                {deletingSub
+                  ? `A resposta de ${submissionRespondent(deletingSub)} será removida permanentemente.`
+                  : ''}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeletingSub(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={delSub.isPending}
+                onClick={() => {
+                  if (!deletingSub) return;
+                  delSub.mutate(deletingSub.id, { onSuccess: () => setDeletingSub(null) });
+                }}
+              >
+                {delSub.isPending ? 'Excluindo…' : 'Excluir'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
