@@ -222,6 +222,15 @@ function FormulariosPage() {
                     >
                       <FileDown className="h-4 w-4" />
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setDeletingSub(s)}
+                      title="Excluir resposta"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
