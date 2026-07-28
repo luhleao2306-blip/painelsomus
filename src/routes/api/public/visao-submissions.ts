@@ -58,12 +58,12 @@ export const Route = createFileRoute('/api/public/visao-submissions')({
           .upsert(
             {
               token,
-              form: {
+              form: ({
                 id: data.form_id ?? 'visao-futuro',
                 name: data.form_name,
                 external: true,
                 fields: [],
-              },
+              }) as never,
             },
             { onConflict: 'token' },
           );
@@ -85,8 +85,8 @@ export const Route = createFileRoute('/api/public/visao-submissions')({
             form_name: data.client_name
               ? `${data.form_name} — ${data.client_name}`
               : data.form_name,
-            form_snapshot: data.form_snapshot ?? { name: data.form_name, external: true },
-            answers,
+            form_snapshot: (data.form_snapshot ?? { name: data.form_name, external: true }) as never,
+            answers: answers as never,
           })
           .select('id')
           .single();

@@ -88,6 +88,7 @@ import { Route as AlcateiaPlaylistRouteImport } from './routes/alcateia.playlist
 import { Route as ClienteTrilhasIndexRouteImport } from './routes/cliente.trilhas.index'
 import { Route as PAtaAtaIdRouteImport } from './routes/p.ata.$ataId'
 import { Route as ClienteTrilhasTrackIdRouteImport } from './routes/cliente.trilhas.$trackId'
+import { Route as ApiPublicVisaoSubmissionsRouteImport } from './routes/api/public/visao-submissions'
 import { Route as ClientesClienteIdProjetosProjetoIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId'
 import { Route as ClientesClienteIdProjetosProjetoIdAtasAtaIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId.atas.$ataId'
 
@@ -488,6 +489,12 @@ const ClienteTrilhasTrackIdRoute = ClienteTrilhasTrackIdRouteImport.update({
   path: '/cliente/trilhas/$trackId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicVisaoSubmissionsRoute =
+  ApiPublicVisaoSubmissionsRouteImport.update({
+    id: '/api/public/visao-submissions',
+    path: '/api/public/visao-submissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ClientesClienteIdProjetosProjetoIdRoute =
   ClientesClienteIdProjetosProjetoIdRouteImport.update({
     id: '/clientes/$clienteId/projetos/$projetoId',
@@ -578,6 +585,7 @@ export interface FileRoutesByFullPath {
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
+  '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
@@ -655,6 +663,7 @@ export interface FileRoutesByTo {
   '/operacoes': typeof OperacoesIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
   '/somus-ia': typeof SomusIaIndexRoute
+  '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas': typeof ClienteTrilhasIndexRoute
@@ -739,6 +748,7 @@ export interface FileRoutesById {
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
+  '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
@@ -824,6 +834,7 @@ export interface FileRouteTypes {
     | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
+    | '/api/public/visao-submissions'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas/'
@@ -901,6 +912,7 @@ export interface FileRouteTypes {
     | '/operacoes'
     | '/registrations'
     | '/somus-ia'
+    | '/api/public/visao-submissions'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas'
@@ -984,6 +996,7 @@ export interface FileRouteTypes {
     | '/operacoes/'
     | '/registrations/'
     | '/somus-ia/'
+    | '/api/public/visao-submissions'
     | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
     | '/cliente/trilhas/'
@@ -1041,6 +1054,7 @@ export interface RootRouteChildren {
   VfTokenRoute: typeof VfTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
   ContractsIndexRoute: typeof ContractsIndexRoute
+  ApiPublicVisaoSubmissionsRoute: typeof ApiPublicVisaoSubmissionsRoute
   ClienteTrilhasTrackIdRoute: typeof ClienteTrilhasTrackIdRoute
   PAtaAtaIdRoute: typeof PAtaAtaIdRoute
   ClienteTrilhasIndexRoute: typeof ClienteTrilhasIndexRoute
@@ -1602,6 +1616,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteTrilhasTrackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/visao-submissions': {
+      id: '/api/public/visao-submissions'
+      path: '/api/public/visao-submissions'
+      fullPath: '/api/public/visao-submissions'
+      preLoaderRoute: typeof ApiPublicVisaoSubmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clientes/$clienteId/projetos/$projetoId': {
       id: '/clientes/$clienteId/projetos/$projetoId'
       path: '/clientes/$clienteId/projetos/$projetoId'
@@ -1816,6 +1837,7 @@ const rootRouteChildren: RootRouteChildren = {
   VfTokenRoute: VfTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
   ContractsIndexRoute: ContractsIndexRoute,
+  ApiPublicVisaoSubmissionsRoute: ApiPublicVisaoSubmissionsRoute,
   ClienteTrilhasTrackIdRoute: ClienteTrilhasTrackIdRoute,
   PAtaAtaIdRoute: PAtaAtaIdRoute,
   ClienteTrilhasIndexRoute: ClienteTrilhasIndexRoute,
