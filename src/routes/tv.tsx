@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useOpStore, STATUS_META, getTaskClientName, type OpTask } from '@/lib/operacoes-store';
 import { parseLocalDate } from '@/lib/date-utils';
-import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame, Users, Trophy, TrendingUp } from 'lucide-react';
 import somusLogoUrl from '@/assets/somus-logo.png';
 
 export const Route = createFileRoute('/tv')({
@@ -33,27 +33,55 @@ type Bucket = {
 function TvDashboard() {
   const store = useOpStore();
   const [now, setNow] = useState(() => new Date());
+  const [assigneeFilter, setAssigneeFilter] = useState<string>('__all__');
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
 
-  const { buckets, kpis, allActive } = useMemo(() => {
+  // Users que têm ao menos uma tarefa (para não poluir o filtro)
+  const filterableUsers = useMemo(() => {
+    const ids = new Set<string>();
+    for (const t of store.tasks) if (t.assigneeId) ids.add(t.assigneeId);
+    return store.users
+      .filter(u => ids.has(u.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [store.tasks, store.users]);
+
+  const filteredTasks = useMemo(() => {
+    if (assigneeFilter === '__all__') return store.tasks;
+    if (assigneeFilter === '__none__') return store.tasks.filter(t => !t.assigneeId);
+    return store.tasks.filter(t => t.assigneeId === assigneeFilter);
+  }, [store.tasks, assigneeFilter]);
+
+  const { buckets, kpis, completed } = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
     const in7 = new Date(today); in7.setDate(today.getDate() + 7);
+    const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay());
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
     const overdue: OpTask[] = [];
     const doHoje: OpTask[] = [];
     const doAmanha: OpTask[] = [];
     const doSemana: OpTask[] = [];
-    const allActive: OpTask[] = [];
+    const doneToday: OpTask[] = [];
+    const doneWeek: OpTask[] = [];
+    const doneMonth: OpTask[] = [];
     let done = 0;
 
-    for (const t of store.tasks) {
-      if (t.status === 'concluido') { done++; continue; }
-      allActive.push(t);
+    for (const t of filteredTasks) {
+      if (t.status === 'concluido') {
+        done++;
+        const u = t.updatedAt ? new Date(t.updatedAt) : null;
+        if (u) {
+          if (u >= today) doneToday.push(t);
+          if (u >= weekStart) doneWeek.push(t);
+          if (u >= monthStart) doneMonth.push(t);
+        }
+        continue;
+      }
       if (!t.dueDate) continue;
       const d = parseLocalDate(t.dueDate); if (!d) continue;
       const bucketPush =
@@ -70,7 +98,10 @@ function TvDashboard() {
       const db = b.dueDate ?? '9999-12-31';
       return da.localeCompare(db);
     };
-    [overdue, doHoje, doAmanha, doSemana, allActive].forEach(arr => arr.sort(sortByDate));
+    [overdue, doHoje, doAmanha, doSemana].forEach(arr => arr.sort(sortByDate));
+    const sortByUpdated = (a: OpTask, b: OpTask) =>
+      (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '');
+    [doneToday, doneWeek, doneMonth].forEach(arr => arr.sort(sortByUpdated));
 
     const buckets: Bucket[] = [
       { key: 'atrasado', label: 'Atrasadas',   icon: AlertTriangle, headerBg: 'bg-red-50',     headerText: 'text-red-700',     countText: 'text-red-600',     cardBorder: 'border-red-100',     tasks: overdue },
@@ -80,14 +111,34 @@ function TvDashboard() {
     ];
     return {
       buckets,
-      kpis: { total: store.tasks.length, done, overdue: overdue.length, hoje: doHoje.length },
-      allActive,
+      kpis: { total: filteredTasks.length, done, overdue: overdue.length, hoje: doHoje.length },
+      completed: { today: doneToday, week: doneWeek, month: doneMonth },
     };
-  }, [store, now]);
+  }, [filteredTasks, now]);
 
+  // Ranking de conclusões no mês (independente do filtro para ter contexto)
+  const ranking = useMemo(() => {
+    const monthStart = new Date(); monthStart.setHours(0,0,0,0); monthStart.setDate(1);
+    const counts = new Map<string, number>();
+    for (const t of store.tasks) {
+      if (t.status !== 'concluido' || !t.assigneeId || !t.updatedAt) continue;
+      if (new Date(t.updatedAt) < monthStart) continue;
+      counts.set(t.assigneeId, (counts.get(t.assigneeId) ?? 0) + 1);
+    }
+    const rows = [...counts.entries()]
+      .map(([id, count]) => ({ id, count, name: store.users.find(u => u.id === id)?.name ?? '—' }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+    const max = rows[0]?.count ?? 0;
+    return { rows, max };
+  }, [store.tasks, store.users]);
 
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
+  const currentAssigneeName =
+    assigneeFilter === '__all__' ? 'Toda a equipe' :
+    assigneeFilter === '__none__' ? 'Sem responsável' :
+    store.users.find(u => u.id === assigneeFilter)?.name ?? '—';
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground overflow-hidden">
@@ -98,7 +149,7 @@ function TvDashboard() {
           <div className="h-10 w-px bg-border" />
           <div>
             <div className="somus-eyebrow text-muted-foreground">Painel da Alcateia</div>
-            <div className="font-serif italic text-2xl tracking-tight text-foreground">Demandas em tempo real</div>
+            <div className="font-serif italic text-2xl tracking-tight text-foreground">{currentAssigneeName}</div>
           </div>
         </div>
         <div className="flex items-center gap-8">
@@ -120,8 +171,29 @@ function TvDashboard() {
         </div>
       </header>
 
+      {/* Filtro por responsável */}
+      <div className="px-10 pt-5">
+        <div className="flex items-center gap-3 mb-2">
+          <Users className="h-3.5 w-3.5 text-muted-foreground" />
+          <div className="somus-eyebrow text-muted-foreground">Filtrar por colaborador</div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <FilterPill active={assigneeFilter === '__all__'} onClick={() => setAssigneeFilter('__all__')}>
+            Todos
+          </FilterPill>
+          {filterableUsers.map(u => (
+            <FilterPill key={u.id} active={assigneeFilter === u.id} onClick={() => setAssigneeFilter(u.id)}>
+              {u.name}
+            </FilterPill>
+          ))}
+          <FilterPill active={assigneeFilter === '__none__'} onClick={() => setAssigneeFilter('__none__')}>
+            Sem responsável
+          </FilterPill>
+        </div>
+      </div>
+
       {/* KPIs */}
-      <div className="grid grid-cols-4 gap-4 px-10 pt-6">
+      <div className="grid grid-cols-4 gap-4 px-10 pt-5">
         <Kpi label="Atrasadas"    value={kpis.overdue}          accent="text-red-600" />
         <Kpi label="Para hoje"    value={kpis.hoje}             accent="text-amber-600" />
         <Kpi label="Total ativas" value={kpis.total - kpis.done} accent="text-foreground" />
@@ -131,7 +203,7 @@ function TvDashboard() {
       {/* Buckets grid */}
       <div className="grid grid-cols-4 gap-4 px-10 pt-4">
         {buckets.map(b => (
-          <div key={b.key} className="rounded-2xl bg-card border border-border shadow-sm flex flex-col min-h-[62vh] overflow-hidden">
+          <div key={b.key} className="rounded-2xl bg-card border border-border shadow-sm flex flex-col min-h-[52vh] overflow-hidden">
             <div className={`flex items-center justify-between px-5 py-4 ${b.headerBg}`}>
               <div className={`flex items-center gap-2.5 ${b.headerText}`}>
                 <b.icon className="h-5 w-5" />
@@ -144,7 +216,7 @@ function TvDashboard() {
                 <div className="h-full flex items-center justify-center text-muted-foreground text-sm italic font-serif">
                   Nada por aqui.
                 </div>
-              ) : b.tasks.slice(0, 10).map(t => {
+              ) : b.tasks.slice(0, 8).map(t => {
                 const assignee = store.users.find(u => u.id === t.assigneeId);
                 const client = getTaskClientName(store, t);
                 const meta = STATUS_META[t.status];
@@ -168,9 +240,9 @@ function TvDashboard() {
                   </div>
                 );
               })}
-              {b.tasks.length > 10 && (
+              {b.tasks.length > 8 && (
                 <div className="text-center text-xs text-muted-foreground pt-2">
-                  + {b.tasks.length - 10} demandas
+                  + {b.tasks.length - 8} demandas
                 </div>
               )}
             </div>
@@ -178,56 +250,112 @@ function TvDashboard() {
         ))}
       </div>
 
-      {/* Demandas gerais */}
-      <div className="px-10 pt-6 pb-8">
-        <div className="flex items-baseline justify-between mb-3">
-          <div className="somus-eyebrow text-muted-foreground">Demandas gerais</div>
-          <div className="text-xs text-muted-foreground tabular-nums">{allActive.length} ativas</div>
-        </div>
-        {allActive.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground py-6 rounded-xl border border-border bg-card">
-            Nenhuma demanda ativa.
+      {/* Concluídas + Performance */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 px-10 pt-6 pb-10">
+        <DoneCard label="Concluídas hoje" tone="emerald" tasks={completed.today} store={store} />
+        <DoneCard label="Concluídas na semana" tone="teal" tasks={completed.week} store={store} />
+        <DoneCard label="Concluídas no mês" tone="sky" tasks={completed.month} store={store} />
+
+        {/* Ranking */}
+        <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 bg-violet-50">
+            <div className="flex items-center gap-2.5 text-violet-700">
+              <Trophy className="h-5 w-5" />
+              <span className="text-sm uppercase tracking-[0.25em] font-semibold">Ranking do mês</span>
+            </div>
+            <TrendingUp className="h-4 w-4 text-violet-500/70" />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-2.5">
-            {allActive.slice(0, 24).map(t => {
-              const assignee = store.users.find(u => u.id === t.assigneeId);
-              const client = getTaskClientName(store, t);
-              const meta = STATUS_META[t.status];
-              const d = t.dueDate ? parseLocalDate(t.dueDate) : null;
-              const today = new Date(); today.setHours(0, 0, 0, 0);
-              const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
-              let dateTone = 'text-muted-foreground border-border bg-background';
-              let dateLabel = d ? d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : 'sem prazo';
-              if (d) {
-                if (d < today) { dateTone = 'text-red-700 border-red-200 bg-red-50'; }
-                else if (d.getTime() === today.getTime()) { dateTone = 'text-amber-800 border-amber-200 bg-amber-50'; dateLabel = 'Hoje'; }
-                else if (d.getTime() === tomorrow.getTime()) { dateTone = 'text-blue-700 border-blue-200 bg-blue-50'; dateLabel = 'Amanhã'; }
-              }
+          <div className="p-4 space-y-3">
+            {ranking.rows.length === 0 ? (
+              <div className="text-sm italic font-serif text-muted-foreground text-center py-6">
+                Sem conclusões no mês ainda.
+              </div>
+            ) : ranking.rows.map((r, i) => {
+              const pct = ranking.max > 0 ? Math.round((r.count / ranking.max) * 100) : 0;
               return (
-                <div key={t.id} className="rounded-lg border border-border bg-card px-3.5 py-2.5 shadow-sm flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium leading-snug truncate text-foreground">{t.name}</div>
-                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-                      <span className="truncate">{client}</span>
-                      <span className="opacity-40">•</span>
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border ${meta.color}`}>{meta.label}</span>
-                      {assignee && (<><span className="opacity-40">•</span><span className="truncate">{assignee.name}</span></>)}
+                <div key={r.id}>
+                  <div className="flex items-center justify-between text-[13px] mb-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-5 text-center font-serif tabular-nums ${i === 0 ? 'text-amber-600' : 'text-muted-foreground'}`}>{i + 1}</span>
+                      <span className="truncate font-medium text-foreground">{r.name}</span>
                     </div>
+                    <span className="font-serif tabular-nums text-foreground">{r.count}</span>
                   </div>
-                  <span className={`shrink-0 text-[11px] tabular-nums px-2 py-1 rounded border ${dateTone}`}>{dateLabel}</span>
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={`h-full ${i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-violet-400' : 'bg-violet-300'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
                 </div>
               );
             })}
-            {allActive.length > 24 && (
-              <div className="col-span-full text-center text-xs text-muted-foreground pt-1">
-                + {allActive.length - 24} demandas
-              </div>
-            )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterPill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3.5 py-1.5 rounded-full text-[12px] uppercase tracking-wider border transition-colors ${
+        active
+          ? 'bg-foreground text-background border-foreground'
+          : 'bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function DoneCard({
+  label, tone, tasks, store,
+}: {
+  label: string;
+  tone: 'emerald' | 'teal' | 'sky';
+  tasks: OpTask[];
+  store: ReturnType<typeof useOpStore>;
+}) {
+  const toneMap = {
+    emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', count: 'text-emerald-600' },
+    teal:    { bg: 'bg-teal-50',    text: 'text-teal-700',    count: 'text-teal-600' },
+    sky:     { bg: 'bg-sky-50',     text: 'text-sky-700',     count: 'text-sky-600' },
+  }[tone];
+  return (
+    <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden flex flex-col">
+      <div className={`flex items-center justify-between px-5 py-4 ${toneMap.bg}`}>
+        <div className={`flex items-center gap-2.5 ${toneMap.text}`}>
+          <CheckCircle2 className="h-5 w-5" />
+          <span className="text-sm uppercase tracking-[0.25em] font-semibold">{label}</span>
+        </div>
+        <span className={`font-serif text-3xl tabular-nums ${toneMap.count}`}>{tasks.length}</span>
+      </div>
+      <div className="p-3 space-y-2 max-h-[42vh] overflow-hidden">
+        {tasks.length === 0 ? (
+          <div className="text-sm italic font-serif text-muted-foreground text-center py-6">
+            Nada concluído ainda.
+          </div>
+        ) : tasks.slice(0, 6).map(t => {
+          const assignee = store.users.find(u => u.id === t.assigneeId);
+          const client = getTaskClientName(store, t);
+          return (
+            <div key={t.id} className="rounded-lg bg-background border border-border px-3 py-2">
+              <div className="text-[13px] font-medium leading-snug line-clamp-2 text-foreground">{t.name}</div>
+              <div className="mt-1 flex items-center gap-1.5 text-[10.5px] text-muted-foreground">
+                <span className="truncate">{client}</span>
+                {assignee && (<><span className="opacity-40">•</span><span className="truncate">{assignee.name}</span></>)}
+              </div>
+            </div>
+          );
+        })}
+        {tasks.length > 6 && (
+          <div className="text-center text-[11px] text-muted-foreground pt-1">+ {tasks.length - 6}</div>
         )}
       </div>
-
     </div>
   );
 }
