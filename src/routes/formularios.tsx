@@ -272,7 +272,7 @@ function FormulariosPage() {
         ))}
       </Card>
 
-      </Card>
+
 
       <section className="space-y-3">
         <div>
