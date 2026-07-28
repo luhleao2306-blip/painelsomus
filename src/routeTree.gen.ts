@@ -49,6 +49,7 @@ import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
 import { Route as ComercialIndexRouteImport } from './routes/comercial.index'
 import { Route as AlcateiaIndexRouteImport } from './routes/alcateia.index'
+import { Route as VfTokenRouteImport } from './routes/vf.$token'
 import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
@@ -287,6 +288,11 @@ const ComercialIndexRoute = ComercialIndexRouteImport.update({
 const AlcateiaIndexRoute = AlcateiaIndexRouteImport.update({
   id: '/alcateia/',
   path: '/alcateia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VfTokenRoute = VfTokenRouteImport.update({
+  id: '/vf/$token',
+  path: '/vf/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SomusIaAgentesRoute = SomusIaAgentesRouteImport.update({
@@ -556,6 +562,7 @@ export interface FileRoutesByFullPath {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -631,6 +638,7 @@ export interface FileRoutesByTo {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia': typeof AlcateiaIndexRoute
   '/comercial': typeof ComercialIndexRoute
   '/contracts': typeof ContractsIndexRoute
@@ -713,6 +721,7 @@ export interface FileRoutesById {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -796,6 +805,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -871,6 +881,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia'
     | '/comercial'
     | '/contracts'
@@ -952,6 +963,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -1012,6 +1024,7 @@ export interface RootRouteChildren {
   FDataRoute: typeof FDataRoute
   InviteTokenRoute: typeof InviteTokenRoute
   OnboardingTokenRoute: typeof OnboardingTokenRoute
+  VfTokenRoute: typeof VfTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
   ContractsIndexRoute: typeof ContractsIndexRoute
   ClienteTrilhasTrackIdRoute: typeof ClienteTrilhasTrackIdRoute
@@ -1300,6 +1313,13 @@ declare module '@tanstack/react-router' {
       path: '/alcateia'
       fullPath: '/alcateia/'
       preLoaderRoute: typeof AlcateiaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vf/$token': {
+      id: '/vf/$token'
+      path: '/vf/$token'
+      fullPath: '/vf/$token'
+      preLoaderRoute: typeof VfTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/somus-ia/agentes': {
@@ -1772,6 +1792,7 @@ const rootRouteChildren: RootRouteChildren = {
   FDataRoute: FDataRoute,
   InviteTokenRoute: InviteTokenRoute,
   OnboardingTokenRoute: OnboardingTokenRoute,
+  VfTokenRoute: VfTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
   ContractsIndexRoute: ContractsIndexRoute,
   ClienteTrilhasTrackIdRoute: ClienteTrilhasTrackIdRoute,
