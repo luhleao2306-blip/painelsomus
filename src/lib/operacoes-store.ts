@@ -53,6 +53,7 @@ export type OpTask = {
   checklist: { id: string; text: string; done: boolean }[];
   comments: OpComment[];
   position?: number;
+  updatedAt?: string;
 };
 
 export type OpSection = { id: string; projectId: string; name: string; order: number };
