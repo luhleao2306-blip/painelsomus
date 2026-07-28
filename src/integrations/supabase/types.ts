@@ -354,6 +354,71 @@ export type Database = {
           },
         ]
       }
+      client_form_requests: {
+        Row: {
+          answers: Json
+          client_id: string | null
+          client_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          progress: number
+          status: string
+          submitted_at: string | null
+          template_key: string
+          template_name: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          client_id?: string | null
+          client_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          progress?: number
+          status?: string
+          submitted_at?: string | null
+          template_key?: string
+          template_name?: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          client_id?: string | null
+          client_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          progress?: number
+          status?: string
+          submitted_at?: string | null
+          template_key?: string
+          template_name?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_form_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_glossary_terms: {
         Row: {
           category: string | null
@@ -4218,6 +4283,21 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_client_form_request: {
+        Args: { _token: string }
+        Returns: {
+          answers: Json
+          client_name: string
+          contact_email: string
+          contact_name: string
+          id: string
+          progress: number
+          status: string
+          submitted_at: string
+          template_key: string
+          template_name: string
+        }[]
+      }
       get_contract_by_token: {
         Args: { _token: string }
         Returns: {
@@ -4275,6 +4355,10 @@ export type Database = {
         Args: { _dados: Json; _token: string }
         Returns: undefined
       }
+      save_client_form_progress: {
+        Args: { _answers: Json; _progress: number; _token: string }
+        Returns: undefined
+      }
       sign_contract: {
         Args: {
           _cpf: string
@@ -4288,6 +4372,17 @@ export type Database = {
       submit_briefing_by_token: {
         Args: { _dados: Json; _token: string }
         Returns: undefined
+      }
+      submit_client_form: {
+        Args: {
+          _answers: Json
+          _client_name: string
+          _contact_email: string
+          _contact_name: string
+          _progress: number
+          _token: string
+        }
+        Returns: string
       }
       submit_onboarding: {
         Args: { _ip: string; _payload: Json; _token: string }
