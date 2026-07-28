@@ -41,6 +41,7 @@ import {
 import { toast } from 'sonner';
 import {
   usePublicSubmissions,
+  useDeletePublicSubmission,
   submissionFields,
   submissionRespondent,
   exportSubmissionPDF,
