@@ -212,6 +212,10 @@ export type PublicSubmission = {
   form_snapshot: any;
   answers: Record<string, any>;
   submitted_at: string;
+  client_id?: string | null;
+  client_name?: string | null;
+  contact_name?: string | null;
+  contact_email?: string | null;
 };
 
 export function usePublicSubmissions() {
@@ -227,6 +231,23 @@ export function usePublicSubmissions() {
     },
   });
 }
+
+/** Respostas vinculadas ao cliente logado (RLS filtra pelo client_id do perfil). */
+export function useMyPublicSubmissions() {
+  return useQuery({
+    queryKey: ['my-public-form-submissions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('public_form_submissions')
+        .select('*')
+        .not('client_id', 'is', null)
+        .order('submitted_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as PublicSubmission[];
+    },
+  });
+}
+
 
 export function submissionFields(sub: PublicSubmission): { label: string; value: string }[] {
   const fields: any[] = sub.form_snapshot?.fields ?? [];

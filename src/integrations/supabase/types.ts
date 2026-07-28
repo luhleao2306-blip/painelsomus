@@ -3351,6 +3351,10 @@ export type Database = {
       public_form_submissions: {
         Row: {
           answers: Json
+          client_id: string | null
+          client_name: string | null
+          contact_email: string | null
+          contact_name: string | null
           created_at: string
           form_id: string | null
           form_name: string | null
@@ -3362,6 +3366,10 @@ export type Database = {
         }
         Insert: {
           answers?: Json
+          client_id?: string | null
+          client_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
           form_id?: string | null
           form_name?: string | null
@@ -3373,6 +3381,10 @@ export type Database = {
         }
         Update: {
           answers?: Json
+          client_id?: string | null
+          client_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
           form_id?: string | null
           form_name?: string | null
@@ -3383,6 +3395,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "public_form_submissions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "public_form_submissions_token_fkey"
             columns: ["token"]

@@ -87,8 +87,11 @@ export const Route = createFileRoute('/api/public/visao-submissions')({
               : data.form_name,
             form_snapshot: (data.form_snapshot ?? { name: data.form_name, external: true }) as never,
             answers: answers as never,
+            client_name: data.client_name ?? null,
+            contact_name: data.contact_name ?? null,
+            contact_email: data.contact_email ?? null,
           })
-          .select('id')
+          .select('id, client_id')
           .single();
 
         if (error) {
@@ -96,7 +99,7 @@ export const Route = createFileRoute('/api/public/visao-submissions')({
           return json({ error: 'insert_failed', message: error.message }, 500);
         }
 
-        return json({ ok: true, id: inserted.id }, 201);
+        return json({ ok: true, id: inserted.id, client_id: inserted.client_id ?? null }, 201);
       },
     },
   },

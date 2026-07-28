@@ -106,8 +106,18 @@ function FormulariosPage() {
                   <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15">
                     Respondido
                   </Badge>
+                  {s.client_id ? (
+                    <Badge className="bg-blue-500/15 text-blue-600 hover:bg-blue-500/15">
+                      Cliente vinculado
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-muted-foreground">
+                      Sem cliente
+                    </Badge>
+                  )}
                 </div>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {s.client_name ? `${s.client_name} · ` : ''}
                   {s.form_name ?? 'Formulário'} · enviado em{' '}
                   {new Date(s.submitted_at).toLocaleString('pt-BR')}
                 </p>
