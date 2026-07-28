@@ -81,6 +81,7 @@ import { Route as ComercialFunilRouteImport } from './routes/comercial.funil'
 import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
 import { Route as ClienteMetasRouteImport } from './routes/cliente.metas'
 import { Route as ClienteGlossarioRouteImport } from './routes/cliente.glossario'
+import { Route as ClienteFormulariosRouteImport } from './routes/cliente.formularios'
 import { Route as ClienteAgentesRouteImport } from './routes/cliente.agentes'
 import { Route as BriefingTokenRouteImport } from './routes/briefing.$token'
 import { Route as AtasAtaIdRouteImport } from './routes/atas.$ataId'
@@ -453,6 +454,11 @@ const ClienteGlossarioRoute = ClienteGlossarioRouteImport.update({
   path: '/cliente/glossario',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteFormulariosRoute = ClienteFormulariosRouteImport.update({
+  id: '/cliente/formularios',
+  path: '/cliente/formularios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClienteAgentesRoute = ClienteAgentesRouteImport.update({
   id: '/cliente/agentes',
   path: '/cliente/agentes',
@@ -539,6 +545,7 @@ export interface FileRoutesByFullPath {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -616,6 +623,7 @@ export interface FileRoutesByTo {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -700,6 +708,7 @@ export interface FileRoutesById {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -785,6 +794,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -862,6 +872,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -945,6 +956,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -1029,6 +1041,7 @@ export interface RootRouteChildren {
   AtasAtaIdRoute: typeof AtasAtaIdRoute
   BriefingTokenRoute: typeof BriefingTokenRoute
   ClienteAgentesRoute: typeof ClienteAgentesRoute
+  ClienteFormulariosRoute: typeof ClienteFormulariosRoute
   ClienteGlossarioRoute: typeof ClienteGlossarioRoute
   ClienteMetasRoute: typeof ClienteMetasRoute
   ContractsContractIdRoute: typeof ContractsContractIdRoute
@@ -1552,6 +1565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteGlossarioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/formularios': {
+      id: '/cliente/formularios'
+      path: '/cliente/formularios'
+      fullPath: '/cliente/formularios'
+      preLoaderRoute: typeof ClienteFormulariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cliente/agentes': {
       id: '/cliente/agentes'
       path: '/cliente/agentes'
@@ -1805,6 +1825,7 @@ const rootRouteChildren: RootRouteChildren = {
   AtasAtaIdRoute: AtasAtaIdRoute,
   BriefingTokenRoute: BriefingTokenRoute,
   ClienteAgentesRoute: ClienteAgentesRoute,
+  ClienteFormulariosRoute: ClienteFormulariosRoute,
   ClienteGlossarioRoute: ClienteGlossarioRoute,
   ClienteMetasRoute: ClienteMetasRoute,
   ContractsContractIdRoute: ContractsContractIdRoute,

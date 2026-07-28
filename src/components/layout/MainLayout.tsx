@@ -120,6 +120,8 @@ const navigationSections: NavSection[] = [
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
+      { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
+
 
       { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
