@@ -232,6 +232,23 @@ export function usePublicSubmissions() {
   });
 }
 
+/** Exclui uma resposta recebida (somente usuários internos). */
+export function useDeletePublicSubmission() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('public_form_submissions').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['public-form-submissions'] });
+      qc.invalidateQueries({ queryKey: ['my-public-form-submissions'] });
+      toast.success('Resposta excluída');
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Erro ao excluir a resposta'),
+  });
+}
+
 /** Respostas vinculadas ao cliente logado (RLS filtra pelo client_id do perfil). */
 export function useMyPublicSubmissions() {
   return useQuery({
