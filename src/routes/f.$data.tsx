@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useForceLight } from '@/hooks/use-force-light';
 import { useEffect, useState } from 'react';
 import { Check, Loader2, ArrowRight } from 'lucide-react';
 
@@ -49,6 +50,7 @@ const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
 const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
 
 function PublicFormPage() {
+  useForceLight();
   const { data } = Route.useParams();
   const [form, setForm] = useState<OpForm | null | undefined>(undefined);
   const [token, setToken] = useState<string | null>(null);

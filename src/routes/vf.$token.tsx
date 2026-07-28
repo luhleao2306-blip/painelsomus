@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useForceLight } from '@/hooks/use-force-light';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,7 @@ type Loaded = {
 };
 
 function PublicVisaoForm() {
+  useForceLight();
   const { token } = Route.useParams();
   const [state, setState] = useState<'loading' | 'ok' | 'invalid' | 'done'>('loading');
   const [meta, setMeta] = useState<Loaded | null>(null);
