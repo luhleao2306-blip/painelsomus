@@ -38,9 +38,7 @@ function ClientFormsPage() {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (
-    <MainLayout>
-data ?? []) as unknown as ClientFormRequest[];
+      return (data ?? []) as unknown as ClientFormRequest[];
     },
   });
 
@@ -48,7 +46,9 @@ data ?? []) as unknown as ClientFormRequest[];
   const done = data.filter(r => r.status === 'submitted');
 
   return (
+    <MainLayout>
     <div className="space-y-8">
+
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Somus</p>
         <h1 className="mt-1 font-display text-3xl">Meus Formulários</h1>
