@@ -120,6 +120,8 @@ const navigationSections: NavSection[] = [
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
       { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
       { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
+      { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
+
 
       { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
@@ -142,7 +144,9 @@ const navigationSections: NavSection[] = [
       { title: 'Clientes', icon: Users, href: '/clients', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Portal do Cliente', icon: Bot, href: '/portal-cliente', roles: ['master', 'project_manager'] },
       { title: 'Formulário de Clientes', icon: UsersRound, href: '/registrations', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Formulários de Clientes', icon: FileText, href: '/formularios', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Colaboradores', icon: UserCog, href: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
+
     ],
   },
   // Seções "Comercial" e "Financeiro" ocultas temporariamente da sidebar.
@@ -194,7 +198,10 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/dashboard', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/clients', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/registrations', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/formularios', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/cliente/formularios', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
+
   { prefix: '/projects-overview', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/projects', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/briefing', roles: ['master', 'project_manager', 'consultant', 'client'] },

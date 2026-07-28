@@ -31,6 +31,7 @@ import { Route as KnowledgeTrailRouteImport } from './routes/knowledge-trail'
 import { Route as IntelligentCentralRouteImport } from './routes/intelligent-central'
 import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
+import { Route as FormulariosRouteImport } from './routes/formularios'
 import { Route as FinancialDashboardRouteImport } from './routes/financial-dashboard'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DocumentsRouteImport } from './routes/documents'
@@ -49,6 +50,7 @@ import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
 import { Route as ComercialIndexRouteImport } from './routes/comercial.index'
 import { Route as AlcateiaIndexRouteImport } from './routes/alcateia.index'
+import { Route as VfTokenRouteImport } from './routes/vf.$token'
 import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
@@ -79,6 +81,7 @@ import { Route as ComercialFunilRouteImport } from './routes/comercial.funil'
 import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
 import { Route as ClienteMetasRouteImport } from './routes/cliente.metas'
 import { Route as ClienteGlossarioRouteImport } from './routes/cliente.glossario'
+import { Route as ClienteFormulariosRouteImport } from './routes/cliente.formularios'
 import { Route as ClienteAgentesRouteImport } from './routes/cliente.agentes'
 import { Route as BriefingTokenRouteImport } from './routes/briefing.$token'
 import { Route as AtasAtaIdRouteImport } from './routes/atas.$ataId'
@@ -199,6 +202,11 @@ const GamificacaoRoute = GamificacaoRouteImport.update({
   path: '/gamificacao',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FormulariosRoute = FormulariosRouteImport.update({
+  id: '/formularios',
+  path: '/formularios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinancialDashboardRoute = FinancialDashboardRouteImport.update({
   id: '/financial-dashboard',
   path: '/financial-dashboard',
@@ -287,6 +295,11 @@ const ComercialIndexRoute = ComercialIndexRouteImport.update({
 const AlcateiaIndexRoute = AlcateiaIndexRouteImport.update({
   id: '/alcateia/',
   path: '/alcateia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VfTokenRoute = VfTokenRouteImport.update({
+  id: '/vf/$token',
+  path: '/vf/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SomusIaAgentesRoute = SomusIaAgentesRouteImport.update({
@@ -441,6 +454,11 @@ const ClienteGlossarioRoute = ClienteGlossarioRouteImport.update({
   path: '/cliente/glossario',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteFormulariosRoute = ClienteFormulariosRouteImport.update({
+  id: '/cliente/formularios',
+  path: '/cliente/formularios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClienteAgentesRoute = ClienteAgentesRouteImport.update({
   id: '/cliente/agentes',
   path: '/cliente/agentes',
@@ -500,6 +518,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof DocumentsRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
@@ -526,6 +545,7 @@ export interface FileRoutesByFullPath {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -556,6 +576,7 @@ export interface FileRoutesByFullPath {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -579,6 +600,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
   '/knowledge-trail': typeof KnowledgeTrailRoute
@@ -601,6 +623,7 @@ export interface FileRoutesByTo {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -631,6 +654,7 @@ export interface FileRoutesByTo {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia': typeof AlcateiaIndexRoute
   '/comercial': typeof ComercialIndexRoute
   '/contracts': typeof ContractsIndexRoute
@@ -657,6 +681,7 @@ export interface FileRoutesById {
   '/documents': typeof DocumentsRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
@@ -683,6 +708,7 @@ export interface FileRoutesById {
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
   '/cliente/agentes': typeof ClienteAgentesRoute
+  '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
@@ -713,6 +739,7 @@ export interface FileRoutesById {
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
   '/somus-ia/agentes': typeof SomusIaAgentesRoute
+  '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
@@ -740,6 +767,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/financeiro'
     | '/financial-dashboard'
+    | '/formularios'
     | '/gamificacao'
     | '/info-center'
     | '/intelligent-central'
@@ -766,6 +794,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -796,6 +825,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -819,6 +849,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documents'
     | '/financial-dashboard'
+    | '/formularios'
     | '/info-center'
     | '/intelligent-central'
     | '/knowledge-trail'
@@ -841,6 +872,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -871,6 +903,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia'
     | '/comercial'
     | '/contracts'
@@ -896,6 +929,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/financeiro'
     | '/financial-dashboard'
+    | '/formularios'
     | '/gamificacao'
     | '/info-center'
     | '/intelligent-central'
@@ -922,6 +956,7 @@ export interface FileRouteTypes {
     | '/atas/$ataId'
     | '/briefing/$token'
     | '/cliente/agentes'
+    | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
     | '/clients/$clientId'
@@ -952,6 +987,7 @@ export interface FileRouteTypes {
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
     | '/somus-ia/agentes'
+    | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
@@ -978,6 +1014,7 @@ export interface RootRouteChildren {
   DocumentsRoute: typeof DocumentsRoute
   FinanceiroRoute: typeof FinanceiroRouteWithChildren
   FinancialDashboardRoute: typeof FinancialDashboardRoute
+  FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
   InfoCenterRoute: typeof InfoCenterRoute
   IntelligentCentralRoute: typeof IntelligentCentralRoute
@@ -1004,6 +1041,7 @@ export interface RootRouteChildren {
   AtasAtaIdRoute: typeof AtasAtaIdRoute
   BriefingTokenRoute: typeof BriefingTokenRoute
   ClienteAgentesRoute: typeof ClienteAgentesRoute
+  ClienteFormulariosRoute: typeof ClienteFormulariosRoute
   ClienteGlossarioRoute: typeof ClienteGlossarioRoute
   ClienteMetasRoute: typeof ClienteMetasRoute
   ContractsContractIdRoute: typeof ContractsContractIdRoute
@@ -1012,6 +1050,7 @@ export interface RootRouteChildren {
   FDataRoute: typeof FDataRoute
   InviteTokenRoute: typeof InviteTokenRoute
   OnboardingTokenRoute: typeof OnboardingTokenRoute
+  VfTokenRoute: typeof VfTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
   ContractsIndexRoute: typeof ContractsIndexRoute
   ClienteTrilhasTrackIdRoute: typeof ClienteTrilhasTrackIdRoute
@@ -1176,6 +1215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamificacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/formularios': {
+      id: '/formularios'
+      path: '/formularios'
+      fullPath: '/formularios'
+      preLoaderRoute: typeof FormulariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/financial-dashboard': {
       id: '/financial-dashboard'
       path: '/financial-dashboard'
@@ -1300,6 +1346,13 @@ declare module '@tanstack/react-router' {
       path: '/alcateia'
       fullPath: '/alcateia/'
       preLoaderRoute: typeof AlcateiaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vf/$token': {
+      id: '/vf/$token'
+      path: '/vf/$token'
+      fullPath: '/vf/$token'
+      preLoaderRoute: typeof VfTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/somus-ia/agentes': {
@@ -1510,6 +1563,13 @@ declare module '@tanstack/react-router' {
       path: '/cliente/glossario'
       fullPath: '/cliente/glossario'
       preLoaderRoute: typeof ClienteGlossarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente/formularios': {
+      id: '/cliente/formularios'
+      path: '/cliente/formularios'
+      fullPath: '/cliente/formularios'
+      preLoaderRoute: typeof ClienteFormulariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cliente/agentes': {
@@ -1738,6 +1798,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocumentsRoute: DocumentsRoute,
   FinanceiroRoute: FinanceiroRouteWithChildren,
   FinancialDashboardRoute: FinancialDashboardRoute,
+  FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,
   InfoCenterRoute: InfoCenterRoute,
   IntelligentCentralRoute: IntelligentCentralRoute,
@@ -1764,6 +1825,7 @@ const rootRouteChildren: RootRouteChildren = {
   AtasAtaIdRoute: AtasAtaIdRoute,
   BriefingTokenRoute: BriefingTokenRoute,
   ClienteAgentesRoute: ClienteAgentesRoute,
+  ClienteFormulariosRoute: ClienteFormulariosRoute,
   ClienteGlossarioRoute: ClienteGlossarioRoute,
   ClienteMetasRoute: ClienteMetasRoute,
   ContractsContractIdRoute: ContractsContractIdRoute,
@@ -1772,6 +1834,7 @@ const rootRouteChildren: RootRouteChildren = {
   FDataRoute: FDataRoute,
   InviteTokenRoute: InviteTokenRoute,
   OnboardingTokenRoute: OnboardingTokenRoute,
+  VfTokenRoute: VfTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
   ContractsIndexRoute: ContractsIndexRoute,
   ClienteTrilhasTrackIdRoute: ClienteTrilhasTrackIdRoute,
@@ -1783,13 +1846,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
