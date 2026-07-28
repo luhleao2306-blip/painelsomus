@@ -144,7 +144,9 @@ const navigationSections: NavSection[] = [
       { title: 'Clientes', icon: Users, href: '/clients', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Portal do Cliente', icon: Bot, href: '/portal-cliente', roles: ['master', 'project_manager'] },
       { title: 'Formulário de Clientes', icon: UsersRound, href: '/registrations', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Formulários de Clientes', icon: FileText, href: '/formularios', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Colaboradores', icon: UserCog, href: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
+
     ],
   },
   // Seções "Comercial" e "Financeiro" ocultas temporariamente da sidebar.
