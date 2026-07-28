@@ -27,6 +27,13 @@ import {
   exportVisaoPDF,
   type ClientFormRequest,
 } from '@/lib/client-forms';
+import {
+  usePublicSubmissions,
+  submissionFields,
+  submissionRespondent,
+  exportSubmissionPDF,
+  type PublicSubmission,
+} from '@/lib/client-forms';
 import { FORM_TEMPLATES, VISAO_SECTIONS, HORIZONS } from '@/lib/visao-form';
 
 export const Route = createFileRoute('/formularios')({
