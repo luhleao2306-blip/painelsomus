@@ -31,6 +31,7 @@ import { Route as KnowledgeTrailRouteImport } from './routes/knowledge-trail'
 import { Route as IntelligentCentralRouteImport } from './routes/intelligent-central'
 import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
+import { Route as FormulariosRouteImport } from './routes/formularios'
 import { Route as FinancialDashboardRouteImport } from './routes/financial-dashboard'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DocumentsRouteImport } from './routes/documents'
@@ -198,6 +199,11 @@ const InfoCenterRoute = InfoCenterRouteImport.update({
 const GamificacaoRoute = GamificacaoRouteImport.update({
   id: '/gamificacao',
   path: '/gamificacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FormulariosRoute = FormulariosRouteImport.update({
+  id: '/formularios',
+  path: '/formularios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinancialDashboardRoute = FinancialDashboardRouteImport.update({
@@ -506,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/documents': typeof DocumentsRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
@@ -586,6 +593,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
   '/knowledge-trail': typeof KnowledgeTrailRoute
@@ -665,6 +673,7 @@ export interface FileRoutesById {
   '/documents': typeof DocumentsRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
+  '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
@@ -749,6 +758,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/financeiro'
     | '/financial-dashboard'
+    | '/formularios'
     | '/gamificacao'
     | '/info-center'
     | '/intelligent-central'
@@ -829,6 +839,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/documents'
     | '/financial-dashboard'
+    | '/formularios'
     | '/info-center'
     | '/intelligent-central'
     | '/knowledge-trail'
@@ -907,6 +918,7 @@ export interface FileRouteTypes {
     | '/documents'
     | '/financeiro'
     | '/financial-dashboard'
+    | '/formularios'
     | '/gamificacao'
     | '/info-center'
     | '/intelligent-central'
@@ -990,6 +1002,7 @@ export interface RootRouteChildren {
   DocumentsRoute: typeof DocumentsRoute
   FinanceiroRoute: typeof FinanceiroRouteWithChildren
   FinancialDashboardRoute: typeof FinancialDashboardRoute
+  FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
   InfoCenterRoute: typeof InfoCenterRoute
   IntelligentCentralRoute: typeof IntelligentCentralRoute
@@ -1187,6 +1200,13 @@ declare module '@tanstack/react-router' {
       path: '/gamificacao'
       fullPath: '/gamificacao'
       preLoaderRoute: typeof GamificacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formularios': {
+      id: '/formularios'
+      path: '/formularios'
+      fullPath: '/formularios'
+      preLoaderRoute: typeof FormulariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financial-dashboard': {
@@ -1758,6 +1778,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocumentsRoute: DocumentsRoute,
   FinanceiroRoute: FinanceiroRouteWithChildren,
   FinancialDashboardRoute: FinancialDashboardRoute,
+  FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,
   InfoCenterRoute: InfoCenterRoute,
   IntelligentCentralRoute: IntelligentCentralRoute,

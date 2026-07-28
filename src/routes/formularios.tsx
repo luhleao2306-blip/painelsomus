@@ -73,7 +73,7 @@ function FormulariosPage() {
   const [q, setQ] = useState('');
   const [viewing, setViewing] = useState<ClientFormRequest | null>(null);
 
-  const [templateKey, setTemplateKey] = useState(FORM_TEMPLATES[0].key);
+  const [templateKey, setTemplateKey] = useState<string>(FORM_TEMPLATES[0].key);
   const [clientId, setClientId] = useState<string>('none');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
