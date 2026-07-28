@@ -17,7 +17,6 @@ export const MODULES: ModuleDef[] = [
   { key: '/time-report', label: 'Relatório de Tempo', group: 'Operação' },
 
   { key: '/clients', label: 'Clientes', group: 'Relacionamento' },
-  { key: '/registrations', label: 'Formulário de Clientes', group: 'Relacionamento' },
   { key: '/collaborators', label: 'Colaboradores', group: 'Relacionamento' },
 
   { key: '/comercial', label: 'Dashboard Comercial', group: 'Comercial' },

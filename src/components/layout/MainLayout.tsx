@@ -196,7 +196,6 @@ const navigationSections: NavSection[] = [
 const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/dashboard', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/clients', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/registrations', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/formularios', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/cliente/formularios', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
