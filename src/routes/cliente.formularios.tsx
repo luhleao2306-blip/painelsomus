@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -37,7 +38,9 @@ function ClientFormsPage() {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as ClientFormRequest[];
+      return (
+    <MainLayout>
+data ?? []) as unknown as ClientFormRequest[];
     },
   });
 
@@ -115,5 +118,6 @@ function ClientFormsPage() {
         </section>
       )}
     </div>
+    </MainLayout>
   );
 }
