@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,8 @@ function FormulariosPage() {
   const [viewingSub, setViewingSub] = useState<PublicSubmission | null>(null);
 
   return (
+    <MainLayout>
+
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -145,6 +148,7 @@ function FormulariosPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </MainLayout>
   );
 }
 

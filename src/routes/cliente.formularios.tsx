@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -45,7 +46,9 @@ function ClientFormsPage() {
   const done = data.filter(r => r.status === 'submitted');
 
   return (
+    <MainLayout>
     <div className="space-y-8">
+
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Somus</p>
         <h1 className="mt-1 font-display text-3xl">Meus Formulários</h1>
@@ -115,5 +118,6 @@ function ClientFormsPage() {
         </section>
       )}
     </div>
+    </MainLayout>
   );
 }
