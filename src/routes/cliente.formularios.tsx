@@ -6,7 +6,12 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, FileText } from 'lucide-react';
-import { formPublicUrl, type ClientFormRequest } from '@/lib/client-forms';
+import {
+  formPublicUrl,
+  useMyPublicSubmissions,
+  submissionFields,
+  type ClientFormRequest,
+} from '@/lib/client-forms';
 
 export const Route = createFileRoute('/cliente/formularios')({
   component: ClientFormsPage,
@@ -42,6 +47,8 @@ function ClientFormsPage() {
     },
   });
 
+  const { data: mySubs = [] } = useMyPublicSubmissions();
+
   const pending = data.filter(r => r.status !== 'submitted');
   const done = data.filter(r => r.status === 'submitted');
 
@@ -59,7 +66,7 @@ function ClientFormsPage() {
 
       {isLoading && <p className="text-sm text-muted-foreground">Carregando…</p>}
 
-      {!isLoading && data.length === 0 && (
+      {!isLoading && data.length === 0 && mySubs.length === 0 && (
         <Card className="p-8 text-center text-sm text-muted-foreground">
           Nenhum formulário disponível no momento.
         </Card>
@@ -89,6 +96,40 @@ function ClientFormsPage() {
                     <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
                   </a>
                 </Button>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {mySubs.length > 0 && (
+        <section>
+          <h2 className="mb-3 font-display text-xl">Formulários recebidos</h2>
+          <div className="space-y-3">
+            {mySubs.map(s => (
+              <Card key={s.id} className="p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{s.form_name ?? 'Formulário'}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Enviado em {new Date(s.submitted_at).toLocaleString('pt-BR')}
+                      {s.contact_name ? ` · ${s.contact_name}` : ''}
+                    </p>
+                  </div>
+                  <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15">
+                    Respondido
+                  </Badge>
+                </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {submissionFields(s).slice(0, 6).map((f, i) => (
+                    <div key={i} className="rounded-lg border bg-muted/30 p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {f.label}
+                      </p>
+                      <p className="mt-0.5 text-sm">{f.value}</p>
+                    </div>
+                  ))}
+                </div>
               </Card>
             ))}
           </div>
