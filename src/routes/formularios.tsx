@@ -140,36 +140,13 @@ function FormulariosPage() {
           </p>
           <h1 className="mt-1 font-display text-3xl">Formulários de Clientes</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Gere o link, envie ao cliente e acompanhe as respostas direto no painel.
+            Acompanhe as respostas dos formulários enviados aos clientes direto no painel.
           </p>
         </div>
-        <Button onClick={() => setOpenNew(true)}>
-          <Plus className="mr-1.5 h-4 w-4" /> Novo envio
-        </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        {FORM_TEMPLATES.map(t => (
-          <Card key={t.key} className="p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Modelo</p>
-            <p className="mt-1 font-display text-lg">{t.name}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{t.description}</p>
-          </Card>
-        ))}
-      </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {(['all', 'pending', 'submitted'] as const).map(k => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              tab === k ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-muted'
-            }`}
-          >
-            {k === 'all' ? 'Todos' : k === 'pending' ? 'Pendentes' : 'Respondidos'} ({counts[k]})
-          </button>
-        ))}
         <div className="relative ml-auto w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -181,106 +158,9 @@ function FormulariosPage() {
         </div>
       </div>
 
-      <Card className="divide-y">
-        {isLoading && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
-        {!isLoading && filtered.length === 0 && (
-          <p className="p-8 text-center text-sm text-muted-foreground">
-            Nenhum formulário aqui ainda. Clique em “Novo envio” para gerar o primeiro link.
-          </p>
-        )}
-        {filtered.map(r => (
-          <div key={r.id} className="flex flex-wrap items-center gap-3 p-4">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="truncate font-medium">{clientName(r)}</p>
-                {r.status === 'submitted' ? (
-                  <Badge className="bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15">
-                    Respondido
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary">Pendente · {r.progress}%</Badge>
-                )}
-                {!r.client_id && <Badge variant="outline">Sem cliente vinculado</Badge>}
-              </div>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                {r.template_name} · {r.contact_name || 'sem contato'}{' '}
-                {r.contact_email ? `· ${r.contact_email}` : ''} ·{' '}
-                {r.submitted_at
-                  ? `enviado em ${new Date(r.submitted_at).toLocaleDateString('pt-BR')}`
-                  : `criado em ${new Date(r.created_at).toLocaleDateString('pt-BR')}`}
-              </p>
-            </div>
-
-            {!r.client_id && (
-              <Select
-                onValueChange={v => link.mutate({ id: r.id, client_id: v })}
-                value={r.client_id ?? undefined}
-              >
-                <SelectTrigger className="h-8 w-48 text-xs">
-                  <SelectValue placeholder="Vincular cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-
-            <div className="flex items-center gap-1">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  navigator.clipboard.writeText(formPublicUrl(r.token));
-                  toast.success('Link copiado');
-                }}
-                title="Copiar link"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-              <Button size="sm" variant="ghost" asChild title="Abrir formulário">
-                <a href={formPublicUrl(r.token)} target="_blank" rel="noreferrer">
-                  <Link2 className="h-4 w-4" />
-                </a>
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setViewing(r)} title="Ver respostas">
-                <Eye className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => exportVisaoPDF(r)}
-                title="Exportar PDF"
-                disabled={r.status !== 'submitted'}
-              >
-                <FileDown className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => remove.mutate(r.id)}
-                title="Excluir"
-                className="text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </Card>
 
 
 
-      <section className="space-y-3">
-        <div>
-          <h2 className="font-display text-xl">Respostas recebidas pelos links públicos</h2>
-          <p className="text-sm text-muted-foreground">
-            Tudo que for preenchido nos links de formulário (/f/…) cai aqui automaticamente.
-          </p>
-        </div>
         <Card className="divide-y">
           {loadingSubs && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
           {!loadingSubs && submissions.length === 0 && (
@@ -313,7 +193,7 @@ function FormulariosPage() {
             </div>
           ))}
         </Card>
-      </section>
+      
 
       <Dialog open={!!viewingSub} onOpenChange={o => !o && setViewingSub(null)}>
         <DialogContent className="max-w-2xl">
