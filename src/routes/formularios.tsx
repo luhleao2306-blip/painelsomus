@@ -92,6 +92,8 @@ function FormulariosPage() {
   const { data: requests = [], isLoading: loadingReqs } = useClientFormRequests();
   const [viewingSub, setViewingSub] = useState<PublicSubmission | null>(null);
   const [genOpen, setGenOpen] = useState(false);
+  const [deletingSub, setDeletingSub] = useState<PublicSubmission | null>(null);
+  const delSub = useDeletePublicSubmission();
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
