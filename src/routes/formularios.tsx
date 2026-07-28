@@ -62,7 +62,7 @@ function FormulariosPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -72,15 +72,21 @@ function FormulariosPage() {
             onChange={e => setQ(e.target.value)}
           />
         </div>
+        <Badge variant="secondary">{submissions.length} respostas</Badge>
       </div>
 
       <Card className="divide-y">
         {loadingSubs && <p className="p-6 text-sm text-muted-foreground">Carregando…</p>}
         {!loadingSubs && submissions.length === 0 && (
-          <p className="p-8 text-center text-sm text-muted-foreground">
-            Nenhuma resposta recebida ainda.
-          </p>
+          <div className="p-10 text-center">
+            <p className="text-sm font-medium">Nenhuma resposta recebida ainda.</p>
+            <p className="mx-auto mt-1 max-w-md text-xs text-muted-foreground">
+              Assim que um cliente preencher um formulário pelo link público gerado no portal, a
+              resposta aparece aqui automaticamente.
+            </p>
+          </div>
         )}
+
         {submissions
           .filter(s => {
             if (!q) return true;
