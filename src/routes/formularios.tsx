@@ -79,6 +79,8 @@ function FormulariosPage() {
   const [tab, setTab] = useState<'all' | 'pending' | 'submitted'>('all');
   const [q, setQ] = useState('');
   const [viewing, setViewing] = useState<ClientFormRequest | null>(null);
+  const { data: submissions = [], isLoading: loadingSubs } = usePublicSubmissions();
+  const [viewingSub, setViewingSub] = useState<PublicSubmission | null>(null);
 
   const [templateKey, setTemplateKey] = useState<string>(FORM_TEMPLATES[0].key);
   const [clientId, setClientId] = useState<string>('none');
