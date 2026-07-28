@@ -27,13 +27,13 @@ export const Route = createFileRoute('/formularios')({
   component: FormulariosPage,
   head: () => ({
     meta: [
-      { title: 'Formulários de Clientes | Somus Group' },
+      { title: 'Visão de Clientes | Somus Group' },
       {
         name: 'description',
         content:
           'Acompanhe as respostas dos formulários preenchidos pelos clientes direto no painel.',
       },
-      { property: 'og:title', content: 'Formulários de Clientes | Somus Group' },
+      { property: 'og:title', content: 'Visão de Clientes | Somus Group' },
       {
         property: 'og:description',
         content: 'Gestão dos formulários preenchidos pelos clientes: visualização e exportação em PDF.',
@@ -58,7 +58,7 @@ function FormulariosPage() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Relacionamento
           </p>
-          <h1 className="mt-1 font-display text-3xl">Formulários de Clientes</h1>
+          <h1 className="mt-1 font-display text-3xl">Visão de Clientes</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Visualize as respostas recebidas através dos links de formulários públicos.
           </p>
