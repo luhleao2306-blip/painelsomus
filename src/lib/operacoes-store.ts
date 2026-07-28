@@ -230,6 +230,7 @@ const rowToTask = (r: any): OpTask => ({
   checklist: r.checklist ?? [],
   comments: r.comments ?? [],
   position: r.position ?? 0,
+  updatedAt: r.updated_at ?? undefined,
 });
 const rowToTemplate = (r: any): OpTemplate => ({ id: r.id, name: r.name, sections: r.sections ?? [] });
 const rowToForm = (r: any): OpForm => ({ id: r.id, name: r.name, fields: r.fields ?? [] });
