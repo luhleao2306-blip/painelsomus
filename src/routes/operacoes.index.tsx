@@ -5,7 +5,7 @@ import {
   useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus,
 } from '@/lib/operacoes-store';
 import {
-  Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
+  Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star, Building2,
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles, ListTodo,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
