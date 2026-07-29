@@ -77,6 +77,7 @@ import { Route as ComercialProspeccoesRouteImport } from './routes/comercial.pro
 import { Route as ComercialMetasRouteImport } from './routes/comercial.metas'
 import { Route as ComercialFunilRouteImport } from './routes/comercial.funil'
 import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
+import { Route as ClientePainelRouteImport } from './routes/cliente.painel'
 import { Route as ClienteMetasRouteImport } from './routes/cliente.metas'
 import { Route as ClienteGlossarioRouteImport } from './routes/cliente.glossario'
 import { Route as ClienteFormulariosRouteImport } from './routes/cliente.formularios'
@@ -433,6 +434,11 @@ const ClientsClientIdRoute = ClientsClientIdRouteImport.update({
   path: '/$clientId',
   getParentRoute: () => ClientsRoute,
 } as any)
+const ClientePainelRoute = ClientePainelRouteImport.update({
+  id: '/cliente/painel',
+  path: '/cliente/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClienteMetasRoute = ClienteMetasRouteImport.update({
   id: '/cliente/metas',
   path: '/cliente/metas',
@@ -542,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
+  '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
@@ -620,6 +627,7 @@ export interface FileRoutesByTo {
   '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
+  '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
@@ -704,6 +712,7 @@ export interface FileRoutesById {
   '/cliente/formularios': typeof ClienteFormulariosRoute
   '/cliente/glossario': typeof ClienteGlossarioRoute
   '/cliente/metas': typeof ClienteMetasRoute
+  '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
@@ -789,6 +798,7 @@ export interface FileRouteTypes {
     | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
+    | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
     | '/comercial/metas'
@@ -867,6 +877,7 @@ export interface FileRouteTypes {
     | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
+    | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
     | '/comercial/metas'
@@ -950,6 +961,7 @@ export interface FileRouteTypes {
     | '/cliente/formularios'
     | '/cliente/glossario'
     | '/cliente/metas'
+    | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
     | '/comercial/metas'
@@ -1034,6 +1046,7 @@ export interface RootRouteChildren {
   ClienteFormulariosRoute: typeof ClienteFormulariosRoute
   ClienteGlossarioRoute: typeof ClienteGlossarioRoute
   ClienteMetasRoute: typeof ClienteMetasRoute
+  ClientePainelRoute: typeof ClientePainelRoute
   ContractsContractIdRoute: typeof ContractsContractIdRoute
   ContratoTokenRoute: typeof ContratoTokenRoute
   CronogramaTokenRoute: typeof CronogramaTokenRoute
@@ -1528,6 +1541,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsClientIdRouteImport
       parentRoute: typeof ClientsRoute
     }
+    '/cliente/painel': {
+      id: '/cliente/painel'
+      path: '/cliente/painel'
+      fullPath: '/cliente/painel'
+      preLoaderRoute: typeof ClientePainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cliente/metas': {
       id: '/cliente/metas'
       path: '/cliente/metas'
@@ -1799,6 +1819,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteFormulariosRoute: ClienteFormulariosRoute,
   ClienteGlossarioRoute: ClienteGlossarioRoute,
   ClienteMetasRoute: ClienteMetasRoute,
+  ClientePainelRoute: ClientePainelRoute,
   ContractsContractIdRoute: ContractsContractIdRoute,
   ContratoTokenRoute: ContratoTokenRoute,
   CronogramaTokenRoute: CronogramaTokenRoute,
