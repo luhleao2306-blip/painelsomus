@@ -226,13 +226,15 @@ function LoginPage() {
         {/* Right Form Panel */}
         <div className="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 md:p-20 relative">
           <div className="md:hidden mb-12">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <img
                 src={somusLogo}
                 alt="Somus"
                 className="h-8 w-auto object-contain"
               />
-              <span className="text-black font-bold tracking-tighter text-xl">SOMUS</span>
+              <span className="text-black font-medium tracking-[0.2em] uppercase text-xs">
+                Somus Group
+              </span>
             </div>
           </div>
 
