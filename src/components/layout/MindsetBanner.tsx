@@ -110,7 +110,7 @@ function pickTopic(pathname: string): Topic {
   if (p.startsWith('/comercial')) return TOPICS[1];
   if (
     p.startsWith('/projects') || p.startsWith('/projetos') ||
-    p.startsWith('/processes') || p.startsWith('/time-report')
+    p.startsWith('/time-report')
   ) return TOPICS[2];
   if (
     p.startsWith('/clients') || p.startsWith('/clientes') ||

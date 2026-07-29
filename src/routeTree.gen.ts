@@ -21,7 +21,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegistrationsRouteImport } from './routes/registrations'
 import { Route as ProjectsOverviewRouteImport } from './routes/projects-overview'
 import { Route as ProjectsRouteImport } from './routes/projects'
-import { Route as ProcessesRouteImport } from './routes/processes'
 import { Route as PortalClienteRouteImport } from './routes/portal-cliente'
 import { Route as OperacoesRouteImport } from './routes/operacoes'
 import { Route as MissoesRouteImport } from './routes/missoes'
@@ -147,11 +146,6 @@ const ProjectsOverviewRoute = ProjectsOverviewRouteImport.update({
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProcessesRoute = ProcessesRouteImport.update({
-  id: '/processes',
-  path: '/processes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalClienteRoute = PortalClienteRouteImport.update({
@@ -509,7 +503,6 @@ export interface FileRoutesByFullPath {
   '/missoes': typeof MissoesRoute
   '/operacoes': typeof OperacoesRouteWithChildren
   '/portal-cliente': typeof PortalClienteRoute
-  '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects-overview': typeof ProjectsOverviewRoute
   '/registrations': typeof RegistrationsRouteWithChildren
@@ -587,7 +580,6 @@ export interface FileRoutesByTo {
   '/meetings': typeof MeetingsRoute
   '/missoes': typeof MissoesRoute
   '/portal-cliente': typeof PortalClienteRoute
-  '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects-overview': typeof ProjectsOverviewRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -667,7 +659,6 @@ export interface FileRoutesById {
   '/missoes': typeof MissoesRoute
   '/operacoes': typeof OperacoesRouteWithChildren
   '/portal-cliente': typeof PortalClienteRoute
-  '/processes': typeof ProcessesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects-overview': typeof ProjectsOverviewRoute
   '/registrations': typeof RegistrationsRouteWithChildren
@@ -750,7 +741,6 @@ export interface FileRouteTypes {
     | '/missoes'
     | '/operacoes'
     | '/portal-cliente'
-    | '/processes'
     | '/projects'
     | '/projects-overview'
     | '/registrations'
@@ -828,7 +818,6 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/missoes'
     | '/portal-cliente'
-    | '/processes'
     | '/projects'
     | '/projects-overview'
     | '/reset-password'
@@ -907,7 +896,6 @@ export interface FileRouteTypes {
     | '/missoes'
     | '/operacoes'
     | '/portal-cliente'
-    | '/processes'
     | '/projects'
     | '/projects-overview'
     | '/registrations'
@@ -989,7 +977,6 @@ export interface RootRouteChildren {
   MissoesRoute: typeof MissoesRoute
   OperacoesRoute: typeof OperacoesRouteWithChildren
   PortalClienteRoute: typeof PortalClienteRoute
-  ProcessesRoute: typeof ProcessesRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   ProjectsOverviewRoute: typeof ProjectsOverviewRoute
   RegistrationsRoute: typeof RegistrationsRouteWithChildren
@@ -1108,13 +1095,6 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/processes': {
-      id: '/processes'
-      path: '/processes'
-      fullPath: '/processes'
-      preLoaderRoute: typeof ProcessesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal-cliente': {
@@ -1738,7 +1718,6 @@ const rootRouteChildren: RootRouteChildren = {
   MissoesRoute: MissoesRoute,
   OperacoesRoute: OperacoesRouteWithChildren,
   PortalClienteRoute: PortalClienteRoute,
-  ProcessesRoute: ProcessesRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   ProjectsOverviewRoute: ProjectsOverviewRoute,
   RegistrationsRoute: RegistrationsRouteWithChildren,

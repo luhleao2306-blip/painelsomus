@@ -29,7 +29,6 @@ export const MODULES: ModuleDef[] = [
 
   { key: '/documents', label: 'Documentos', group: 'Conhecimento' },
   { key: '/info-center', label: 'Central de Informações', group: 'Conhecimento' },
-  { key: '/processes', label: 'Processos & POPs', group: 'Conhecimento' },
   { key: '/intelligent-central', label: 'Central Inteligente', group: 'Conhecimento' },
   { key: '/knowledge-trail', label: 'Trilha da Alcateia', group: 'Conhecimento' },
 

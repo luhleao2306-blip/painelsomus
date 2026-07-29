@@ -18,7 +18,6 @@ import {
   Timer,
   UserCog,
   Library,
-  Workflow,
   BookOpen,
   BookOpenCheck,
   CalendarDays,
@@ -112,7 +111,6 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
       { title: 'Meu Painel', icon: LayoutDashboard, href: '/cliente/painel', roles: ['client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
@@ -202,7 +200,6 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/info-center', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/processes', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/system-docs', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/settings', roles: ['master', 'project_manager', 'consultant', 'client'] },
