@@ -161,17 +161,21 @@ function initials(name: string) {
 }
 
 function ProjectItem({
-  name, tasks, users, active, onSelect, onRename,
+  name, ownerId, tasks, users, active, onSelect, onRename, onSetOwner,
 }: {
   name: string;
+  ownerId?: string;
   tasks: OpTask[];
   users: { id: string; name: string }[];
   active: boolean;
   onSelect: () => void;
   onRename: (name: string) => void;
+  onSetOwner: (ownerId?: string) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
+  const owner = users.find(u => u.id === ownerId);
+
 
   const done = tasks.filter(t => t.status === 'concluido').length;
   const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
