@@ -381,7 +381,7 @@ function DemandsTab({ clientId }: { clientId: string }) {
   const [q, setQ] = useState('');
 
   const linked = folders.filter(f => f.client_id === clientId);
-  const filtered = demands.filter(d => d.name.toLowerCase().includes(q.toLowerCase()));
+  const filtered = (demands as any[]).filter((d: any) => d.name.toLowerCase().includes(q.toLowerCase()));
 
   return (
     <div className="space-y-4">
@@ -413,7 +413,7 @@ function DemandsTab({ clientId }: { clientId: string }) {
       <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar demanda..." className="max-w-sm" />
 
       <div className="space-y-2">
-        {filtered.map(d => (
+        {filtered.map((d: any) => (
           <Card key={d.id}><CardContent className="p-3 flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">{d.name}</p>
