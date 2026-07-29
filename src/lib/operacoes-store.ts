@@ -683,6 +683,15 @@ export const opStore = {
     });
     return id;
   },
+  setProjectOwner(id: string, ownerId?: string) {
+    const previous = state.projects;
+    pendingProjectIds.add(id);
+    setState({ projects: state.projects.map(p => p.id === id ? { ...p, ownerId } : p) });
+    bg(() => supabase.from('op_projects').update({ owner_id: ownerId ?? null, updated_at: new Date().toISOString() } as any).eq('id', id), {
+      pending: [{ set: pendingProjectIds, ids: [id] }],
+      rollback: () => setState({ projects: previous }),
+    });
+  },
   renameProject(id: string, name: string) {
     const previous = state.projects;
     pendingProjectIds.add(id);
