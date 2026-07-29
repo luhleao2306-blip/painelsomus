@@ -36,7 +36,7 @@ function OperacoesPainel() {
     for (const t of store.tasks) {
       byStatus[t.status]++;
       if (t.status === 'concluido') done++;
-      if (t.dueDate) {
+      if (t.dueDate && t.status !== 'aprovacao_cliente') {
         const d = parseLocalDate(t.dueDate)!;
         if (t.status !== 'concluido' && d < today) overdue++;
         else if (t.status !== 'concluido' && d >= today && d <= in7) dueSoon++;
@@ -63,7 +63,7 @@ function OperacoesPainel() {
   // Demandas diárias por pessoa (tarefas de hoje + em atraso, não concluídas)
   const dailyByUser = store.users.map(u => {
     const items = store.tasks
-      .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.dueDate)
+      .filter(t => t.assigneeId === u.id && t.status !== 'concluido' && t.status !== 'aprovacao_cliente' && t.dueDate)
       .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
       .filter(({ d }) => d < tomorrow) // hoje ou atrasadas
       .sort((a, b) => a.d.getTime() - b.d.getTime());
