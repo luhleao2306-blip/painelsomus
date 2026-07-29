@@ -114,7 +114,7 @@ export function AtaPage({ ataId }: { ataId: string }) {
         {/* Header */}
         <header className="px-10 pt-10 pb-6 border-b-4 border-gradient bg-white">
           <div className="flex items-start justify-between gap-6">
-            <img src={somusLogo} alt="Somus" className="h-12 w-auto object-contain" />
+            <img src={somusLogo} alt="Somus" className="h-12 w-auto object-contain dark:invert" />
             <div className="text-right">
               <p className="text-[11px] font-bold tracking-[0.2em] text-slate-600">ATA DE REUNIÃO</p>
               <p className="text-[11px] text-slate-500 mt-1">Ref. {ref}</p>

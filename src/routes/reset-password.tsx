@@ -73,7 +73,7 @@ function ResetPasswordPage() {
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-6">
       <div className="w-full max-w-[420px] animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex justify-center mb-8">
-          <img src={somusLogo} alt="Somus" className="h-8 w-auto object-contain" />
+          <img src={somusLogo} alt="Somus" className="h-8 w-auto object-contain dark:invert" />
         </div>
 
         <div className="text-center mb-8">
