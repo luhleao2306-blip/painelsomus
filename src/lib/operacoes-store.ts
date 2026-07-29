@@ -475,27 +475,29 @@ function clearSyncOptions(options?: SyncOptions) {
   options?.deleting?.forEach(bucket => clearIds(bucket.set, bucket.ids));
 }
 
+async function refreshFromCloud() {
+  try {
+    const data = await fetchAll();
+    setState({
+      ...data,
+      folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
+      templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
+      projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
+      sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
+      tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
+      forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
+      formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
+      senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
+      _lastSyncError: null,
+    });
+  } catch (e: any) {
+    raiseSyncError(e?.message ?? 'Falha ao atualizar Operações em tempo real.');
+  }
+}
+
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
-  const refresh = async () => {
-    try {
-      const data = await fetchAll();
-      setState({
-        ...data,
-        folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
-        templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
-        projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
-        sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
-        tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
-        forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
-        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
-        senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
-        _lastSyncError: null,
-      });
-    } catch (e: any) {
-      raiseSyncError(e?.message ?? 'Falha ao atualizar Operações em tempo real.');
-    }
-  };
+  const refresh = () => { void refreshFromCloud(); };
   realtimeChannel = supabase
     .channel('op-realtime')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'op_folders' },  refresh)
@@ -508,6 +510,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'op_senhas' },   refresh)
     .subscribe();
 }
+
 
 // dispara na 1ª leitura do store no browser
 if (typeof window !== 'undefined') {
@@ -532,8 +535,13 @@ const bg = (p: any, options?: SyncOptions) => {
         raiseSyncError(failed.error.message ?? String(failed.error));
         return;
       }
-      clearSyncOptions(options);
+      // Só liberamos a marcação "pendente" depois de reler a nuvem já com o
+      // registro gravado — senão um refresh em voo (realtime) apagaria o item
+      // recém-criado da tela.
       setState({ _syncing: false, _lastSyncError: null });
+      void refreshFromCloud().finally(() => {
+        clearSyncOptions(options);
+      });
     })
     .catch((e: any) => {
       if (count < 2) {
@@ -622,14 +630,16 @@ export const opStore = {
   // Folders
   addFolder(name: string) {
     const id = uid();
-    const previous = state.folders;
     pendingFolderIds.add(id);
     setState({ folders: [...state.folders, { id, name }] });
     bg(() => supabase.from('op_folders').upsert({ id, name }), {
       pending: [{ set: pendingFolderIds, ids: [id] }],
-      rollback: () => setState({ folders: previous }),
+      // remove só a pasta que falhou (não descarta o que outros criaram no meio-tempo)
+      rollback: () => setState({ folders: state.folders.filter(f => f.id !== id) }),
     });
+    return id;
   },
+
   renameFolder(id: string, name: string) {
     const previous = state.folders;
     pendingFolderIds.add(id);
