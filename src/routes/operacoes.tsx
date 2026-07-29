@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import {
-  LayoutDashboard, FolderKanban, LayoutTemplate,
+  LayoutDashboard, FolderKanban, LayoutTemplate, Building2,
   ClipboardList, TrendingUp, Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
