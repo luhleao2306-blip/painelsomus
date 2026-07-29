@@ -126,17 +126,10 @@ const navigationSections: NavSection[] = [
       { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
-  {
-    label: 'Gestão de Clientes',
-    items: [
-      // Atas de Reunião agora ficam dentro de cada cliente (aba "Atas" em /clients/$clientId)
-      { title: 'Documentos', icon: FileText, href: '/documents', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant'] },
+  // "Gestão de Clientes" removida do menu: Atas e Documentos vivem dentro de cada cliente
+  // (/clients/$clientId). Metas Estratégicas, Trilha de Aprendizagem e Glossário foram
+  // retirados do menu interno (rotas preservadas).
 
-      { title: 'Metas Estratégicas', icon: Target, href: '/portal-cliente', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['master', 'project_manager', 'consultant'] },
-    ],
-  },
 
   {
     label: 'Relacionamento',
