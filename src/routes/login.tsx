@@ -218,7 +218,7 @@ function LoginPage() {
       </div>
 
       {/* Conteúdo central */}
-      <main className="relative z-10 flex min-h-[calc(100vh-190px)] flex-col items-center justify-center px-6 pb-16">
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-10">
         <div className="w-full max-w-[344px] text-center">
           <p className="text-[10px] font-medium uppercase tracking-[0.4em] text-white/55">
             Portal de acesso
