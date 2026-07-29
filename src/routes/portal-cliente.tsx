@@ -61,13 +61,17 @@ function AdminPortalPage() {
         </div>
 
         {clientId && (
-          <Tabs defaultValue="agents">
+          <Tabs defaultValue="demands">
             <TabsList>
+              <TabsTrigger value="demands">Demandas</TabsTrigger>
+              <TabsTrigger value="links">Links úteis</TabsTrigger>
               <TabsTrigger value="agents">Agentes</TabsTrigger>
               <TabsTrigger value="tracks">Trilhas</TabsTrigger>
               <TabsTrigger value="glossary">Glossário</TabsTrigger>
               <TabsTrigger value="goals">Metas</TabsTrigger>
             </TabsList>
+            <TabsContent value="demands" className="pt-4"><DemandsTab clientId={clientId} /></TabsContent>
+            <TabsContent value="links" className="pt-4"><UsefulLinksTab clientId={clientId} /></TabsContent>
             <TabsContent value="agents" className="pt-4"><AgentsTab clientId={clientId} /></TabsContent>
             <TabsContent value="tracks" className="pt-4"><TracksTab clientId={clientId} /></TabsContent>
             <TabsContent value="glossary" className="pt-4"><GlossaryTab clientId={clientId} /></TabsContent>
