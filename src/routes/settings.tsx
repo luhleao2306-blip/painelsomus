@@ -77,14 +77,6 @@ function SettingsPage() {
     phone: '',
   });
 
-  const NOTIF_KEYS: { key: string; title: string; desc: string }[] = [
-    { key: 'new_minutes', title: 'Novas Atas', desc: 'Receba um e-mail sempre que uma nova ata for publicada.' },
-    { key: 'deadline_alerts', title: 'Alertas de Prazo', desc: 'Notificações push quando uma tarefa estiver próxima do vencimento.' },
-    { key: 'mentions', title: 'Menções', desc: 'Avisar quando você for citado em um comentário ou tarefa.' },
-    { key: 'weekly_reports', title: 'Relatórios Semanais', desc: 'Resumo de progresso enviado toda segunda-feira.' },
-  ];
-
-  const prefs = ((profile as any)?.notification_prefs as Record<string, boolean>) || {};
   const avatarUrl = (profile as any)?.avatar_url as string | null | undefined;
 
   useEffect(() => {
@@ -138,17 +130,6 @@ function SettingsPage() {
     }
   };
 
-  const handleTogglePref = async (key: string, value: boolean) => {
-    if (!profile?.id) return;
-    const next = { ...prefs, [key]: value };
-    try {
-      const { error } = await (supabase as any).from('profiles').update({ notification_prefs: next }).eq('id', profile.id);
-      if (error) throw error;
-      await refreshProfile();
-    } catch (err: any) {
-      toast.error('Erro ao salvar preferência');
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!profile?.id) return;
@@ -181,7 +162,7 @@ function SettingsPage() {
       <div className="space-y-8 max-w-4xl mx-auto">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">Configurações</h1>
-          <p className="text-muted-foreground">Gerencie sua conta, preferências e notificações.</p>
+          <p className="text-muted-foreground">Gerencie sua conta e preferências.</p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
@@ -189,10 +170,6 @@ function SettingsPage() {
             <TabsTrigger value="profile" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <User className="h-4 w-4" />
               Perfil
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-              <Bell className="h-4 w-4" />
-              Notificações
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <Shield className="h-4 w-4" />
@@ -299,30 +276,6 @@ function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="notifications" className="space-y-6">
-            <Card className="border-border/50 shadow-sm">
-              <CardHeader>
-                <CardTitle>Preferências de Notificação</CardTitle>
-                <CardDescription>Escolha como deseja ser avisado sobre atualizações nos projetos.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  {NOTIF_KEYS.map((item) => (
-                    <div key={item.key} className="flex items-center justify-between py-2">
-                      <div className="space-y-0.5">
-                        <h4 className="text-sm font-bold">{item.title}</h4>
-                        <p className="text-xs text-muted-foreground">{item.desc}</p>
-                      </div>
-                      <Switch
-                        checked={prefs[item.key] ?? false}
-                        onCheckedChange={(v) => handleTogglePref(item.key, v)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
             <ChangePasswordCard />
