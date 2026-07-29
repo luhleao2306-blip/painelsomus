@@ -36,7 +36,7 @@ function OperacoesPainel() {
     for (const t of store.tasks) {
       byStatus[t.status]++;
       if (t.status === 'concluido') done++;
-      if (t.dueDate) {
+      if (t.dueDate && t.status !== 'aprovacao_cliente') {
         const d = parseLocalDate(t.dueDate)!;
         if (t.status !== 'concluido' && d < today) overdue++;
         else if (t.status !== 'concluido' && d >= today && d <= in7) dueSoon++;
