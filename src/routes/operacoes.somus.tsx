@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import {
   useOpStore, opStore, STATUS_META, STATUS_ORDER,
@@ -524,23 +525,47 @@ function TaskCard({
         </DropdownMenu>
 
         {/* Prazo */}
-        <label
-          className={cn(
-            'relative inline-flex cursor-pointer items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px]',
-            late ? 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300'
-              : today ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
-              : 'border-border/70 bg-muted/40 text-muted-foreground',
-          )}
-        >
-          <CalendarDays className="h-2.5 w-2.5" />
-          {task.dueDate ? formatLocalDate(task.dueDate) : 'Prazo'}
-          <input
-            type="date"
-            value={task.dueDate ?? ''}
-            onChange={e => opStore.updateTask(task.id, { dueDate: e.target.value || undefined })}
-            className="absolute inset-0 cursor-pointer opacity-0"
-          />
-        </label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              draggable={false}
+              onPointerDown={e => e.stopPropagation()}
+              onDragStart={e => { e.preventDefault(); e.stopPropagation(); }}
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px]',
+                late ? 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300'
+                  : today ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                  : 'border-border/70 bg-muted/40 text-muted-foreground',
+              )}
+            >
+              <CalendarDays className="h-2.5 w-2.5" />
+              {task.dueDate ? formatLocalDate(task.dueDate) : 'Prazo'}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-auto space-y-2 p-2"
+            onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
+          >
+            <input
+              type="date"
+              value={task.dueDate ?? ''}
+              onChange={e => opStore.updateTask(task.id, { dueDate: e.target.value || undefined })}
+              className="h-8 rounded-md border border-border bg-background px-2 text-xs"
+            />
+            {task.dueDate && (
+              <button
+                type="button"
+                onClick={() => opStore.updateTask(task.id, { dueDate: undefined })}
+                className="block w-full rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+              >
+                Limpar prazo
+              </button>
+            )}
+          </PopoverContent>
+        </Popover>
+
 
         {task.status !== 'concluido' && (
           <button
