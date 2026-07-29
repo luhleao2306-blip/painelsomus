@@ -173,7 +173,7 @@ const navigationSections: NavSection[] = [
       { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'], wip: true },
 
       { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'], wip: true },
-      { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
+      { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'], wip: true },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
     ],
   },
