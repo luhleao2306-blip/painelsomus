@@ -86,7 +86,7 @@ function useClientOptions() {
   });
 }
 
-function FormulariosPage() {
+export function VisaoClientesPanel({ embedded = false }: { embedded?: boolean }) {
   const [q, setQ] = useState('');
   const { data: submissions = [], isLoading: loadingSubs } = usePublicSubmissions();
   const { data: requests = [], isLoading: loadingReqs } = useClientFormRequests();
