@@ -243,7 +243,7 @@ function CollapsibleNavSection({
   section,
   pathname,
 }: {
-  section: { label: string; items: { title: string; icon: any; href: string; roles: UserRole[] }[] };
+  section: NavSection;
   pathname: string;
 }) {
   const hasActive = section.items.some(
