@@ -136,7 +136,6 @@ const USERS: OpUser[] = [
   { id: 'u-joao',    name: 'João Rodri',        cargoId: 'c-gp' },
   { id: 'u-luis',    name: 'Luís Felipe',       cargoId: 'c-tech' },
   { id: 'u-arthur',  name: 'Arthur Limeira',    cargoId: 'c-asst' },
-  { id: 'u-esaki',   name: 'Esaki',             cargoId: 'c-arte' },
 ];
 
 // ============= Template semente (usado quando o banco estiver vazio) =============
