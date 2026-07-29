@@ -81,6 +81,7 @@ function TvDashboard() {
     const doneWeek: OpTask[] = [];
     const doneMonth: OpTask[] = [];
     let done = 0;
+    const aprovacao: OpTask[] = [];
 
     for (const t of filteredTasks) {
       if (t.status === 'concluido') {
@@ -93,7 +94,10 @@ function TvDashboard() {
         }
         continue;
       }
-      if (t.status === 'aprovacao_cliente') continue; // aguardando cliente: não conta como atraso
+      if (t.status === 'aprovacao_cliente') {
+        aprovacao.push(t); // aguardando cliente: seção própria, não conta como atraso
+        continue;
+      }
       if (!t.dueDate) continue;
       const d = parseLocalDate(t.dueDate); if (!d) continue;
       const bucketPush =
@@ -113,7 +117,7 @@ function TvDashboard() {
       const db = b.dueDate ?? '9999-12-31';
       return da.localeCompare(db);
     };
-    [overdue, doHoje, doAmanha, doSemana].forEach(arr => arr.sort(sortByDate));
+    [overdue, doHoje, doAmanha, doSemana, aprovacao].forEach(arr => arr.sort(sortByDate));
     const sortByUpdated = (a: OpTask, b: OpTask) =>
       (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '');
     [doneToday, doneWeek, doneMonth].forEach(arr => arr.sort(sortByUpdated));
@@ -126,6 +130,7 @@ function TvDashboard() {
     ];
     return {
       buckets,
+      aprovacao,
       kpis: { total: filteredTasks.length, done, overdue: overdue.length, hoje: doHoje.length },
       completed: { today: doneToday, week: doneWeek, month: doneMonth },
     };
