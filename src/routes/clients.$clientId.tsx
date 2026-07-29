@@ -337,35 +337,9 @@ function ClientDetailPage() {
               </TabsContent>
 
               <TabsContent value="meetings" className="space-y-4">
-                 <div className="grid gap-4">
-                    {clientMinutes.map(minute => (
-                       <Card key={minute.id} className="border-border/50 hover:shadow-md transition-all group overflow-hidden bg-card/80">
-                          <CardContent className="p-4 flex items-center justify-between">
-                             <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                   <FileText className="h-5 w-5" />
-                                </div>
-                                <div>
-                                   <p className="text-sm font-bold">{minute.title}</p>
-                                   <p className="text-[10px] text-muted-foreground font-bold uppercase">{new Date(minute.date).toLocaleDateString()} • {minute.attendees?.length || 0} participantes</p>
-                                </div>
-                             </div>
-                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenLink(minute.title, minute.externalLink || minute.recordingLink)}>
-                                <ExternalLink className="h-4 w-4" />
-                             </Button>
-                          </CardContent>
-                       </Card>
-                    ))}
-                    {clientMinutes.length === 0 && (
-                       <EmptyState 
-                          icon={UsersRound} 
-                          title="Sem atas recentes" 
-                          description="O histórico de reuniões deste cliente está vazio." 
-                           action={<Button size="sm" onClick={() => navigate({ to: '/meetings' })}>Nova Ata</Button>}
-                       />
-                    )}
-                 </div>
+                 <MeetingsPanel clientId={clientId} embedded />
               </TabsContent>
+
             </Tabs>
           </div>
         </div>
