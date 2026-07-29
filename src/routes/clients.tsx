@@ -216,6 +216,20 @@ function ClientsPage() {
                 <LinkIcon className="h-4 w-4" />
                 Gerar link de cliente
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 gap-2"
+                onClick={() => {
+                  const url = `${window.location.origin}/cliente/painel`;
+                  navigator.clipboard.writeText(url);
+                  toast.success('Link do portal copiado', { description: url });
+                }}
+              >
+                <LinkIcon className="h-4 w-4" />
+                Link do portal do cliente
+              </Button>
+
               <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
                 <DialogTrigger asChild>
                   <Button className="gap-2 shadow-lg shadow-primary/20">

@@ -111,11 +111,7 @@ const navigationSections: NavSection[] = [
     label: 'Operação',
     items: [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
-      { title: 'Meu Painel', icon: LayoutDashboard, href: '/cliente/painel', roles: ['client'] },
-      { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
-      { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
-      { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
+      { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant'] },
 
 
       { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
@@ -161,7 +157,7 @@ const navigationSections: NavSection[] = [
       { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'], wip: true },
 
       { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'], wip: true },
-      { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'], wip: true },
+      { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant'], wip: true },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
     ],
   },
@@ -177,24 +173,24 @@ const navigationSections: NavSection[] = [
 
 // Mapa de acesso por rota. Master tem acesso total.
 const routeAccess: { prefix: string; roles: UserRole[] }[] = [
-  { prefix: '/dashboard', roles: ['master', 'project_manager', 'consultant', 'client'] },
+  { prefix: '/dashboard', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/clients', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/formularios', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/cliente/formularios', roles: ['master', 'project_manager', 'consultant', 'client'] },
+  { prefix: '/cliente/formularios', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/collaborators', roles: ['master', 'project_manager', 'consultant'] },
 
   { prefix: '/projects-overview', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/projects', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/briefing', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/tasks', roles: ['master', 'project_manager', 'consultant', 'client'] },
+  { prefix: '/projects', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/briefing', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/tasks', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/sales-performance', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/comercial', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/gamificacao', roles: ['master', 'project_manager', 'consultant'] },
 
-  { prefix: '/documents', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/meetings', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
+  { prefix: '/documents', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/meetings', roles: ['master', 'project_manager', 'consultant'] },
+  { prefix: '/agenda', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/info-center', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] },
@@ -206,11 +202,11 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/missoes', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/cliente/painel', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/portal-cliente', roles: ['master', 'project_manager'] },
-  { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
+  { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant'] },
 ];
 
 function getHomeForRole(role: UserRole): string {
-  if (role === 'client') return '/agenda';
+  if (role === 'client') return '/cliente/painel';
   return '/operacoes';
 }
 
