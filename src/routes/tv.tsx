@@ -66,7 +66,7 @@ function TvDashboard() {
     return store.tasks.filter(t => t.assigneeId === assigneeFilter);
   }, [store.tasks, assigneeFilter]);
 
-  const { buckets, kpis, completed } = useMemo(() => {
+  const { buckets, kpis, completed, aprovacao } = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
     const in7 = new Date(today); in7.setDate(today.getDate() + 7);
