@@ -33,7 +33,6 @@ import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
 import { Route as FormulariosRouteImport } from './routes/formularios'
 import { Route as FinancialDashboardRouteImport } from './routes/financial-dashboard'
-import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComercialRouteImport } from './routes/comercial'
@@ -46,7 +45,6 @@ import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
 import { Route as OperacoesIndexRouteImport } from './routes/operacoes.index'
 import { Route as GamificacaoIndexRouteImport } from './routes/gamificacao.index'
-import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
 import { Route as ComercialIndexRouteImport } from './routes/comercial.index'
 import { Route as AlcateiaIndexRouteImport } from './routes/alcateia.index'
@@ -71,7 +69,6 @@ import { Route as GamificacaoLojaRouteImport } from './routes/gamificacao.loja'
 import { Route as GamificacaoHabitosRouteImport } from './routes/gamificacao.habitos'
 import { Route as GamificacaoGaleriaDoLoboRouteImport } from './routes/gamificacao.galeria-do-lobo'
 import { Route as GamificacaoEstrelaDoLiderRouteImport } from './routes/gamificacao.estrela-do-lider'
-import { Route as FinanceiroIndicadoresRouteImport } from './routes/financeiro.indicadores'
 import { Route as FDataRouteImport } from './routes/f.$data'
 import { Route as CronogramaTokenRouteImport } from './routes/cronograma.$token'
 import { Route as ContratoTokenRouteImport } from './routes/contrato.$token'
@@ -214,11 +211,6 @@ const FinancialDashboardRoute = FinancialDashboardRouteImport.update({
   path: '/financial-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinanceiroRoute = FinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -278,11 +270,6 @@ const GamificacaoIndexRoute = GamificacaoIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GamificacaoRoute,
-} as any)
-const FinanceiroIndexRoute = FinanceiroIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => FinanceiroRoute,
 } as any)
 const ContractsIndexRoute = ContractsIndexRouteImport.update({
   id: '/contracts/',
@@ -406,11 +393,6 @@ const GamificacaoEstrelaDoLiderRoute =
     path: '/estrela-do-lider',
     getParentRoute: () => GamificacaoRoute,
   } as any)
-const FinanceiroIndicadoresRoute = FinanceiroIndicadoresRouteImport.update({
-  id: '/indicadores',
-  path: '/indicadores',
-  getParentRoute: () => FinanceiroRoute,
-} as any)
 const FDataRoute = FDataRouteImport.update({
   id: '/f/$data',
   path: '/f/$data',
@@ -529,7 +511,6 @@ export interface FileRoutesByFullPath {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
-  '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -569,7 +550,6 @@ export interface FileRoutesByFullPath {
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
-  '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
   '/gamificacao/habitos': typeof GamificacaoHabitosRoute
@@ -594,7 +574,6 @@ export interface FileRoutesByFullPath {
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
-  '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
@@ -649,7 +628,6 @@ export interface FileRoutesByTo {
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
-  '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
   '/gamificacao/habitos': typeof GamificacaoHabitosRoute
@@ -674,7 +652,6 @@ export interface FileRoutesByTo {
   '/alcateia': typeof AlcateiaIndexRoute
   '/comercial': typeof ComercialIndexRoute
   '/contracts': typeof ContractsIndexRoute
-  '/financeiro': typeof FinanceiroIndexRoute
   '/gamificacao': typeof GamificacaoIndexRoute
   '/operacoes': typeof OperacoesIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
@@ -696,7 +673,6 @@ export interface FileRoutesById {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
-  '/financeiro': typeof FinanceiroRouteWithChildren
   '/financial-dashboard': typeof FinancialDashboardRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -736,7 +712,6 @@ export interface FileRoutesById {
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
-  '/financeiro/indicadores': typeof FinanceiroIndicadoresRoute
   '/gamificacao/estrela-do-lider': typeof GamificacaoEstrelaDoLiderRoute
   '/gamificacao/galeria-do-lobo': typeof GamificacaoGaleriaDoLoboRoute
   '/gamificacao/habitos': typeof GamificacaoHabitosRoute
@@ -761,7 +736,6 @@ export interface FileRoutesById {
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
   '/contracts/': typeof ContractsIndexRoute
-  '/financeiro/': typeof FinanceiroIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
@@ -784,7 +758,6 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/documents'
-    | '/financeiro'
     | '/financial-dashboard'
     | '/formularios'
     | '/gamificacao'
@@ -824,7 +797,6 @@ export interface FileRouteTypes {
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
-    | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
     | '/gamificacao/habitos'
@@ -849,7 +821,6 @@ export interface FileRouteTypes {
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
-    | '/financeiro/'
     | '/gamificacao/'
     | '/operacoes/'
     | '/registrations/'
@@ -904,7 +875,6 @@ export interface FileRouteTypes {
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
-    | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
     | '/gamificacao/habitos'
@@ -929,7 +899,6 @@ export interface FileRouteTypes {
     | '/alcateia'
     | '/comercial'
     | '/contracts'
-    | '/financeiro'
     | '/gamificacao'
     | '/operacoes'
     | '/registrations'
@@ -950,7 +919,6 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/documents'
-    | '/financeiro'
     | '/financial-dashboard'
     | '/formularios'
     | '/gamificacao'
@@ -990,7 +958,6 @@ export interface FileRouteTypes {
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
-    | '/financeiro/indicadores'
     | '/gamificacao/estrela-do-lider'
     | '/gamificacao/galeria-do-lobo'
     | '/gamificacao/habitos'
@@ -1015,7 +982,6 @@ export interface FileRouteTypes {
     | '/alcateia/'
     | '/comercial/'
     | '/contracts/'
-    | '/financeiro/'
     | '/gamificacao/'
     | '/operacoes/'
     | '/registrations/'
@@ -1037,7 +1003,6 @@ export interface RootRouteChildren {
   ComercialRoute: typeof ComercialRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   DocumentsRoute: typeof DocumentsRoute
-  FinanceiroRoute: typeof FinanceiroRouteWithChildren
   FinancialDashboardRoute: typeof FinancialDashboardRoute
   FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
@@ -1255,13 +1220,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinancialDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/financeiro': {
-      id: '/financeiro'
-      path: '/financeiro'
-      fullPath: '/financeiro'
-      preLoaderRoute: typeof FinanceiroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/documents': {
       id: '/documents'
       path: '/documents'
@@ -1345,13 +1303,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/gamificacao/'
       preLoaderRoute: typeof GamificacaoIndexRouteImport
       parentRoute: typeof GamificacaoRoute
-    }
-    '/financeiro/': {
-      id: '/financeiro/'
-      path: '/'
-      fullPath: '/financeiro/'
-      preLoaderRoute: typeof FinanceiroIndexRouteImport
-      parentRoute: typeof FinanceiroRoute
     }
     '/contracts/': {
       id: '/contracts/'
@@ -1520,13 +1471,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/gamificacao/estrela-do-lider'
       preLoaderRoute: typeof GamificacaoEstrelaDoLiderRouteImport
       parentRoute: typeof GamificacaoRoute
-    }
-    '/financeiro/indicadores': {
-      id: '/financeiro/indicadores'
-      path: '/indicadores'
-      fullPath: '/financeiro/indicadores'
-      preLoaderRoute: typeof FinanceiroIndicadoresRouteImport
-      parentRoute: typeof FinanceiroRoute
     }
     '/f/$data': {
       id: '/f/$data'
@@ -1707,20 +1651,6 @@ const ComercialRouteWithChildren = ComercialRoute._addFileChildren(
   ComercialRouteChildren,
 )
 
-interface FinanceiroRouteChildren {
-  FinanceiroIndicadoresRoute: typeof FinanceiroIndicadoresRoute
-  FinanceiroIndexRoute: typeof FinanceiroIndexRoute
-}
-
-const FinanceiroRouteChildren: FinanceiroRouteChildren = {
-  FinanceiroIndicadoresRoute: FinanceiroIndicadoresRoute,
-  FinanceiroIndexRoute: FinanceiroIndexRoute,
-}
-
-const FinanceiroRouteWithChildren = FinanceiroRoute._addFileChildren(
-  FinanceiroRouteChildren,
-)
-
 interface GamificacaoRouteChildren {
   GamificacaoEstrelaDoLiderRoute: typeof GamificacaoEstrelaDoLiderRoute
   GamificacaoGaleriaDoLoboRoute: typeof GamificacaoGaleriaDoLoboRoute
@@ -1838,7 +1768,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComercialRoute: ComercialRouteWithChildren,
   DashboardRoute: DashboardRoute,
   DocumentsRoute: DocumentsRoute,
-  FinanceiroRoute: FinanceiroRouteWithChildren,
   FinancialDashboardRoute: FinancialDashboardRoute,
   FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,
@@ -1889,3 +1818,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

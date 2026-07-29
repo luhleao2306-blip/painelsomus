@@ -207,7 +207,6 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/tasks', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/contracts', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/financeiro', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/financial-dashboard', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/sales-performance', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/comercial', roles: ['master', 'project_manager', 'consultant'] },
