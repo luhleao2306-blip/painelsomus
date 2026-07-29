@@ -174,7 +174,7 @@ function LoginPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-hidden bg-[#050505] text-white"
+      className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#050505] text-white"
       style={{ fontFamily: "'Inter Tight', sans-serif" }}
     >
       {/* Fundo full-bleed */}
@@ -196,7 +196,7 @@ function LoginPage() {
       </header>
 
       {/* Cartões laterais */}
-      <div className="pointer-events-none absolute bottom-24 left-10 z-10 hidden w-[210px] flex-col gap-2.5 xl:flex">
+      <div className="pointer-events-none absolute left-10 top-1/2 z-10 hidden w-[210px] -translate-y-1/2 flex-col gap-2.5 xl:flex 2xl:left-16">
         {[
           { icon: Layers, label: 'Visão completa', desc: 'Todos os seus projetos em tempo real' },
           { icon: LineChart, label: 'Decisões rápidas', desc: 'Indicadores e relatórios sempre à mão' },
@@ -218,21 +218,22 @@ function LoginPage() {
       </div>
 
       {/* Conteúdo central */}
-      <main className="relative z-10 flex min-h-[calc(100vh-190px)] flex-col items-center justify-center px-6 pb-16">
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-10">
         <div className="w-full max-w-[344px] text-center">
           <p className="text-[10px] font-medium uppercase tracking-[0.4em] text-white/55">
             Portal de acesso
           </p>
           <h1
-            className="mt-4 text-[56px] leading-[0.9] tracking-tight sm:text-[72px]"
+            className="mt-4 pb-2 text-[52px] leading-[1] tracking-tight sm:text-[64px]"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
             Somus<br />
             <span className="italic font-light">Hub.</span>
           </h1>
-          <p className="mt-6 text-lg font-light text-white/75">
+          <p className="mt-4 text-base font-light text-white/75 sm:text-lg">
             Sua operação, <span className="italic">centralizada.</span>
           </p>
+
 
           <form onSubmit={handleSubmit} className="mt-10 space-y-5 text-left">
             {mode === 'signup' && (
