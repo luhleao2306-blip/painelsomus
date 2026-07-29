@@ -55,6 +55,7 @@ import { Route as SomusIaAgentesRouteImport } from './routes/somus-ia.agentes'
 import { Route as SomusIaConversationIdRouteImport } from './routes/somus-ia.$conversationId'
 import { Route as RegistrationsIdRouteImport } from './routes/registrations.$id'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as OperacoesSomusRouteImport } from './routes/operacoes.somus'
 import { Route as OperacoesSenhasRouteImport } from './routes/operacoes.senhas'
 import { Route as OperacoesProjetosRouteImport } from './routes/operacoes.projetos'
 import { Route as OperacoesPerformanceRouteImport } from './routes/operacoes.performance'
@@ -323,6 +324,11 @@ const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
   path: '/$projectId',
   getParentRoute: () => ProjectsRoute,
 } as any)
+const OperacoesSomusRoute = OperacoesSomusRouteImport.update({
+  id: '/somus',
+  path: '/somus',
+  getParentRoute: () => OperacoesRoute,
+} as any)
 const OperacoesSenhasRoute = OperacoesSenhasRouteImport.update({
   id: '/senhas',
   path: '/senhas',
@@ -579,6 +585,7 @@ export interface FileRoutesByFullPath {
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/operacoes/senhas': typeof OperacoesSenhasRoute
+  '/operacoes/somus': typeof OperacoesSomusRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -658,6 +665,7 @@ export interface FileRoutesByTo {
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/operacoes/senhas': typeof OperacoesSenhasRoute
+  '/operacoes/somus': typeof OperacoesSomusRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -744,6 +752,7 @@ export interface FileRoutesById {
   '/operacoes/performance': typeof OperacoesPerformanceRoute
   '/operacoes/projetos': typeof OperacoesProjetosRoute
   '/operacoes/senhas': typeof OperacoesSenhasRoute
+  '/operacoes/somus': typeof OperacoesSomusRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/registrations/$id': typeof RegistrationsIdRoute
   '/somus-ia/$conversationId': typeof SomusIaConversationIdRoute
@@ -831,6 +840,7 @@ export interface FileRouteTypes {
     | '/operacoes/performance'
     | '/operacoes/projetos'
     | '/operacoes/senhas'
+    | '/operacoes/somus'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -910,6 +920,7 @@ export interface FileRouteTypes {
     | '/operacoes/performance'
     | '/operacoes/projetos'
     | '/operacoes/senhas'
+    | '/operacoes/somus'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -995,6 +1006,7 @@ export interface FileRouteTypes {
     | '/operacoes/performance'
     | '/operacoes/projetos'
     | '/operacoes/senhas'
+    | '/operacoes/somus'
     | '/projects/$projectId'
     | '/registrations/$id'
     | '/somus-ia/$conversationId'
@@ -1397,6 +1409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/operacoes/somus': {
+      id: '/operacoes/somus'
+      path: '/somus'
+      fullPath: '/operacoes/somus'
+      preLoaderRoute: typeof OperacoesSomusRouteImport
+      parentRoute: typeof OperacoesRoute
+    }
     '/operacoes/senhas': {
       id: '/operacoes/senhas'
       path: '/senhas'
@@ -1735,6 +1754,7 @@ interface OperacoesRouteChildren {
   OperacoesPerformanceRoute: typeof OperacoesPerformanceRoute
   OperacoesProjetosRoute: typeof OperacoesProjetosRoute
   OperacoesSenhasRoute: typeof OperacoesSenhasRoute
+  OperacoesSomusRoute: typeof OperacoesSomusRoute
   OperacoesIndexRoute: typeof OperacoesIndexRoute
 }
 
@@ -1745,6 +1765,7 @@ const OperacoesRouteChildren: OperacoesRouteChildren = {
   OperacoesPerformanceRoute: OperacoesPerformanceRoute,
   OperacoesProjetosRoute: OperacoesProjetosRoute,
   OperacoesSenhasRoute: OperacoesSenhasRoute,
+  OperacoesSomusRoute: OperacoesSomusRoute,
   OperacoesIndexRoute: OperacoesIndexRoute,
 }
 
