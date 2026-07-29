@@ -286,25 +286,9 @@ function ClientDetailPage() {
               </TabsContent>
 
               <TabsContent value="docs" className="space-y-4">
-                <Card className="border-border/50 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-                  <CardContent className="p-0">
-                    <div className="divide-y divide-border/50">
-                      {clientDocs.map(doc => (
-                        <div key={doc.id} className="p-2">
-                          <DocumentCard doc={doc} onDownload={() => handleOpenLink(doc.name, doc.externalLink)} />
-                        </div>
-                      ))}
-                      {clientDocs.length === 0 && (
-                        <EmptyState 
-                          icon={FileText} 
-                          title="Sem documentos" 
-                          description="Não encontramos arquivos para este cliente." 
-                        />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <ClientDocumentsPanel clientId={clientId} />
               </TabsContent>
+
 
               <TabsContent value="contracts" className="space-y-4">
                  <div className="grid gap-4">
