@@ -44,7 +44,7 @@ function ClientDetailPage() {
   const navigate = useNavigate();
   const { clientId } = Route.useParams();
   const { role } = useProfile();
-  const { clients, projects, documents, tasks, contracts, minutes } = useData();
+  const { clients, projects, documents, tasks, minutes } = useData();
   const canManageContracts = role === 'master' || role === 'project_manager';
   const canCreate = role === 'master' || role === 'project_manager' || role === 'consultant';
 
@@ -71,7 +71,6 @@ function ClientDetailPage() {
 
   const clientProjects = projects.filter(p => p.clientId === clientId);
   const clientDocs = documents.filter(d => d.clientId === clientId);
-   const clientContracts = contracts.filter(c => c.clientId === clientId);
   const clientMinutes = minutes.filter(m => m.clientId === clientId);
 
   const handleOpenLink = (name: string, link?: string) => {
