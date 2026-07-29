@@ -734,6 +734,7 @@ export const opStore = {
       pending: [{ set: pendingSectionIds, ids: [id] }],
       rollback: () => setState({ sections: previous }),
     });
+    return id;
   },
   renameSection(id: string, name: string) {
     const previous = state.sections;
