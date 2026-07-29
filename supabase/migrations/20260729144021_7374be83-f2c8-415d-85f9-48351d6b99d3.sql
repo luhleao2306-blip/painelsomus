@@ -1,0 +1,1 @@
+ALTER TABLE public.op_projects ADD COLUMN IF NOT EXISTS owner_id text;
