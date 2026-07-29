@@ -45,7 +45,6 @@ const BOARD_STATUSES = STATUS_ORDER;
 function ProjetoSomusPage() {
   const store = useOpStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [newProject, setNewProject] = useState('');
   const [creating, setCreating] = useState(false);
 
   const folder = store.folders.find(f => f.name.toLowerCase() === INTERNAL_FOLDER.toLowerCase());
@@ -68,50 +67,36 @@ function ProjetoSomusPage() {
 
   const active = projects.find(p => p.id === selectedId) ?? projects[0] ?? null;
 
-  const createProject = () => {
-    const name = newProject.trim();
-    if (!name) return;
+  const ensureFolderId = () => {
     let folderId = folder?.id;
     if (!folderId) {
       opStore.addFolder(INTERNAL_FOLDER);
       folderId = opStore.get().folders.find(f => f.name === INTERNAL_FOLDER)?.id;
     }
-    if (!folderId) return;
-    const id = opStore.addProject(folderId, name);
-    opStore.addSection(id, 'Geral');
-    setNewProject('');
-    setCreating(false);
-    setSelectedId(id);
+    return folderId;
   };
 
   return (
     <div className="w-full pb-16 pt-6">
+      <NewInternalProjectDialog
+        open={creating}
+        onOpenChange={setCreating}
+        folderId={ensureFolderId}
+        users={store.users}
+        onCreated={setSelectedId}
+      />
       <OpPageHeader
         eyebrow="Interno · Alcateia"
         title="Projeto Somus"
         icon={<Building2 className="h-4 w-4" />}
         description="Aqui ficam os projetos e demandas da própria Somus — o que construímos para dentro de casa. Os demais módulos seguem sendo dos clientes."
         actions={
-          creating ? (
-            <div className="flex items-center gap-2">
-              <Input
-                autoFocus
-                value={newProject}
-                onChange={e => setNewProject(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') createProject(); if (e.key === 'Escape') setCreating(false); }}
-                placeholder="Nome do projeto interno"
-                className="h-9 w-64"
-              />
-              <Button size="sm" onClick={createProject}>Criar</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCreating(false)}><X className="h-4 w-4" /></Button>
-            </div>
-          ) : (
-            <Button size="sm" onClick={() => setCreating(true)} className="gap-1.5">
-              <Plus className="h-4 w-4" /> Novo projeto interno
-            </Button>
-          )
+          <Button size="sm" onClick={() => setCreating(true)} className="gap-1.5">
+            <Plus className="h-4 w-4" /> Novo projeto interno
+          </Button>
         }
       />
+
 
       {/* KPIs */}
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
