@@ -31,7 +31,13 @@ function TrailImage({ path, alt }: { path: string; alt: string }) {
 }
 
 export const Route = createFileRoute('/knowledge-trail')({
-  component: KnowledgeTrailPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Trilha da Alcateia" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 type Category = 'cultura' | 'time' | 'produtos' | 'informacoes';

@@ -24,7 +24,13 @@ import {
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/processes')({
-  component: ProcessesPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Processos & POPs" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 interface Process {

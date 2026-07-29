@@ -43,7 +43,13 @@ import { Switch } from '@/components/ui/switch';
 import { FileViewerDialog } from '@/components/files/FileViewerDialog';
 
 export const Route = createFileRoute('/documents')({
-  component: DocumentsPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Documentos" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 const getFileIcon = (type: string) => {
