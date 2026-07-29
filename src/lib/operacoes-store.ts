@@ -475,27 +475,29 @@ function clearSyncOptions(options?: SyncOptions) {
   options?.deleting?.forEach(bucket => clearIds(bucket.set, bucket.ids));
 }
 
+async function refreshFromCloud() {
+  try {
+    const data = await fetchAll();
+    setState({
+      ...data,
+      folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
+      templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
+      projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
+      sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
+      tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
+      forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
+      formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
+      senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
+      _lastSyncError: null,
+    });
+  } catch (e: any) {
+    raiseSyncError(e?.message ?? 'Falha ao atualizar Operações em tempo real.');
+  }
+}
+
 function subscribeRealtime() {
   if (realtimeChannel || typeof window === 'undefined') return;
-  const refresh = async () => {
-    try {
-      const data = await fetchAll();
-      setState({
-        ...data,
-        folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
-        templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
-        projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
-        sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
-        tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
-        forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
-        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
-        senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
-        _lastSyncError: null,
-      });
-    } catch (e: any) {
-      raiseSyncError(e?.message ?? 'Falha ao atualizar Operações em tempo real.');
-    }
-  };
+  const refresh = () => { void refreshFromCloud(); };
   realtimeChannel = supabase
     .channel('op-realtime')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'op_folders' },  refresh)
@@ -508,6 +510,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'op_senhas' },   refresh)
     .subscribe();
 }
+
 
 // dispara na 1ª leitura do store no browser
 if (typeof window !== 'undefined') {
