@@ -32,7 +32,6 @@ import { Route as IntelligentCentralRouteImport } from './routes/intelligent-cen
 import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
 import { Route as FormulariosRouteImport } from './routes/formularios'
-import { Route as FinancialDashboardRouteImport } from './routes/financial-dashboard'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComercialRouteImport } from './routes/comercial'
@@ -45,7 +44,6 @@ import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
 import { Route as OperacoesIndexRouteImport } from './routes/operacoes.index'
 import { Route as GamificacaoIndexRouteImport } from './routes/gamificacao.index'
-import { Route as ContractsIndexRouteImport } from './routes/contracts.index'
 import { Route as ComercialIndexRouteImport } from './routes/comercial.index'
 import { Route as AlcateiaIndexRouteImport } from './routes/alcateia.index'
 import { Route as VfTokenRouteImport } from './routes/vf.$token'
@@ -72,7 +70,6 @@ import { Route as GamificacaoEstrelaDoLiderRouteImport } from './routes/gamifica
 import { Route as FDataRouteImport } from './routes/f.$data'
 import { Route as CronogramaTokenRouteImport } from './routes/cronograma.$token'
 import { Route as ContratoTokenRouteImport } from './routes/contrato.$token'
-import { Route as ContractsContractIdRouteImport } from './routes/contracts.$contractId'
 import { Route as ComercialProspeccoesRouteImport } from './routes/comercial.prospeccoes'
 import { Route as ComercialMetasRouteImport } from './routes/comercial.metas'
 import { Route as ComercialFunilRouteImport } from './routes/comercial.funil'
@@ -207,11 +204,6 @@ const FormulariosRoute = FormulariosRouteImport.update({
   path: '/formularios',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FinancialDashboardRoute = FinancialDashboardRouteImport.update({
-  id: '/financial-dashboard',
-  path: '/financial-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -271,11 +263,6 @@ const GamificacaoIndexRoute = GamificacaoIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GamificacaoRoute,
-} as any)
-const ContractsIndexRoute = ContractsIndexRouteImport.update({
-  id: '/contracts/',
-  path: '/contracts/',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ComercialIndexRoute = ComercialIndexRouteImport.update({
   id: '/',
@@ -409,11 +396,6 @@ const ContratoTokenRoute = ContratoTokenRouteImport.update({
   path: '/contrato/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContractsContractIdRoute = ContractsContractIdRouteImport.update({
-  id: '/contracts/$contractId',
-  path: '/contracts/$contractId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComercialProspeccoesRoute = ComercialProspeccoesRouteImport.update({
   id: '/prospeccoes',
   path: '/prospeccoes',
@@ -517,7 +499,6 @@ export interface FileRoutesByFullPath {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
-  '/financial-dashboard': typeof FinancialDashboardRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
@@ -553,7 +534,6 @@ export interface FileRoutesByFullPath {
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
   '/comercial/prospeccoes': typeof ComercialProspeccoesRoute
-  '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
@@ -580,7 +560,6 @@ export interface FileRoutesByFullPath {
   '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
-  '/contracts/': typeof ContractsIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
@@ -600,7 +579,6 @@ export interface FileRoutesByTo {
   '/collaborators': typeof CollaboratorsRoute
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
-  '/financial-dashboard': typeof FinancialDashboardRoute
   '/formularios': typeof FormulariosRoute
   '/info-center': typeof InfoCenterRoute
   '/intelligent-central': typeof IntelligentCentralRoute
@@ -632,7 +610,6 @@ export interface FileRoutesByTo {
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
   '/comercial/prospeccoes': typeof ComercialProspeccoesRoute
-  '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
@@ -659,7 +636,6 @@ export interface FileRoutesByTo {
   '/vf/$token': typeof VfTokenRoute
   '/alcateia': typeof AlcateiaIndexRoute
   '/comercial': typeof ComercialIndexRoute
-  '/contracts': typeof ContractsIndexRoute
   '/gamificacao': typeof GamificacaoIndexRoute
   '/operacoes': typeof OperacoesIndexRoute
   '/registrations': typeof RegistrationsIndexRoute
@@ -681,7 +657,6 @@ export interface FileRoutesById {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/documents': typeof DocumentsRoute
-  '/financial-dashboard': typeof FinancialDashboardRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
   '/info-center': typeof InfoCenterRoute
@@ -717,7 +692,6 @@ export interface FileRoutesById {
   '/comercial/funil': typeof ComercialFunilRoute
   '/comercial/metas': typeof ComercialMetasRoute
   '/comercial/prospeccoes': typeof ComercialProspeccoesRoute
-  '/contracts/$contractId': typeof ContractsContractIdRoute
   '/contrato/$token': typeof ContratoTokenRoute
   '/cronograma/$token': typeof CronogramaTokenRoute
   '/f/$data': typeof FDataRoute
@@ -744,7 +718,6 @@ export interface FileRoutesById {
   '/vf/$token': typeof VfTokenRoute
   '/alcateia/': typeof AlcateiaIndexRoute
   '/comercial/': typeof ComercialIndexRoute
-  '/contracts/': typeof ContractsIndexRoute
   '/gamificacao/': typeof GamificacaoIndexRoute
   '/operacoes/': typeof OperacoesIndexRoute
   '/registrations/': typeof RegistrationsIndexRoute
@@ -767,7 +740,6 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/documents'
-    | '/financial-dashboard'
     | '/formularios'
     | '/gamificacao'
     | '/info-center'
@@ -803,7 +775,6 @@ export interface FileRouteTypes {
     | '/comercial/funil'
     | '/comercial/metas'
     | '/comercial/prospeccoes'
-    | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
@@ -830,7 +801,6 @@ export interface FileRouteTypes {
     | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
-    | '/contracts/'
     | '/gamificacao/'
     | '/operacoes/'
     | '/registrations/'
@@ -850,7 +820,6 @@ export interface FileRouteTypes {
     | '/collaborators'
     | '/dashboard'
     | '/documents'
-    | '/financial-dashboard'
     | '/formularios'
     | '/info-center'
     | '/intelligent-central'
@@ -882,7 +851,6 @@ export interface FileRouteTypes {
     | '/comercial/funil'
     | '/comercial/metas'
     | '/comercial/prospeccoes'
-    | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
@@ -909,7 +877,6 @@ export interface FileRouteTypes {
     | '/vf/$token'
     | '/alcateia'
     | '/comercial'
-    | '/contracts'
     | '/gamificacao'
     | '/operacoes'
     | '/registrations'
@@ -930,7 +897,6 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/documents'
-    | '/financial-dashboard'
     | '/formularios'
     | '/gamificacao'
     | '/info-center'
@@ -966,7 +932,6 @@ export interface FileRouteTypes {
     | '/comercial/funil'
     | '/comercial/metas'
     | '/comercial/prospeccoes'
-    | '/contracts/$contractId'
     | '/contrato/$token'
     | '/cronograma/$token'
     | '/f/$data'
@@ -993,7 +958,6 @@ export interface FileRouteTypes {
     | '/vf/$token'
     | '/alcateia/'
     | '/comercial/'
-    | '/contracts/'
     | '/gamificacao/'
     | '/operacoes/'
     | '/registrations/'
@@ -1015,7 +979,6 @@ export interface RootRouteChildren {
   ComercialRoute: typeof ComercialRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   DocumentsRoute: typeof DocumentsRoute
-  FinancialDashboardRoute: typeof FinancialDashboardRoute
   FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
   InfoCenterRoute: typeof InfoCenterRoute
@@ -1047,7 +1010,6 @@ export interface RootRouteChildren {
   ClienteGlossarioRoute: typeof ClienteGlossarioRoute
   ClienteMetasRoute: typeof ClienteMetasRoute
   ClientePainelRoute: typeof ClientePainelRoute
-  ContractsContractIdRoute: typeof ContractsContractIdRoute
   ContratoTokenRoute: typeof ContratoTokenRoute
   CronogramaTokenRoute: typeof CronogramaTokenRoute
   FDataRoute: typeof FDataRoute
@@ -1055,7 +1017,6 @@ export interface RootRouteChildren {
   OnboardingTokenRoute: typeof OnboardingTokenRoute
   VfTokenRoute: typeof VfTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
-  ContractsIndexRoute: typeof ContractsIndexRoute
   ApiPublicVisaoSubmissionsRoute: typeof ApiPublicVisaoSubmissionsRoute
   ClienteTrilhasTrackIdRoute: typeof ClienteTrilhasTrackIdRoute
   PAtaAtaIdRoute: typeof PAtaAtaIdRoute
@@ -1226,13 +1187,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FormulariosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/financial-dashboard': {
-      id: '/financial-dashboard'
-      path: '/financial-dashboard'
-      fullPath: '/financial-dashboard'
-      preLoaderRoute: typeof FinancialDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/documents': {
       id: '/documents'
       path: '/documents'
@@ -1316,13 +1270,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/gamificacao/'
       preLoaderRoute: typeof GamificacaoIndexRouteImport
       parentRoute: typeof GamificacaoRoute
-    }
-    '/contracts/': {
-      id: '/contracts/'
-      path: '/contracts'
-      fullPath: '/contracts/'
-      preLoaderRoute: typeof ContractsIndexRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/comercial/': {
       id: '/comercial/'
@@ -1504,13 +1451,6 @@ declare module '@tanstack/react-router' {
       path: '/contrato/$token'
       fullPath: '/contrato/$token'
       preLoaderRoute: typeof ContratoTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contracts/$contractId': {
-      id: '/contracts/$contractId'
-      path: '/contracts/$contractId'
-      fullPath: '/contracts/$contractId'
-      preLoaderRoute: typeof ContractsContractIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comercial/prospeccoes': {
@@ -1788,7 +1728,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComercialRoute: ComercialRouteWithChildren,
   DashboardRoute: DashboardRoute,
   DocumentsRoute: DocumentsRoute,
-  FinancialDashboardRoute: FinancialDashboardRoute,
   FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,
   InfoCenterRoute: InfoCenterRoute,
@@ -1820,7 +1759,6 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteGlossarioRoute: ClienteGlossarioRoute,
   ClienteMetasRoute: ClienteMetasRoute,
   ClientePainelRoute: ClientePainelRoute,
-  ContractsContractIdRoute: ContractsContractIdRoute,
   ContratoTokenRoute: ContratoTokenRoute,
   CronogramaTokenRoute: CronogramaTokenRoute,
   FDataRoute: FDataRoute,
@@ -1828,7 +1766,6 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingTokenRoute: OnboardingTokenRoute,
   VfTokenRoute: VfTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
-  ContractsIndexRoute: ContractsIndexRoute,
   ApiPublicVisaoSubmissionsRoute: ApiPublicVisaoSubmissionsRoute,
   ClienteTrilhasTrackIdRoute: ClienteTrilhasTrackIdRoute,
   PAtaAtaIdRoute: PAtaAtaIdRoute,
