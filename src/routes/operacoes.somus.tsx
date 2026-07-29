@@ -137,11 +137,13 @@ function ProjetoSomusPage() {
               <ProjectItem
                 key={p.id}
                 name={p.name}
+                ownerId={p.ownerId}
                 tasks={tasksOfProject(p.id)}
                 users={store.users}
                 active={active?.id === p.id}
                 onSelect={() => setSelectedId(p.id)}
                 onRename={(n) => opStore.renameProject(p.id, n)}
+                onSetOwner={(uid) => opStore.setProjectOwner(p.id, uid)}
               />
             ))}
           </aside>
