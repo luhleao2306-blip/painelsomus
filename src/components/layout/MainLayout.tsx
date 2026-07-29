@@ -187,7 +187,7 @@ const navigationSections: NavSection[] = [
   {
     label: 'Sistema',
     items: [
-      { title: 'Documentação do Sistema', icon: BookOpen, href: '/system-docs', roles: ['master', 'project_manager', 'consultant'] },
+      
       { title: 'Configurações', icon: Settings, href: '/settings', roles: ['master', 'project_manager', 'consultant'] },
     ],
   },
