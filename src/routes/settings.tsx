@@ -130,17 +130,6 @@ function SettingsPage() {
     }
   };
 
-  const handleTogglePref = async (key: string, value: boolean) => {
-    if (!profile?.id) return;
-    const next = { ...prefs, [key]: value };
-    try {
-      const { error } = await (supabase as any).from('profiles').update({ notification_prefs: next }).eq('id', profile.id);
-      if (error) throw error;
-      await refreshProfile();
-    } catch (err: any) {
-      toast.error('Erro ao salvar preferência');
-    }
-  };
 
   const handleDeleteAccount = async () => {
     if (!profile?.id) return;
