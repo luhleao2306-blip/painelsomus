@@ -57,7 +57,7 @@ export type OpTask = {
 };
 
 export type OpSection = { id: string; projectId: string; name: string; order: number };
-export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
+export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado'; ownerId?: string };
 export type OpFolder = { id: string; name: string };
 
 export type OpTemplateTask = { name: string; subtasks: string[] };
