@@ -129,7 +129,7 @@ const navigationSections: NavSection[] = [
   {
     label: 'Gestão de Clientes',
     items: [
-      { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['master', 'project_manager', 'consultant'] },
+      // Atas de Reunião agora ficam dentro de cada cliente (aba "Atas" em /clients/$clientId)
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant'] },
 
