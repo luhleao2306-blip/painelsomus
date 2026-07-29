@@ -27,7 +27,7 @@ export function getRedirectPath(role: string): string {
     case 'master': return '/operacoes';
     case 'project_manager': return '/operacoes';
     case 'consultant': return '/operacoes';
-    case 'client': return '/agenda';
+    case 'client': return '/cliente/painel';
     default: return '/login';
   }
 }

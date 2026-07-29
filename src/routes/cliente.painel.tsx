@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { ClientLayout } from '@/components/layout/ClientLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,7 @@ function ClientPanelPage() {
   const entregues = filtered.filter(d => d.situation === 'entregue');
 
   return (
-    <MainLayout>
+    <ClientLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-1 pb-2 border-b border-border/40">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Portal do Cliente</span>
@@ -156,7 +156,7 @@ function ClientPanelPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
+    </ClientLayout>
   );
 }
 
