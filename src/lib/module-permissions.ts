@@ -24,7 +24,6 @@ export const MODULES: ModuleDef[] = [
   { key: '/comercial/metas', label: 'Metas Comerciais', group: 'Comercial' },
   { key: '/sales-performance', label: 'Performance Comercial', group: 'Comercial' },
 
-  { key: '/contracts', label: 'Contratos', group: 'Financeiro' },
 
   { key: '/gamificacao', label: 'Carreira', group: 'Carreira' },
 

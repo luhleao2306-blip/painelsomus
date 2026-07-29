@@ -7,7 +7,6 @@ import {
   Briefcase, 
    
   FileText, 
-  FileSignature,
   UsersRound, 
   Settings, 
   LogOut,
@@ -145,12 +144,6 @@ const navigationSections: NavSection[] = [
   },
   // Seções "Comercial" e "Financeiro" ocultas temporariamente da sidebar.
   // As rotas e o banco de dados permanecem intactos para reativação futura.
-  {
-    label: 'Financeiro',
-    items: [
-      { title: 'Contratos', icon: FileSignature, href: '/contracts', roles: ['master', 'project_manager', 'consultant'] },
-    ],
-  },
 
   {
     label: 'Alcateia',
@@ -200,8 +193,6 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/briefing', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/tasks', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/time-report', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/contracts', roles: ['master', 'project_manager', 'consultant'] },
-  { prefix: '/financial-dashboard', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/sales-performance', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/comercial', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/gamificacao', roles: ['master', 'project_manager', 'consultant'] },
