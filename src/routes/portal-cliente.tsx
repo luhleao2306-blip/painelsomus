@@ -23,6 +23,7 @@ import {
   type ClientAgent, type LearningTrack, type LearningItem, type GlossaryTerm, type StrategicGoal,
 } from '@/lib/client-portal-store';
 import { Switch } from '@/components/ui/switch';
+import { MeetingsPanel } from '@/routes/meetings';
 import {
   useOpFolders, useLinkFolderToClient, useClientDemandsAdmin, useSetDemandVisibility,
   useUsefulLinks, useUpsertUsefulLink, useDeleteUsefulLink,
@@ -69,6 +70,7 @@ function AdminPortalPage() {
           <Tabs defaultValue="demands">
             <TabsList>
               <TabsTrigger value="demands">Demandas</TabsTrigger>
+              <TabsTrigger value="minutes">Atas</TabsTrigger>
               <TabsTrigger value="links">Links úteis</TabsTrigger>
               <TabsTrigger value="agents">Agentes</TabsTrigger>
               <TabsTrigger value="tracks">Trilhas</TabsTrigger>
@@ -76,6 +78,11 @@ function AdminPortalPage() {
               <TabsTrigger value="goals">Metas</TabsTrigger>
             </TabsList>
             <TabsContent value="demands" className="pt-4"><DemandsTab clientId={clientId} /></TabsContent>
+            <TabsContent value="minutes" className="pt-4">
+              {clientId ? <MeetingsPanel clientId={clientId} embedded /> : (
+                <p className="text-sm text-muted-foreground">Selecione um cliente para ver as atas.</p>
+              )}
+            </TabsContent>
             <TabsContent value="links" className="pt-4"><UsefulLinksTab clientId={clientId} /></TabsContent>
             <TabsContent value="agents" className="pt-4"><AgentsTab clientId={clientId} /></TabsContent>
             <TabsContent value="tracks" className="pt-4"><TracksTab clientId={clientId} /></TabsContent>
