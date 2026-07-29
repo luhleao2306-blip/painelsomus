@@ -196,7 +196,7 @@ function LoginPage() {
       </header>
 
       {/* Cartões laterais */}
-      <div className="pointer-events-none absolute bottom-24 left-10 z-10 hidden w-[210px] flex-col gap-2.5 xl:flex">
+      <div className="pointer-events-none absolute left-10 top-1/2 z-10 hidden w-[210px] -translate-y-1/2 flex-col gap-2.5 xl:flex 2xl:left-16">
         {[
           { icon: Layers, label: 'Visão completa', desc: 'Todos os seus projetos em tempo real' },
           { icon: LineChart, label: 'Decisões rápidas', desc: 'Indicadores e relatórios sempre à mão' },
