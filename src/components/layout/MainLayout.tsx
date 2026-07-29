@@ -94,7 +94,7 @@ import { LevelSeal } from '@/components/gamificacao/LevelSeal';
 import { WolfAvatar } from '@/components/WolfAvatar';
 import { ClientAvatar } from '@/components/client/ClientAvatar';
 
-type NavItem = { title: string; icon: typeof LayoutDashboard; href: string; roles: UserRole[] };
+type NavItem = { title: string; icon: typeof LayoutDashboard; href: string; roles: UserRole[]; wip?: boolean };
 type NavSection = { label: string; items: NavItem[] };
 
 const getRoleName = (r: UserRole, email?: string | null) => {
