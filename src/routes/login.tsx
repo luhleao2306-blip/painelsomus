@@ -174,7 +174,7 @@ function LoginPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-hidden bg-[#050505] text-white"
+      className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#050505] text-white"
       style={{ fontFamily: "'Inter Tight', sans-serif" }}
     >
       {/* Fundo full-bleed */}
