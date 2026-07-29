@@ -94,7 +94,7 @@ import { LevelSeal } from '@/components/gamificacao/LevelSeal';
 import { WolfAvatar } from '@/components/WolfAvatar';
 import { ClientAvatar } from '@/components/client/ClientAvatar';
 
-type NavItem = { title: string; icon: typeof LayoutDashboard; href: string; roles: UserRole[] };
+type NavItem = { title: string; icon: typeof LayoutDashboard; href: string; roles: UserRole[]; wip?: boolean };
 type NavSection = { label: string; items: NavItem[] };
 
 const getRoleName = (r: UserRole, email?: string | null) => {
@@ -176,9 +176,9 @@ const navigationSections: NavSection[] = [
   {
     label: 'Conhecimento',
     items: [
-      { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Central de Informações', icon: Library, href: '/info-center', roles: ['master', 'project_manager', 'consultant'], wip: true },
 
-      { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'] },
+      { title: 'Central Inteligente', icon: Cpu, href: '/intelligent-central', roles: ['master', 'project_manager', 'consultant'], wip: true },
       { title: 'SOMUS IA', icon: Sparkles, href: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
       // { title: 'Trilha da Alcateia', icon: BookOpenCheck, href: '/knowledge-trail', roles: ['master', 'project_manager', 'consultant'] }, // oculto até ter conteúdo
     ],
@@ -243,7 +243,7 @@ function CollapsibleNavSection({
   section,
   pathname,
 }: {
-  section: { label: string; items: { title: string; icon: any; href: string; roles: UserRole[] }[] };
+  section: NavSection;
   pathname: string;
 }) {
   const hasActive = section.items.some(
@@ -302,6 +302,14 @@ function CollapsibleNavSection({
                     <Link to={item.href as any} className="flex items-center gap-2.5">
                       <item.icon className="h-[18px] w-[18px] shrink-0 opacity-80" />
                       <span className="truncate">{item.title}</span>
+                      {item.wip && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto shrink-0 border-amber-500/40 bg-amber-500/10 px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide text-amber-600 group-data-[collapsible=icon]:hidden dark:text-amber-400"
+                        >
+                          Em construção
+                        </Badge>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

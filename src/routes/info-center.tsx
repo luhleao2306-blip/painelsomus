@@ -1,3 +1,4 @@
+import { InDevelopmentNotice } from '@/components/common/InDevelopmentNotice';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -23,7 +24,13 @@ import {
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/info-center')({
-  component: InfoCenterPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Central de Informações" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 interface InfoFolder {

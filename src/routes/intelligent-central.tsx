@@ -1,3 +1,4 @@
+import { InDevelopmentNotice } from '@/components/common/InDevelopmentNotice';
 import React, { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -30,7 +31,13 @@ import { IntelligentCentralForm } from '@/components/intelligent-central/Intelli
 import { Separator } from '@/components/ui/separator';
 
 export const Route = createFileRoute('/intelligent-central')({
-  component: IntelligentCentralPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Central Inteligente" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 function IntelligentCentralPage() {
