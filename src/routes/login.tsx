@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 import { getRedirectPath } from '@/lib/auth-utils';
 import { useProfile } from '@/hooks/use-profile';
 import somusLogo from '@/assets/somus-logo.png';
-import loginHero from '@/assets/login-hero.jpg';
-import { ShieldCheck, LineChart, Layers, ArrowRight } from 'lucide-react';
+import loginHeroAsset from '@/assets/login-hero-dark.png.asset.json';
+import { ShieldCheck, LineChart, Layers, ArrowRight, User, Lock, Eye, EyeOff } from 'lucide-react';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -36,6 +36,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!authReady || profileLoading || loading || hasRedirected) return;
@@ -172,206 +173,117 @@ function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full overflow-hidden bg-background" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
-      {/* Left panel: brand showcase */}
-      <div className="relative hidden lg:flex lg:w-[55%] xl:w-1/2 flex-col justify-between bg-[#0a0a0a] text-white p-10 xl:p-14 overflow-hidden">
-        {/* Hero background image */}
-        <img
-          src={loginHero}
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50 mix-blend-screen"
-        />
-        {/* Gradient veil for legibility */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0a0a0a]/90 to-[#0a0a0a]/50" />
-        {/* Fine grid */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.5) 1px, transparent 1px)',
-            backgroundSize: '56px 56px',
-          }}
-        />
+    <div
+      className="relative min-h-screen w-full overflow-hidden bg-[#050505] text-white"
+      style={{ fontFamily: "'Inter Tight', sans-serif" }}
+    >
+      {/* Fundo full-bleed */}
+      <img
+        src={loginHeroAsset.url}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-[#050505]/45" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/70" />
 
-        {/* Top: logo */}
-        <div className="relative z-10 flex items-center justify-between">
-          <img
-            src={somusLogo}
-            alt="Somus"
-            className="h-8 w-auto object-contain invert"
-          />
-          <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white/50">
-            somus.group
-          </span>
-        </div>
+      {/* Topo */}
+      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10 sm:py-8">
+        <img src={somusLogo} alt="Somus" className="h-6 w-auto object-contain invert sm:h-7" />
+        <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/55 sm:text-[11px]">
+          somus.group
+        </span>
+      </header>
 
-        {/* Middle: headline centered */}
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center text-center">
-          <div className="space-y-6 max-w-xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.35em] text-white/50">
-              Portal de Acesso · Somus Hub
-            </p>
-            <h1
-              className="text-5xl xl:text-[72px] font-semibold leading-[0.95] tracking-tight"
-              style={{ fontFamily: "'Instrument Serif', serif" }}
-            >
-              Somus<br />
-              <span className="italic font-extralight">Hub.</span>
-            </h1>
-            <p className="text-xl xl:text-2xl font-light text-white/70 leading-relaxed">
-              Sua operação, <span className="italic font-extralight">centralizada.</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Feature highlights */}
-        <div className="relative z-10 grid grid-cols-1 gap-3 pt-2">
-          {[
-            { icon: Layers, label: 'Visão completa', desc: 'Todos os seus projetos em tempo real' },
-            { icon: LineChart, label: 'Decisões rápidas', desc: 'Indicadores e relatórios sempre à mão' },
-            { icon: ShieldCheck, label: 'Seguro por padrão', desc: 'Acesso restrito e auditado' },
-          ].map(({ icon: Icon, label, desc }) => (
-            <div key={label} className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-4 hover:bg-white/[0.07] transition-colors">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 border border-white/10">
-                <Icon className="h-4 w-4 text-white" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-white">{label}</p>
-                <p className="text-xs text-white/60 mt-0.5">{desc}</p>
-              </div>
+      {/* Cartões laterais */}
+      <div className="pointer-events-none absolute bottom-24 left-10 z-10 hidden w-[210px] flex-col gap-2.5 xl:flex">
+        {[
+          { icon: Layers, label: 'Visão completa', desc: 'Todos os seus projetos em tempo real' },
+          { icon: LineChart, label: 'Decisões rápidas', desc: 'Indicadores e relatórios sempre à mão' },
+          { icon: ShieldCheck, label: 'Seguro por padrão', desc: 'Acesso restrito e auditado' },
+        ].map(({ icon: Icon, label, desc }) => (
+          <div
+            key={label}
+            className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3.5 backdrop-blur-md"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10">
+              <Icon className="h-3.5 w-3.5 text-white" />
             </div>
-          ))}
-        </div>
-
-        {/* Bottom: footer */}
-        <div className="relative z-10">
-          <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-white/40 border-t border-white/10 pt-5">
-            <span>&copy; 2026 Somus Group</span>
-            <span>v3.0 · Acesso restrito</span>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold leading-tight text-white">{label}</p>
+              <p className="mt-1 text-[11px] leading-snug text-white/55">{desc}</p>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* Right panel: form */}
-      <div className="flex flex-1 flex-col bg-background lg:items-center lg:justify-center lg:p-12">
-        {/* Mobile hero — visible only on small screens */}
-        <div className="relative lg:hidden h-[44vh] min-h-[300px] w-full overflow-hidden bg-[#0a0a0a] text-white">
-          <img
-            src={loginHero}
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50 mix-blend-screen"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/70 via-[#0a0a0a]/85 to-background" />
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                'linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.5) 1px, transparent 1px)',
-              backgroundSize: '40px 40px',
-            }}
-          />
-          <div className="relative z-10 flex h-full flex-col justify-between p-6">
-            <div className="flex items-center justify-between">
-              <img src={somusLogo} alt="Somus" className="h-7 w-auto object-contain invert" />
-              <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/60">
-                Portal · Acesso seguro
-              </span>
-            </div>
-            <div className="space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">
-                Somus Hub
-              </p>
-              <h1
-                className="text-4xl font-semibold leading-[0.95] tracking-tight"
-                style={{ fontFamily: "'Instrument Serif', serif" }}
-              >
-                Sua operação,<br />
-                <span className="italic font-extralight">centralizada.</span>
-              </h1>
-            </div>
-          </div>
-        </div>
+      {/* Conteúdo central */}
+      <main className="relative z-10 flex min-h-[calc(100vh-190px)] flex-col items-center justify-center px-6 pb-16">
+        <div className="w-full max-w-[344px] text-center">
+          <p className="text-[10px] font-medium uppercase tracking-[0.4em] text-white/55">
+            Portal de acesso
+          </p>
+          <h1
+            className="mt-4 text-[56px] leading-[0.9] tracking-tight sm:text-[72px]"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            Somus<br />
+            <span className="italic font-light">Hub.</span>
+          </h1>
+          <p className="mt-6 text-lg font-light text-white/75">
+            Sua operação, <span className="italic">centralizada.</span>
+          </p>
 
-        <div className="w-full max-w-[420px] mx-auto px-6 pt-8 pb-10 sm:px-8 lg:p-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Mobile feature pills */}
-          <div className="flex flex-wrap gap-2 mb-8 lg:hidden">
-            {[
-              { icon: Layers, label: 'Projetos' },
-              { icon: LineChart, label: 'Relatórios' },
-              { icon: ShieldCheck, label: 'Seguro' },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5">
-                <Icon className="h-3 w-3 text-foreground/70" />
-                <span className="text-[11px] font-semibold text-foreground/80">{label}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mb-8">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground mb-2">
-              Somus Hub
-            </p>
-            <h2
-              className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1"
-              style={{ fontFamily: "'Instrument Serif', serif" }}
-            >
-              {mode === 'signin' ? 'Bem-vindo de volta' : 'Criar conta'}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-3">
-              {mode === 'signin'
-                ? 'Entre com suas credenciais para acessar o Somus Hub.'
-                : 'Preencha seus dados para começar a usar o Somus Hub.'}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-
+          <form onSubmit={handleSubmit} className="mt-10 space-y-5 text-left">
             {mode === 'signup' && (
-              <div className="space-y-1.5">
-                <Label htmlFor="fullName" className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold ml-1">
+              <div className="space-y-2">
+                <Label htmlFor="fullName" className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55">
                   Nome completo
                 </Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Seu nome"
-                  required
-                  className="w-full px-5 py-4 h-auto bg-muted/30 border-border rounded-xl focus:ring-1 focus:ring-foreground text-sm placeholder:text-muted-foreground/50"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  disabled={loading}
-                />
+                <div className="relative">
+                  <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Seu nome"
+                    required
+                    className="h-[52px] w-full rounded-xl border-white/15 bg-white/[0.05] pl-11 pr-4 text-sm text-white backdrop-blur-md placeholder:text-white/35 focus-visible:border-white/40 focus-visible:ring-0"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold ml-1">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55">
                 E-mail
               </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="nome@empresa.com.br"
-                required
-                className="w-full px-5 py-4 h-auto bg-muted/30 border-border rounded-xl focus:ring-1 focus:ring-foreground text-sm placeholder:text-muted-foreground/50"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="nome@empresa.com.br"
+                  required
+                  className="h-[52px] w-full rounded-xl border-white/15 bg-white/[0.05] pl-11 pr-4 text-sm text-white backdrop-blur-md placeholder:text-white/35 focus-visible:border-white/40 focus-visible:ring-0"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold ml-1">
+                <Label htmlFor="password" className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55">
                   Senha
                 </Label>
-                <Button
-                  variant="link"
-                  className="px-0 h-auto text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground font-semibold"
+                <button
                   type="button"
                   disabled={loading}
+                  className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55 transition-colors hover:text-white"
                   onClick={async () => {
                     const target = email.trim().toLowerCase();
                     if (!target) {
@@ -383,55 +295,74 @@ function LoginPage() {
                       redirectTo: `${window.location.origin}/reset-password`,
                     });
                     setLoading(false);
-                    if (error) {
-                      toast.error(error.message);
-                    } else {
-                      toast.success('Enviamos um link de redefinição para o seu e-mail.');
-                    }
+                    if (error) toast.error(error.message);
+                    else toast.success('Enviamos um link de redefinição para o seu e-mail.');
                   }}
                 >
                   Esqueceu?
-                </Button>
+                </button>
               </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                className="w-full px-5 py-4 h-auto bg-muted/30 border-border rounded-xl focus:ring-1 focus:ring-foreground text-sm placeholder:text-muted-foreground/50"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-              />
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  required
+                  className="h-[52px] w-full rounded-xl border-white/15 bg-white/[0.05] pl-11 pr-12 text-sm text-white backdrop-blur-md placeholder:text-white/35 focus-visible:border-white/40 focus-visible:ring-0"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45 transition-colors hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl font-medium text-sm bg-foreground text-background hover:bg-foreground/90 transition-all flex items-center justify-center gap-2 group"
+              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-medium text-[#0a0a0a] transition-all hover:bg-white/90"
               disabled={loading}
             >
               {loading ? 'Processando...' : mode === 'signin' ? 'Entrar no Portal' : 'Criar Conta'}
-              {!loading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+              {!loading && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
             </Button>
 
-            <p className="text-center text-xs text-muted-foreground pt-2">
+            <div className="flex items-center gap-4 pt-1">
+              <span className="h-px flex-1 bg-white/15" />
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/15 text-[9px] uppercase tracking-widest text-white/50">
+                ou
+              </span>
+              <span className="h-px flex-1 bg-white/15" />
+            </div>
+
+            <p className="text-center text-[13px] text-white/70">
               {mode === 'signin' ? 'Ainda não tem conta?' : 'Já tem uma conta?'}{' '}
               <button
                 type="button"
-                className="font-semibold text-foreground underline underline-offset-4 decoration-border hover:decoration-foreground transition-all"
+                className="font-semibold text-white underline underline-offset-4"
                 onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
                 disabled={loading}
               >
                 {mode === 'signin' ? 'Cadastre-se' : 'Fazer login'}
               </button>
             </p>
-
           </form>
-
-          <p className="mt-12 text-center text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 lg:hidden">
-            &copy; 2026 Somus &middot; Acesso restrito
-          </p>
         </div>
-      </div>
+      </main>
+
+      {/* Rodapé */}
+      <footer className="relative z-10 flex items-center justify-between px-6 pb-6 text-[9px] uppercase tracking-[0.25em] text-white/40 sm:px-10 sm:pb-8 sm:text-[10px]">
+        <span>&copy; 2026 Somus Group</span>
+        <span>v3.0 &middot; Acesso restrito</span>
+      </footer>
     </div>
   );
 }
+
