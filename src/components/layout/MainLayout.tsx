@@ -205,7 +205,6 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/team-performance', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/missoes', roles: ['master', 'project_manager', 'consultant'] },
   { prefix: '/cliente/painel', roles: ['master', 'project_manager', 'consultant', 'client'] },
-  { prefix: '/cliente/painel', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/portal-cliente', roles: ['master', 'project_manager'] },
   { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
 ];
