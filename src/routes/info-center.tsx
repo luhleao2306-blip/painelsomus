@@ -23,7 +23,13 @@ import {
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/info-center')({
-  component: InfoCenterPage,
+  component: () => (
+    <MainLayout>
+      <div className="py-16">
+        <InDevelopmentNotice module="Central de Informações" />
+      </div>
+    </MainLayout>
+  ),
 });
 
 interface InfoFolder {
