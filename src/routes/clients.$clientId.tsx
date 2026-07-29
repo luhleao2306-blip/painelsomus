@@ -291,36 +291,8 @@ function ClientDetailPage() {
               </TabsContent>
 
 
-              <TabsContent value="contracts" className="space-y-4">
-                 <div className="grid gap-4">
-                    {clientContracts.map(contract => (
-                       <Card key={contract.id} className="border-border/50 bg-card/80 overflow-hidden group">
-                          <CardContent className="p-4 flex items-center justify-between">
-                             <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                   <FileBadge className="h-5 w-5" />
-                                </div>
-                                <div>
-                                   <p className="text-sm font-bold">{contract.name}</p>
-                                   <p className="text-[10px] text-muted-foreground font-bold uppercase">{contract.status} • Início: {contract.startDate ? new Date(contract.startDate).toLocaleDateString() : '—'}</p>
-                                </div>
-                             </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => navigate({ to: '/contracts/$contractId', params: { contractId: contract.id } })}
-                              >
-                                <Eye className="h-4 w-4" />
-                             </Button>
-                          </CardContent>
-                       </Card>
-                    ))}
-                    {clientContracts.length === 0 && (
-                       <EmptyState icon={FileBadge} title="Sem contratos" description="Não há contratos registrados para este cliente." />
-                    )}
-                 </div>
-              </TabsContent>
+
+
 
               <TabsContent value="meetings" className="space-y-4">
                  <MeetingsPanel clientId={clientId} embedded />
