@@ -246,10 +246,23 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
   const [overStatus, setOverStatus] = useState<OpStatus | null>(null);
   const [adding, setAdding] = useState<OpStatus | null>(null);
   const [draft, setDraft] = useState('');
+  const [query, setQuery] = useState('');
+  const [assigneeFilter, setAssigneeFilter] = useState<string | 'all'>('all');
+  const [hideDone, setHideDone] = useState(false);
 
   const sections = store.sections.filter(s => s.projectId === projectId);
   const sectionId = sections[0]?.id;
-  const tasks = store.tasks.filter(t => sections.some(s => s.id === t.sectionId));
+  const allTasks = store.tasks.filter(t => sections.some(s => s.id === t.sectionId));
+
+  const q = query.trim().toLowerCase();
+  const tasks = allTasks.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q)) return false;
+    if (assigneeFilter !== 'all' && t.assigneeId !== assigneeFilter) return false;
+    return true;
+  });
+
+  const crew = Array.from(new Set(allTasks.map(t => t.assigneeId).filter(Boolean) as string[]))
+    .map(id => store.users.find(u => u.id === id)).filter(Boolean) as { id: string; name: string }[];
 
   const ensureSection = () => sectionId ?? opStore.addSection(projectId, 'Geral');
 
@@ -268,14 +281,61 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
     setOverStatus(null);
   };
 
+  const visibleStatuses = hideDone ? BOARD_STATUSES.filter(s => s !== 'concluido') : BOARD_STATUSES;
+  const doneCount = allTasks.filter(t => t.status === 'concluido').length;
+  const pct = allTasks.length ? Math.round((doneCount / allTasks.length) * 100) : 0;
+
   return (
     <section className="min-w-0">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="font-display text-[19px] font-semibold tracking-tight">{projectName}</h2>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            {tasks.length} demandas
-          </span>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-display text-[19px] font-semibold tracking-tight">{projectName}</h2>
+          <div className="mt-1 flex items-center gap-2">
+            <div className="h-1 w-28 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {doneCount}/{allTasks.length} concluídas
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Buscar demanda"
+              className="h-8 w-48 pl-8 text-[12.5px]"
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline" className="h-8 gap-1.5 text-[12px]">
+                <User2 className="h-3.5 w-3.5" />
+                {assigneeFilter === 'all' ? 'Todos' : (store.users.find(u => u.id === assigneeFilter)?.name ?? 'Todos')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="max-h-64 overflow-y-auto">
+              <DropdownMenuLabel className="text-[11px]">Filtrar por responsável</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAssigneeFilter('all')}>Todos</DropdownMenuItem>
+              {crew.map(u => (
+                <DropdownMenuItem key={u.id} onClick={() => setAssigneeFilter(u.id)}>{u.name}</DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            size="sm"
+            variant={hideDone ? 'default' : 'outline'}
+            className="h-8 gap-1.5 text-[12px]"
+            onClick={() => setHideDone(v => !v)}
+          >
+            <EyeOff className="h-3.5 w-3.5" /> Ocultar concluídas
+          </Button>
+
           <Button
             size="sm"
             variant="outline"
@@ -286,13 +346,13 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               }
             }}
           >
-            <Trash2 className="h-3.5 w-3.5" /> Excluir
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-3">
-        {BOARD_STATUSES.map(status => {
+        {visibleStatuses.map(status => {
           const meta = STATUS_META[status];
           const items = tasks
             .filter(t => t.status === status)
@@ -302,6 +362,7 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               if (r !== 0) return r;
               return (a.dueDate ?? '9999').localeCompare(b.dueDate ?? '9999');
             });
+          const lateHere = items.filter(t => status !== 'concluido' && status !== 'aprovacao_cliente' && isBeforeToday(t.dueDate)).length;
           return (
             <div
               key={status}
@@ -310,14 +371,20 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               onDrop={() => drop(status)}
               className={cn(
                 'flex w-[280px] shrink-0 flex-col rounded-2xl border bg-muted/20 p-2.5 transition-colors',
-                overStatus === status ? 'border-foreground/40 bg-muted/50' : 'border-border/60',
+                overStatus === status ? 'border-foreground/40 bg-muted/50 ring-2 ring-foreground/10' : 'border-border/60',
               )}
             >
               <div className="mb-2 flex items-center gap-2 px-1">
                 <span className={cn('h-2 w-2 rounded-full', meta.dot)} />
                 <span className="text-[11.5px] font-semibold uppercase tracking-[0.12em]">{meta.label}</span>
+                {lateHere > 0 && (
+                  <span className="rounded-full bg-red-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:text-red-300">
+                    {lateHere} atrasada{lateHere > 1 ? 's' : ''}
+                  </span>
+                )}
                 <span className="ml-auto font-mono text-[10px] text-muted-foreground">{items.length}</span>
               </div>
+
 
               <div className="flex flex-col gap-2">
                 {items.map(task => (
