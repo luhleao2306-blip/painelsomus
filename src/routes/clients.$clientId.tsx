@@ -228,10 +228,6 @@ function ClientDetailPage() {
                   <FileText className="h-4 w-4" />
                   Documentos ({clientDocs.length})
                 </TabsTrigger>
-                <TabsTrigger value="contracts" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">
-                  <FileBadge className="h-4 w-4" />
-                  Contratos ({clientContracts.length})
-                </TabsTrigger>
                 <TabsTrigger value="meetings" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">
                   <UsersRound className="h-4 w-4" />
                   Atas ({clientMinutes.length})
