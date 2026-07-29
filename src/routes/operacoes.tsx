@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import {
-  LayoutDashboard, FolderKanban, LayoutTemplate,
+  LayoutDashboard, FolderKanban, LayoutTemplate, Building2,
   ClipboardList, TrendingUp, Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/operacoes')({
 const NAV = [
   { to: '/operacoes',              label: 'Visão Geral',   icon: LayoutDashboard, exact: true },
   { to: '/operacoes/projetos',     label: 'Projetos',      icon: FolderKanban },
+  { to: '/operacoes/somus',        label: 'Projeto Somus', icon: Building2 },
   { to: '/operacoes/modelos',      label: 'Modelos',       icon: LayoutTemplate },
   { to: '/operacoes/formularios',  label: 'Formulários',   icon: ClipboardList },
   { to: '/operacoes/performance',  label: 'Performance',   icon: TrendingUp },
