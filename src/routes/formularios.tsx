@@ -86,7 +86,7 @@ function useClientOptions() {
   });
 }
 
-function FormulariosPage() {
+export function VisaoClientesPanel({ embedded = false }: { embedded?: boolean }) {
   const [q, setQ] = useState('');
   const { data: submissions = [], isLoading: loadingSubs } = usePublicSubmissions();
   const { data: requests = [], isLoading: loadingReqs } = useClientFormRequests();
@@ -125,14 +125,17 @@ function FormulariosPage() {
   }, [submissions, requests]);
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Relacionamento
-            </p>
-            <h1 className="mt-1 font-display text-3xl">Visão de Clientes</h1>
+            {!embedded && (
+              <>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Relacionamento
+                </p>
+                <h1 className="mt-1 font-display text-3xl">Visão de Clientes</h1>
+              </>
+            )}
             <p className="mt-1 text-sm text-muted-foreground">
               Gere links de formulário e acompanhe tudo o que os clientes responderam.
             </p>
@@ -141,6 +144,7 @@ function FormulariosPage() {
             <Link2 className="mr-1.5 h-4 w-4" /> Gerar link de formulário
           </Button>
         </div>
+
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard icon={Inbox} label="Respostas recebidas" value={stats.total} />
@@ -325,6 +329,13 @@ function FormulariosPage() {
 
         <GenerateLinkDialog open={genOpen} onOpenChange={setGenOpen} />
       </div>
+  );
+}
+
+function FormulariosPage() {
+  return (
+    <MainLayout>
+      <VisaoClientesPanel />
     </MainLayout>
   );
 }
