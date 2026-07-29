@@ -70,6 +70,34 @@ function OperacoesPainel() {
     return { user: u, items };
   }).sort((a, b) => b.items.length - a.items.length);
 
+  // Demandas do Projeto Somus (pasta interna)
+  const somus = useMemo(() => {
+    const folder = store.folders.find(f => f.name.toLowerCase() === 'projeto somus');
+    if (!folder) return { open: [] as { t: typeof store.tasks[number]; d: Date | null; projectName: string }[], late: 0 };
+    const projects = store.projects.filter(p => p.folderId === folder.id);
+    const projById = new Map(projects.map(p => [p.id, p.name]));
+    const secToProj = new Map(
+      store.sections.filter(s => projById.has(s.projectId)).map(s => [s.id, s.projectId]),
+    );
+    const rows = store.tasks
+      .filter(t => secToProj.has(t.sectionId) && t.status !== 'concluido')
+      .map(t => ({
+        t,
+        d: t.dueDate ? parseLocalDate(t.dueDate) : null,
+        projectName: projById.get(secToProj.get(t.sectionId)!) ?? '—',
+      }))
+      .sort((a, b) => {
+        if (!a.d && !b.d) return 0;
+        if (!a.d) return 1;
+        if (!b.d) return -1;
+        return a.d.getTime() - b.d.getTime();
+      });
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    const late = rows.filter(r => r.d && r.d < t0 && r.t.status !== 'aprovacao_cliente').length;
+    return { open: rows, late };
+  }, [store]);
+
+
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
     .map(t => ({ t, d: parseLocalDate(t.dueDate!)! }))
