@@ -224,15 +224,16 @@ function LoginPage() {
             Portal de acesso
           </p>
           <h1
-            className="mt-4 text-[56px] leading-[0.9] tracking-tight sm:text-[72px]"
+            className="mt-4 pb-2 text-[52px] leading-[1] tracking-tight sm:text-[64px]"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
             Somus<br />
             <span className="italic font-light">Hub.</span>
           </h1>
-          <p className="mt-6 text-lg font-light text-white/75">
+          <p className="mt-4 text-base font-light text-white/75 sm:text-lg">
             Sua operação, <span className="italic">centralizada.</span>
           </p>
+
 
           <form onSubmit={handleSubmit} className="mt-10 space-y-5 text-left">
             {mode === 'signup' && (
