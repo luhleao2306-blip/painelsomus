@@ -1,3 +1,4 @@
+import { InDevelopmentNotice } from '@/components/common/InDevelopmentNotice';
 import { createFileRoute } from '@tanstack/react-router';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

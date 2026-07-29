@@ -1,3 +1,4 @@
+import { InDevelopmentNotice } from '@/components/common/InDevelopmentNotice';
 import React, { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { MainLayout } from '@/components/layout/MainLayout';
