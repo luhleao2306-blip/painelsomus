@@ -214,7 +214,7 @@ function setState(next: Partial<Store>) { state = { ...state, ...next }; emit();
 // ============= Row mappers =============
 
 const rowToFolder = (r: any): OpFolder => ({ id: r.id, name: r.name });
-const rowToProject = (r: any): OpProject => ({ id: r.id, folderId: r.folder_id, name: r.name, status: r.status });
+const rowToProject = (r: any): OpProject => ({ id: r.id, folderId: r.folder_id, name: r.name, status: r.status, ownerId: r.owner_id ?? undefined });
 const rowToSection = (r: any): OpSection => ({ id: r.id, projectId: r.project_id, name: r.name, order: r.position });
 const rowToTask = (r: any): OpTask => ({
   id: r.id,
