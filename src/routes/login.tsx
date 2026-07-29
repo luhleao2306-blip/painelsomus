@@ -309,7 +309,7 @@ function LoginPage() {
 
             <Button
               type="submit"
-              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-medium text-[#0a0a0a] transition-all hover:bg-white/90"
+              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/95 text-sm font-medium text-black transition-all hover:bg-white hover:shadow-lg hover:shadow-white/10"
               disabled={loading}
             >
               {loading ? 'Processando...' : mode === 'signin' ? 'Entrar no Portal' : 'Criar Conta'}
