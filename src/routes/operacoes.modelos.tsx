@@ -38,16 +38,10 @@ function OperacoesModelos() {
           const totalTasks = tpl.sections.reduce((n, s) => n + s.tasks.length, 0);
           return (
             <div key={tpl.id} className="flex flex-col rounded-xl border border-border/60 bg-card p-5">
-              <div className="mb-3 flex items-center justify-between">
+              <div className="mb-3 flex items-center">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <LayoutTemplate className="h-5 w-5" />
                 </div>
-                <button
-                  onClick={() => { if (confirm(`Excluir modelo "${tpl.name}"?`)) opStore.removeTemplate(tpl.id); }}
-                  className="rounded p-1 text-destructive/70 hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
               </div>
               <h3 className="font-display text-base font-semibold">{tpl.name}</h3>
               <p className="mt-1 text-[11.5px] text-muted-foreground">
