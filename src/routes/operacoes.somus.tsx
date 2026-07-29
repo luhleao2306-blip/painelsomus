@@ -17,6 +17,7 @@ import {
   type OpStatus, type OpPriority, type OpTask,
 } from '@/lib/operacoes-store';
 import { formatLocalDate, isBeforeToday, isToday } from '@/lib/date-utils';
+import { NewInternalProjectDialog } from '@/components/operacoes/NewInternalProjectDialog';
 
 export const Route = createFileRoute('/operacoes/somus')({
   component: ProjetoSomusPage,
