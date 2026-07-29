@@ -124,47 +124,118 @@ function ProjetoSomusPage() {
       {projects.length === 0 ? (
         <EmptyState onCreate={() => setCreating(true)} />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           {/* Lista de projetos */}
           <aside className="space-y-2">
-            <div className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Iniciativas
+            <div className="flex items-center justify-between px-1">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Iniciativas
+              </span>
+              <span className="font-mono text-[10px] text-muted-foreground">{projects.length}</span>
             </div>
-            {projects.map(p => {
-              const ts = tasksOfProject(p.id);
-              const done = ts.filter(t => t.status === 'concluido').length;
-              const pct = ts.length ? Math.round((done / ts.length) * 100) : 0;
-              const isActive = active?.id === p.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedId(p.id)}
-                  className={cn(
-                    'group w-full rounded-xl border p-3 text-left transition-all',
-                    isActive
-                      ? 'border-foreground/40 bg-muted/50 shadow-sm'
-                      : 'border-border/60 bg-card hover:border-foreground/25 hover:bg-muted/30',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[13.5px] font-medium leading-snug">{p.name}</span>
-                    <span className="shrink-0 font-mono text-[10px] text-muted-foreground">{pct}%</span>
-                  </div>
-                  <Progress value={pct} className="mt-2 h-1" />
-                  <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
-                    <span>{ts.length} demandas</span>
-                    <span>·</span>
-                    <span>{done} concluídas</span>
-                  </div>
-                </button>
-              );
-            })}
+            {projects.map(p => (
+              <ProjectItem
+                key={p.id}
+                name={p.name}
+                tasks={tasksOfProject(p.id)}
+                users={store.users}
+                active={active?.id === p.id}
+                onSelect={() => setSelectedId(p.id)}
+                onRename={(n) => opStore.renameProject(p.id, n)}
+              />
+            ))}
           </aside>
 
           {/* Board */}
           {active && <ProjectBoard key={active.id} projectId={active.id} projectName={active.name} />}
         </div>
       )}
+    </div>
+  );
+}
+
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() ?? '').join('');
+}
+
+function ProjectItem({
+  name, tasks, users, active, onSelect, onRename,
+}: {
+  name: string;
+  tasks: OpTask[];
+  users: { id: string; name: string }[];
+  active: boolean;
+  onSelect: () => void;
+  onRename: (name: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+
+  const done = tasks.filter(t => t.status === 'concluido').length;
+  const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  const late = tasks.filter(t => t.status !== 'concluido' && t.status !== 'aprovacao_cliente' && isBeforeToday(t.dueDate)).length;
+  const crew = Array.from(new Set(tasks.map(t => t.assigneeId).filter(Boolean) as string[]))
+    .map(id => users.find(u => u.id === id)).filter(Boolean).slice(0, 4) as { id: string; name: string }[];
+
+  return (
+    <div
+      onClick={onSelect}
+      className={cn(
+        'group w-full cursor-pointer rounded-xl border p-3 text-left transition-all',
+        active
+          ? 'border-foreground/40 bg-muted/50 shadow-sm'
+          : 'border-border/60 bg-card hover:border-foreground/25 hover:bg-muted/30',
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        {editing ? (
+          <Input
+            autoFocus
+            value={draft}
+            onClick={e => e.stopPropagation()}
+            onChange={e => setDraft(e.target.value)}
+            onBlur={() => { if (draft.trim()) onRename(draft.trim()); setEditing(false); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { if (draft.trim()) onRename(draft.trim()); setEditing(false); }
+              if (e.key === 'Escape') { setDraft(name); setEditing(false); }
+            }}
+            className="h-7 px-1 text-[13.5px]"
+          />
+        ) : (
+          <span
+            className="text-[13.5px] font-medium leading-snug"
+            onDoubleClick={e => { e.stopPropagation(); setDraft(name); setEditing(true); }}
+            title="Duplo clique para renomear"
+          >
+            {name}
+          </span>
+        )}
+        <span className="shrink-0 font-mono text-[10px] text-muted-foreground">{pct}%</span>
+      </div>
+
+      <Progress value={pct} className="mt-2 h-1" />
+
+      <div className="mt-2 flex items-center gap-2">
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <span>{tasks.length} demandas</span>
+          {late > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-700 dark:text-red-300">
+              <AlertTriangle className="h-2.5 w-2.5" />{late}
+            </span>
+          )}
+        </div>
+        <div className="ml-auto flex -space-x-1.5">
+          {crew.map(u => (
+            <span
+              key={u.id}
+              title={u.name}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-background bg-muted text-[9px] font-semibold text-muted-foreground"
+            >
+              {initials(u.name)}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
