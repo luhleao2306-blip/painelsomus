@@ -535,8 +535,13 @@ const bg = (p: any, options?: SyncOptions) => {
         raiseSyncError(failed.error.message ?? String(failed.error));
         return;
       }
-      clearSyncOptions(options);
+      // Só liberamos a marcação "pendente" depois de reler a nuvem já com o
+      // registro gravado — senão um refresh em voo (realtime) apagaria o item
+      // recém-criado da tela.
       setState({ _syncing: false, _lastSyncError: null });
+      void refreshFromCloud().finally(() => {
+        clearSyncOptions(options);
+      });
     })
     .catch((e: any) => {
       if (count < 2) {
