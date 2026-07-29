@@ -214,29 +214,6 @@ function ClientDetailPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 shadow-sm bg-primary text-primary-foreground p-6 overflow-hidden relative group">
-                <div className="absolute top-0 right-0 p-8 opacity-10 scale-150 transition-transform group-hover:scale-[1.7]">
-                  <FileBadge className="h-32 w-32" />
-                </div>
-                <div className="space-y-4 relative z-10">
-                   <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center">
-                     <FileBadge className="h-6 w-6" />
-                   </div>
-                   <div className="space-y-1">
-                     <h4 className="font-bold text-lg">Contrato Digital</h4>
-                     <p className="text-xs text-white/70">Status: {clientContracts[0]?.status || 'Consultar'}</p>
-                 </div>
-                     <Button 
-                     variant="secondary" 
-                     className="w-full font-bold h-10 gap-2"
-                     disabled={clientContracts.length === 0}
-                      onClick={() => navigate({ to: '/contracts/$contractId', params: { contractId: clientContracts[0]?.id ?? '' } })}
-                   >
-                     <Eye className="h-4 w-4" />
-                     Ver Contrato
-                   </Button>
-                </div>
-            </Card>
           </div>
 
           {/* Conteúdo Dinâmico */}
