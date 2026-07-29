@@ -2688,6 +2688,7 @@ export type Database = {
           folder_id: string | null
           id: string
           name: string
+          owner_id: string | null
           status: string
           updated_at: string
         }
@@ -2696,6 +2697,7 @@ export type Database = {
           folder_id?: string | null
           id: string
           name: string
+          owner_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -2704,6 +2706,7 @@ export type Database = {
           folder_id?: string | null
           id?: string
           name?: string
+          owner_id?: string | null
           status?: string
           updated_at?: string
         }

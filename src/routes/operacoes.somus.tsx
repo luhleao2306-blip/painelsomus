@@ -137,11 +137,13 @@ function ProjetoSomusPage() {
               <ProjectItem
                 key={p.id}
                 name={p.name}
+                ownerId={p.ownerId}
                 tasks={tasksOfProject(p.id)}
                 users={store.users}
                 active={active?.id === p.id}
                 onSelect={() => setSelectedId(p.id)}
                 onRename={(n) => opStore.renameProject(p.id, n)}
+                onSetOwner={(uid) => opStore.setProjectOwner(p.id, uid)}
               />
             ))}
           </aside>
@@ -159,17 +161,21 @@ function initials(name: string) {
 }
 
 function ProjectItem({
-  name, tasks, users, active, onSelect, onRename,
+  name, ownerId, tasks, users, active, onSelect, onRename, onSetOwner,
 }: {
   name: string;
+  ownerId?: string;
   tasks: OpTask[];
   users: { id: string; name: string }[];
   active: boolean;
   onSelect: () => void;
   onRename: (name: string) => void;
+  onSetOwner: (ownerId?: string) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
+  const owner = users.find(u => u.id === ownerId);
+
 
   const done = tasks.filter(t => t.status === 'concluido').length;
   const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
@@ -214,6 +220,34 @@ function ProjectItem({
       </div>
 
       <Progress value={pct} className="mt-2 h-1" />
+
+      <div className="mt-2" onClick={e => e.stopPropagation()}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10.5px] font-medium transition-colors',
+                owner
+                  ? 'border-foreground/20 bg-muted/60 text-foreground'
+                  : 'border-dashed border-border text-muted-foreground hover:text-foreground',
+              )}
+              title="Responsável pelo projeto"
+            >
+              <User2 className="h-3 w-3" />
+              {owner?.name ?? 'Definir responsável'}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="max-h-64 overflow-y-auto">
+            <DropdownMenuLabel className="text-[11px]">Responsável pelo projeto</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onSetOwner(undefined)}>Sem responsável</DropdownMenuItem>
+            {users.map(u => (
+              <DropdownMenuItem key={u.id} onClick={() => onSetOwner(u.id)}>{u.name}</DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
 
       <div className="mt-2 flex items-center gap-2">
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">

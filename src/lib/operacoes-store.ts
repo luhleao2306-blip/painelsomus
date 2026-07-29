@@ -57,7 +57,7 @@ export type OpTask = {
 };
 
 export type OpSection = { id: string; projectId: string; name: string; order: number };
-export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado' };
+export type OpProject = { id: string; folderId: string; name: string; status: 'nao_iniciado' | 'em_andamento' | 'concluido' | 'pausado'; ownerId?: string };
 export type OpFolder = { id: string; name: string };
 
 export type OpTemplateTask = { name: string; subtasks: string[] };
@@ -214,7 +214,7 @@ function setState(next: Partial<Store>) { state = { ...state, ...next }; emit();
 // ============= Row mappers =============
 
 const rowToFolder = (r: any): OpFolder => ({ id: r.id, name: r.name });
-const rowToProject = (r: any): OpProject => ({ id: r.id, folderId: r.folder_id, name: r.name, status: r.status });
+const rowToProject = (r: any): OpProject => ({ id: r.id, folderId: r.folder_id, name: r.name, status: r.status, ownerId: r.owner_id ?? undefined });
 const rowToSection = (r: any): OpSection => ({ id: r.id, projectId: r.project_id, name: r.name, order: r.position });
 const rowToTask = (r: any): OpTask => ({
   id: r.id,
@@ -682,6 +682,15 @@ export const opStore = {
       rollback: () => setState({ projects: previous }),
     });
     return id;
+  },
+  setProjectOwner(id: string, ownerId?: string) {
+    const previous = state.projects;
+    pendingProjectIds.add(id);
+    setState({ projects: state.projects.map(p => p.id === id ? { ...p, ownerId } : p) });
+    bg(() => supabase.from('op_projects').update({ owner_id: ownerId ?? null, updated_at: new Date().toISOString() } as any).eq('id', id), {
+      pending: [{ set: pendingProjectIds, ids: [id] }],
+      rollback: () => setState({ projects: previous }),
+    });
   },
   renameProject(id: string, name: string) {
     const previous = state.projects;
