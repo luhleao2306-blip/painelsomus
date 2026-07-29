@@ -7,7 +7,6 @@ import {
   Briefcase, 
    
   FileText, 
-  FileSignature,
   UsersRound, 
   Settings, 
   LogOut,
