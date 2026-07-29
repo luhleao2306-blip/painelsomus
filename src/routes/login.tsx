@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { getRedirectPath } from '@/lib/auth-utils';
 import { useProfile } from '@/hooks/use-profile';
 import somusLogo from '@/assets/somus-logo.png';
-import loginHero from '@/assets/login-hero-dark.png.asset.json';
+import loginHeroAsset from '@/assets/login-hero-dark.png.asset.json';
 import { ShieldCheck, LineChart, Layers, ArrowRight, User, Lock, Eye, EyeOff } from 'lucide-react';
 
 export const Route = createFileRoute('/login')({
@@ -36,6 +36,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!authReady || profileLoading || loading || hasRedirected) return;
@@ -178,7 +179,7 @@ function LoginPage() {
     >
       {/* Fundo full-bleed */}
       <img
-        src={loginHero}
+        src={loginHeroAsset.url}
         alt=""
         aria-hidden
         className="pointer-events-none absolute inset-0 h-full w-full object-cover"
