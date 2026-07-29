@@ -329,6 +329,13 @@ function FormulariosPage() {
 
         <GenerateLinkDialog open={genOpen} onOpenChange={setGenOpen} />
       </div>
+  );
+}
+
+function FormulariosPage() {
+  return (
+    <MainLayout>
+      <VisaoClientesPanel />
     </MainLayout>
   );
 }
