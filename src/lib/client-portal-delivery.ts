@@ -61,8 +61,8 @@ export function useClientDemandsAdmin(clientId?: string) {
         .in('section_id', sectionIds);
       if (te) throw te;
 
-      const projById = new Map((projects ?? []).map((p: any) => [p.id, p]));
-      const secById = new Map((sections ?? []).map((s: any) => [s.id, s]));
+      const projById = new Map<string, any>((projects ?? []).map((p: any) => [p.id, p]));
+      const secById = new Map<string, any>((sections ?? []).map((s: any) => [s.id, s]));
 
       return (tasks ?? []).map((t: any) => {
         const sec = secById.get(t.section_id);
