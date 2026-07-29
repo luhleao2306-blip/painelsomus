@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
   Building2, Plus, Trash2, CalendarDays, Flag, User2, Sparkles, Search, EyeOff,
-  CheckCircle2, Clock, AlertTriangle, ListChecks, X,
+  CheckCircle2, Clock, AlertTriangle, ListChecks,
 } from 'lucide-react';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
 import { Button } from '@/components/ui/button';
