@@ -162,7 +162,7 @@ const navigationSections: NavSection[] = [
     label: 'Alcateia',
     items: [
       { title: 'A Alcateia (Cultura)', icon: Mountain, href: '/alcateia', roles: ['master', 'project_manager', 'consultant'] },
-      { title: 'Playlist Somus', icon: Music, href: '/alcateia/playlist', roles: ['master', 'project_manager', 'consultant'] },
+      // { title: 'Playlist Somus', icon: Music, href: '/alcateia/playlist', roles: ['master', 'project_manager', 'consultant'] }, // oculto por enquanto
       { title: 'Dashboard', icon: Trophy, href: '/gamificacao', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Galeria do Lobo', icon: ImageIcon, href: '/gamificacao/galeria-do-lobo', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Pins & Conquistas', icon: Award, href: '/gamificacao/pins', roles: ['master', 'project_manager', 'consultant'] },
