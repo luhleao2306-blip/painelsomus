@@ -62,9 +62,11 @@ export function RegistrationsListPage() {
           <TabsList className="h-9">
             <TabsTrigger value="registrations" className="text-xs">Cadastros</TabsTrigger>
             <TabsTrigger value="invites" className="text-xs">Convites</TabsTrigger>
+            <TabsTrigger value="visao" className="text-xs">Visão de Clientes</TabsTrigger>
           </TabsList>
           <TabsContent value="registrations" className="mt-3"><RegistrationsTab /></TabsContent>
           <TabsContent value="invites" className="mt-3"><InvitesTab /></TabsContent>
+          <TabsContent value="visao" className="mt-3"><VisaoClientesPanel embedded /></TabsContent>
         </Tabs>
         <NewClientDialog open={newClientOpen} onOpenChange={setNewClientOpen} />
       </div>
