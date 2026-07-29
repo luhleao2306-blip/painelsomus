@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { useOpStore, STATUS_META, getTaskClientName, type OpTask } from '@/lib/operacoes-store';
+import { useOpStore, STATUS_META, getTaskClientName, opStore, type OpTask } from '@/lib/operacoes-store';
 import { parseLocalDate } from '@/lib/date-utils';
-import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame, Users, Trophy, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame, Users, Trophy, TrendingUp, Radio } from 'lucide-react';
 import somusLogoUrl from '@/assets/somus-logo.png';
 
 export const Route = createFileRoute('/tv')({
