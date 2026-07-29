@@ -104,7 +104,10 @@ function TvDashboard() {
       bucketPush.push(t);
     }
 
+    const priorityRank = (p: OpTask['priority']) => (p === 'alta' ? 0 : p === 'media' ? 1 : 2);
     const sortByDate = (a: OpTask, b: OpTask) => {
+      const pr = priorityRank(a.priority) - priorityRank(b.priority);
+      if (pr !== 0) return pr;
       const da = a.dueDate ?? '9999-12-31';
       const db = b.dueDate ?? '9999-12-31';
       return da.localeCompare(db);
