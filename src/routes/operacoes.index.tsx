@@ -5,7 +5,7 @@ import {
   useOpStore, STATUS_META, STATUS_ORDER, CARGO_COLOR_MAP, getTaskClientName, type OpStatus,
 } from '@/lib/operacoes-store';
 import {
-  Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star,
+  Crown, Megaphone, Brush, Diamond, Bot, Zap, Rocket, Star, Building2,
   Flame, Target, AlertTriangle, CheckCircle2, ArrowRight, Activity, CalendarClock, Sparkles, ListTodo,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -69,6 +69,34 @@ function OperacoesPainel() {
       .sort((a, b) => a.d.getTime() - b.d.getTime());
     return { user: u, items };
   }).sort((a, b) => b.items.length - a.items.length);
+
+  // Demandas do Projeto Somus (pasta interna)
+  const somus = useMemo(() => {
+    const folder = store.folders.find(f => f.name.toLowerCase() === 'projeto somus');
+    if (!folder) return { open: [] as { t: typeof store.tasks[number]; d: Date | null; projectName: string }[], late: 0 };
+    const projects = store.projects.filter(p => p.folderId === folder.id);
+    const projById = new Map(projects.map(p => [p.id, p.name]));
+    const secToProj = new Map(
+      store.sections.filter(s => projById.has(s.projectId)).map(s => [s.id, s.projectId]),
+    );
+    const rows = store.tasks
+      .filter(t => secToProj.has(t.sectionId) && t.status !== 'concluido')
+      .map(t => ({
+        t,
+        d: t.dueDate ? parseLocalDate(t.dueDate) : null,
+        projectName: projById.get(secToProj.get(t.sectionId)!) ?? '—',
+      }))
+      .sort((a, b) => {
+        if (!a.d && !b.d) return 0;
+        if (!a.d) return 1;
+        if (!b.d) return -1;
+        return a.d.getTime() - b.d.getTime();
+      });
+    const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    const late = rows.filter(r => r.d && r.d < t0 && r.t.status !== 'aprovacao_cliente').length;
+    return { open: rows, late };
+  }, [store]);
+
 
   const upcoming = store.tasks
     .filter(t => t.dueDate && t.status !== 'concluido')
@@ -330,6 +358,111 @@ function OperacoesPainel() {
             })}
           </div>
         </div>
+
+        {/* Demandas do Projeto Somus */}
+        <div className="lg:col-span-12 rounded-2xl border border-border/70 bg-card p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-semibold inline-flex items-center gap-2">
+                <Building2 className="h-4 w-4" /> Demandas do Projeto Somus
+              </h2>
+              <p className="text-[11px] text-muted-foreground">
+                O que a alcateia está construindo para dentro de casa
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full border border-border bg-muted/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                {somus.open.length} abertas
+              </span>
+              {somus.late > 0 && (
+                <span className="rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-red-600 dark:text-red-400">
+                  {somus.late} em atraso
+                </span>
+              )}
+              <Link to="/operacoes/somus" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground hover:text-foreground">
+                Abrir módulo <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+
+          {somus.open.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border/60 p-6 text-center text-[12.5px] text-muted-foreground">
+              <Sparkles className="mx-auto mb-2 h-4 w-4" />
+              Nenhuma demanda interna aberta. <Link to="/operacoes/somus" className="underline">Criar projeto interno</Link>.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-border/60">
+              <table className="w-full border-collapse text-left">
+                <thead className="bg-muted/40">
+                  <tr className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground">
+                    <th className="px-3 py-2 font-semibold">Demanda</th>
+                    <th className="hidden px-3 py-2 font-semibold md:table-cell">Iniciativa</th>
+                    <th className="px-3 py-2 font-semibold">Status</th>
+                    <th className="hidden px-3 py-2 font-semibold sm:table-cell">Responsável</th>
+                    <th className="px-3 py-2 text-right font-semibold">Prazo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {somus.open.slice(0, 10).map(({ t, d, projectName }) => {
+                    const meta = STATUS_META[t.status];
+                    const assignee = store.users.find(u => u.id === t.assigneeId);
+                    const overdue = !!d && d < today && t.status !== 'aprovacao_cliente';
+                    const isToday = !!d && d.getTime() === today.getTime();
+                    return (
+                      <tr key={t.id} className="border-t border-border/50 transition hover:bg-muted/30">
+                        <td className="px-3 py-2.5">
+                          <Link to="/operacoes/somus" className="flex items-center gap-2">
+                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${meta.dot}`} />
+                            <span className="truncate text-[12.5px] font-medium">{t.name}</span>
+                          </Link>
+                        </td>
+                        <td className="hidden px-3 py-2.5 md:table-cell">
+                          <span className="inline-block max-w-[180px] truncate rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground">
+                            {projectName}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <span className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10.5px] ${meta.color}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
+                          </span>
+                        </td>
+                        <td className="hidden px-3 py-2.5 sm:table-cell">
+                          {assignee ? (
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-foreground font-mono text-[8.5px] font-bold text-background">
+                                {assignee.name.split(' ').map(p => p[0]).slice(0, 2).join('')}
+                              </span>
+                              <span className="text-[11.5px] text-muted-foreground">{assignee.name.split(' ')[0]}</span>
+                            </span>
+                          ) : (
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">sem dono</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2.5 text-right">
+                          <span className={`font-mono text-[10.5px] font-semibold uppercase tracking-wider ${
+                            overdue ? 'text-red-600 dark:text-red-400' : isToday ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'
+                          }`}>
+                            {d ? (overdue ? 'atraso' : isToday ? 'hoje' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')) : '—'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {somus.open.length > 10 && (
+                <Link
+                  to="/operacoes/somus"
+                  className="block border-t border-border/50 bg-muted/20 py-2 text-center font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition hover:bg-muted/40 hover:text-foreground"
+                >
+                  + {somus.open.length - 10} demandas internas
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+
+
 
 
         {/* Upcoming deadlines */}
