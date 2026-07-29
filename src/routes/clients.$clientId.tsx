@@ -25,6 +25,7 @@ import { Link } from '@tanstack/react-router';
 import { StatusBadge, ProjectCard, DocumentCard, EmptyState, TimelineStages } from '@/components/design-system/DesignSystem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MeetingsPanel } from '@/routes/meetings';
+import { ClientDocumentsPanel } from '@/components/clients/ClientDocumentsPanel';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useProfile } from '@/hooks/use-profile';
