@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 import { getRedirectPath } from '@/lib/auth-utils';
 import { useProfile } from '@/hooks/use-profile';
 import somusLogo from '@/assets/somus-logo.png';
-import loginHero from '@/assets/login-hero.jpg';
-import { ShieldCheck, LineChart, Layers, ArrowRight } from 'lucide-react';
+import loginHero from '@/assets/login-hero-dark.png.asset.json';
+import { ShieldCheck, LineChart, Layers, ArrowRight, User, Lock, Eye, EyeOff } from 'lucide-react';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
