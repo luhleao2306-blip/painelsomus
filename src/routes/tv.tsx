@@ -93,6 +93,7 @@ function TvDashboard() {
         }
         continue;
       }
+      if (t.status === 'aprovacao_cliente') continue; // aguardando cliente: não conta como atraso
       if (!t.dueDate) continue;
       const d = parseLocalDate(t.dueDate); if (!d) continue;
       const bucketPush =
