@@ -33,11 +33,22 @@ type Bucket = {
 function TvDashboard() {
   const store = useOpStore();
   const [now, setNow] = useState(() => new Date());
+  const [lastSync, setLastSync] = useState(() => new Date());
   const [assigneeFilter, setAssigneeFilter] = useState<string>('__all__');
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(id);
+    const clock = setInterval(() => setNow(new Date()), 30_000);
+    const doRefresh = () => opStore.refresh().then(() => setLastSync(new Date())).catch(() => {});
+    // primeiro pull imediato + polling de segurança a cada 15s (complementa o realtime)
+    doRefresh();
+    const poll = setInterval(doRefresh, 15_000);
+    const onVis = () => { if (document.visibilityState === 'visible') doRefresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(clock);
+      clearInterval(poll);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, []);
 
   // Users que têm ao menos uma tarefa (para não poluir o filtro)
