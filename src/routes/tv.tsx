@@ -159,7 +159,13 @@ function TvDashboard() {
           <img src={somusLogoUrl} alt="Somus" className="h-11 w-auto object-contain" />
           <div className="h-10 w-px bg-border" />
           <div>
-            <div className="somus-eyebrow text-muted-foreground">Painel da Alcateia</div>
+            <div className="somus-eyebrow text-muted-foreground flex items-center gap-2">
+              Painel da Alcateia
+              <span className="inline-flex items-center gap-1 text-emerald-600 normal-case tracking-normal">
+                <Radio className="h-3 w-3 animate-pulse" />
+                ao vivo · {lastSync.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
             <div className="font-serif italic text-2xl tracking-tight text-foreground">{currentAssigneeName}</div>
           </div>
         </div>
