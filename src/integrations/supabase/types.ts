@@ -735,6 +735,47 @@ export type Database = {
           },
         ]
       }
+      client_useful_links: {
+        Row: {
+          category: string | null
+          client_id: string
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string | null
+          client_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string | null
+          client_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_useful_links_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           birthday: string | null
@@ -2607,24 +2648,35 @@ export type Database = {
       }
       op_folders: {
         Row: {
+          client_id: string | null
           created_at: string
           id: string
           name: string
           updated_at: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           id: string
           name: string
           updated_at?: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           id?: string
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "op_folders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       op_form_answers: {
         Row: {
@@ -2792,6 +2844,7 @@ export type Database = {
         Row: {
           assignee_id: string | null
           checklist: Json
+          client_visible: boolean
           comments: Json
           created_at: string
           due_date: string | null
@@ -2809,6 +2862,7 @@ export type Database = {
         Insert: {
           assignee_id?: string | null
           checklist?: Json
+          client_visible?: boolean
           comments?: Json
           created_at?: string
           due_date?: string | null
@@ -2826,6 +2880,7 @@ export type Database = {
         Update: {
           assignee_id?: string | null
           checklist?: Json
+          client_visible?: boolean
           comments?: Json
           created_at?: string
           due_date?: string | null
@@ -4330,6 +4385,18 @@ export type Database = {
           signature_status: string
           signed_at: string
           version: number
+        }[]
+      }
+      get_my_client_demands: {
+        Args: never
+        Returns: {
+          delivered_at: string
+          due_date: string
+          folder_name: string
+          id: string
+          name: string
+          project_name: string
+          situation: string
         }[]
       }
       get_my_client_id: { Args: never; Returns: string }
