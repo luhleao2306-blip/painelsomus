@@ -546,7 +546,7 @@ function TaskCard({
           <PopoverContent
             align="start"
             className="w-auto space-y-2 p-2"
-            onPointerDown={e => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
           >
             <input
               type="date"
