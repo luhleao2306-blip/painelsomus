@@ -165,7 +165,7 @@ function TvDashboard() {
       {/* Header */}
       <header className="flex items-center justify-between px-10 py-6 border-b border-border">
         <div className="flex items-center gap-5">
-          <img src={somusLogoUrl} alt="Somus" className="h-11 w-auto object-contain" />
+          <img src={somusLogoUrl} alt="Somus" className="h-11 w-auto object-contain dark:invert" />
           <div className="h-10 w-px bg-border" />
           <div>
             <div className="somus-eyebrow text-muted-foreground flex items-center gap-2">
