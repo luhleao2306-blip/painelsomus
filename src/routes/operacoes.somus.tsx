@@ -387,6 +387,11 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
 
 
               <div className="flex flex-col gap-2">
+                {items.length === 0 && adding !== status && (
+                  <div className="rounded-xl border border-dashed border-border/50 px-2.5 py-4 text-center text-[11px] text-muted-foreground">
+                    {overStatus === status ? 'Solte aqui' : 'Nada por aqui'}
+                  </div>
+                )}
                 {items.map(task => (
                   <TaskCard
                     key={task.id}
@@ -396,6 +401,7 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
                     onDragEnd={() => setDragId(null)}
                   />
                 ))}
+
 
                 {adding === status ? (
                   <div className="rounded-xl border border-dashed border-foreground/30 bg-card p-2">
