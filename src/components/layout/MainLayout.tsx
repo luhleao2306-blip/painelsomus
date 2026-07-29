@@ -18,7 +18,6 @@ import {
   Timer,
   UserCog,
   Library,
-  Workflow,
   BookOpen,
   BookOpenCheck,
   CalendarDays,
