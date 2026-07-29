@@ -22,6 +22,7 @@ import {
 import {
   listRegistrations, listInvites, createInvite, invalidateInvite, deleteRegistration,
 } from '@/lib/onboarding.functions';
+import { VisaoClientesPanel } from '@/routes/formularios';
 
 export const Route = createFileRoute('/registrations')({
   component: () => <Outlet />,
