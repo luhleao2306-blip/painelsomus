@@ -117,8 +117,6 @@ const navigationSections: NavSection[] = [
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
       { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
 
-      { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
-
 
       { title: 'Cofre de Senhas', icon: KeyRound, href: '/operacoes/senhas', roles: ['master', 'project_manager', 'consultant'] },
     ],
