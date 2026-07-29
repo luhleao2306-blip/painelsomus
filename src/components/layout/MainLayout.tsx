@@ -115,6 +115,7 @@ const navigationSections: NavSection[] = [
       { title: 'Painel de Operações', icon: LayoutDashboard, href: '/operacoes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Processos & POPs', icon: Workflow, href: '/processes', roles: ['master', 'project_manager', 'consultant'] },
       { title: 'Agenda', icon: CalendarDays, href: '/agenda', roles: ['master', 'project_manager', 'consultant', 'client'] },
+      { title: 'Meu Painel', icon: LayoutDashboard, href: '/cliente/painel', roles: ['client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
       { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
@@ -221,6 +222,7 @@ const routeAccess: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/cliente/glossario', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/cliente/trilhas', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/cliente/metas', roles: ['client'] },
+  { prefix: '/cliente/painel', roles: ['master', 'project_manager', 'consultant', 'client'] },
   { prefix: '/portal-cliente', roles: ['master', 'project_manager'] },
   { prefix: '/somus-ia', roles: ['master', 'project_manager', 'consultant', 'client'] },
 ];
