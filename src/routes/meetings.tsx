@@ -259,9 +259,10 @@ function MeetingsPage() {
   };
 
   return (
-    <MainLayout>
+    <>
       <div className="space-y-8">
         {/* Header */}
+        {!embedded && (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight">Atas de Reunião</h1>
@@ -273,10 +274,11 @@ function MeetingsPage() {
             </Button>
           )}
         </div>
+        )}
 
         {/* Filtros — apenas cliente + período opcional */}
         <div className="flex flex-wrap items-end gap-2 border-b pb-3">
-          {role !== 'client' && (
+          {role !== 'client' && !clientId && (
             <div className="space-y-1">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Cliente</Label>
               <Select value={clientFilter} onValueChange={setClientFilter}>
@@ -298,13 +300,19 @@ function MeetingsPage() {
               <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="h-8 w-[140px] text-xs" />
             </div>
           </div>
-          {((role !== 'client' && clientFilter !== 'all') || startDate || endDate) && (
+          {((role !== 'client' && !clientId && clientFilter !== 'all') || startDate || endDate) && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 gap-1 text-xs">
               <X className="h-3 w-3" /> Limpar
             </Button>
           )}
+          {embedded && canManage && (
+            <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setIsAdding(true)}>
+              <Plus className="h-3.5 w-3.5" /> Nova Ata
+            </Button>
+          )}
           <span className="ml-auto text-xs text-muted-foreground">{filtered.length} ata(s)</span>
         </div>
+
 
         {/* Lista fina, estilo task-list */}
         <div className="divide-y rounded-lg border bg-card">
