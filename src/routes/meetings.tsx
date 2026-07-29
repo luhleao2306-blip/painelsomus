@@ -30,8 +30,16 @@ import { useAssignableUsers } from '@/components/shared/AssigneeSelect';
 
 
 export const Route = createFileRoute('/meetings')({
-  component: MeetingsPage,
+  component: MeetingsRoute,
 });
+
+function MeetingsRoute() {
+  return (
+    <MainLayout>
+      <MeetingsPanel />
+    </MainLayout>
+  );
+}
 
 const STATUSES: MeetingMinuteStatus[] = ['Rascunho', 'Revisada', 'Enviada ao cliente', 'Aprovada', 'Arquivada'];
 const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -46,7 +54,7 @@ const statusVariant: Record<MeetingMinuteStatus, 'secondary' | 'default' | 'outl
 
 interface ProfileLite { id: string; full_name: string | null; }
 
-function MeetingsPage() {
+export function MeetingsPanel({ clientId, embedded }: { clientId?: string; embedded?: boolean } = {}) {
   const { role } = useProfile();
   const { filteredMinutes, clients, projects, addMinute, updateMinute, deleteMinute, refreshMinutes } = useData();
 
@@ -60,7 +68,7 @@ function MeetingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emptyMinute = {
     title: '',
-    clientId: '',
+    clientId: clientId ?? '',
     projectId: '',
     date: new Date().toISOString().split('T')[0],
     attendees: '' as string,
@@ -170,7 +178,8 @@ function MeetingsPage() {
   };
 
   // Filters — only client + optional period
-  const [clientFilter, setClientFilter] = useState<string>('all');
+  const [clientFilter, setClientFilter] = useState<string>(clientId ?? 'all');
+  useEffect(() => { setClientFilter(clientId ?? 'all'); }, [clientId]);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
