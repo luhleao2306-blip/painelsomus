@@ -583,6 +583,25 @@ export const opStore = {
   subscribe(l: () => void) { listeners.add(l); return () => listeners.delete(l); },
   get() { return state; },
   hydrate,
+  async refresh() {
+    try {
+      const data = await fetchAll();
+      setState({
+        ...data,
+        folders: mergePendingRows(data.folders, state.folders, pendingFolderIds, deletingFolderIds),
+        templates: mergePendingRows(data.templates, state.templates, pendingTemplateIds, deletingTemplateIds),
+        projects: mergePendingRows(data.projects, state.projects, pendingProjectIds, deletingProjectIds),
+        sections: mergePendingRows(data.sections, state.sections, pendingSectionIds, deletingSectionIds),
+        tasks: mergePendingRows(data.tasks, state.tasks, pendingTaskIds, deletingTaskIds),
+        forms: mergePendingRows(data.forms, state.forms, pendingFormIds, deletingFormIds),
+        formAnswers: mergePendingRows(data.formAnswers, state.formAnswers, pendingFormAnswerIds, deletingFormAnswerIds),
+        senhas: mergePendingRows(data.senhas, state.senhas, pendingSenhaIds, deletingSenhaIds),
+        _lastSyncError: null,
+      });
+    } catch (e: any) {
+      raiseSyncError(e?.message ?? 'Falha ao atualizar Operações.');
+    }
+  },
   async forceSyncLegacy() {
     const res = await migrateLegacyIfNeeded(true);
     if (res.ok) {

@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { useOpStore, STATUS_META, getTaskClientName, type OpTask } from '@/lib/operacoes-store';
+import { useOpStore, STATUS_META, getTaskClientName, opStore, type OpTask } from '@/lib/operacoes-store';
 import { parseLocalDate } from '@/lib/date-utils';
-import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame, Users, Trophy, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, Clock, ArrowLeft, Flame, Users, Trophy, TrendingUp, Radio } from 'lucide-react';
 import somusLogoUrl from '@/assets/somus-logo.png';
 
 export const Route = createFileRoute('/tv')({
@@ -33,11 +33,22 @@ type Bucket = {
 function TvDashboard() {
   const store = useOpStore();
   const [now, setNow] = useState(() => new Date());
+  const [lastSync, setLastSync] = useState(() => new Date());
   const [assigneeFilter, setAssigneeFilter] = useState<string>('__all__');
 
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);
-    return () => clearInterval(id);
+    const clock = setInterval(() => setNow(new Date()), 30_000);
+    const doRefresh = () => opStore.refresh().then(() => setLastSync(new Date())).catch(() => {});
+    // primeiro pull imediato + polling de segurança a cada 15s (complementa o realtime)
+    doRefresh();
+    const poll = setInterval(doRefresh, 15_000);
+    const onVis = () => { if (document.visibilityState === 'visible') doRefresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      clearInterval(clock);
+      clearInterval(poll);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, []);
 
   // Users que têm ao menos uma tarefa (para não poluir o filtro)
@@ -148,7 +159,13 @@ function TvDashboard() {
           <img src={somusLogoUrl} alt="Somus" className="h-11 w-auto object-contain" />
           <div className="h-10 w-px bg-border" />
           <div>
-            <div className="somus-eyebrow text-muted-foreground">Painel da Alcateia</div>
+            <div className="somus-eyebrow text-muted-foreground flex items-center gap-2">
+              Painel da Alcateia
+              <span className="inline-flex items-center gap-1 text-emerald-600 normal-case tracking-normal">
+                <Radio className="h-3 w-3 animate-pulse" />
+                ao vivo · {lastSync.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
             <div className="font-serif italic text-2xl tracking-tight text-foreground">{currentAssigneeName}</div>
           </div>
         </div>
