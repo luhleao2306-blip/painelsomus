@@ -195,27 +195,8 @@ function LoginPage() {
         </span>
       </header>
 
-      {/* Cartões laterais */}
-      <div className="pointer-events-none absolute left-10 top-1/2 z-10 hidden w-[210px] -translate-y-1/2 flex-col gap-2.5 xl:flex 2xl:left-16">
-        {[
-          { icon: Layers, label: 'Visão completa', desc: 'Todos os seus projetos em tempo real' },
-          { icon: LineChart, label: 'Decisões rápidas', desc: 'Indicadores e relatórios sempre à mão' },
-          { icon: ShieldCheck, label: 'Seguro por padrão', desc: 'Acesso restrito e auditado' },
-        ].map(({ icon: Icon, label, desc }) => (
-          <div
-            key={label}
-            className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3.5 backdrop-blur-md"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10">
-              <Icon className="h-3.5 w-3.5 text-white" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[13px] font-semibold leading-tight text-white">{label}</p>
-              <p className="mt-1 text-[11px] leading-snug text-white/55">{desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+
+
 
       {/* Conteúdo central */}
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-10">
