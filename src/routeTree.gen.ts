@@ -74,16 +74,11 @@ import { Route as ComercialMetasRouteImport } from './routes/comercial.metas'
 import { Route as ComercialFunilRouteImport } from './routes/comercial.funil'
 import { Route as ClientsClientIdRouteImport } from './routes/clients.$clientId'
 import { Route as ClientePainelRouteImport } from './routes/cliente.painel'
-import { Route as ClienteMetasRouteImport } from './routes/cliente.metas'
-import { Route as ClienteGlossarioRouteImport } from './routes/cliente.glossario'
 import { Route as ClienteFormulariosRouteImport } from './routes/cliente.formularios'
-import { Route as ClienteAgentesRouteImport } from './routes/cliente.agentes'
 import { Route as BriefingTokenRouteImport } from './routes/briefing.$token'
 import { Route as AtasAtaIdRouteImport } from './routes/atas.$ataId'
 import { Route as AlcateiaPlaylistRouteImport } from './routes/alcateia.playlist'
-import { Route as ClienteTrilhasIndexRouteImport } from './routes/cliente.trilhas.index'
 import { Route as PAtaAtaIdRouteImport } from './routes/p.ata.$ataId'
-import { Route as ClienteTrilhasTrackIdRouteImport } from './routes/cliente.trilhas.$trackId'
 import { Route as ApiPublicVisaoSubmissionsRouteImport } from './routes/api/public/visao-submissions'
 import { Route as ClientesClienteIdProjetosProjetoIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId'
 import { Route as ClientesClienteIdProjetosProjetoIdAtasAtaIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId.atas.$ataId'
@@ -415,24 +410,9 @@ const ClientePainelRoute = ClientePainelRouteImport.update({
   path: '/cliente/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClienteMetasRoute = ClienteMetasRouteImport.update({
-  id: '/cliente/metas',
-  path: '/cliente/metas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClienteGlossarioRoute = ClienteGlossarioRouteImport.update({
-  id: '/cliente/glossario',
-  path: '/cliente/glossario',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ClienteFormulariosRoute = ClienteFormulariosRouteImport.update({
   id: '/cliente/formularios',
   path: '/cliente/formularios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClienteAgentesRoute = ClienteAgentesRouteImport.update({
-  id: '/cliente/agentes',
-  path: '/cliente/agentes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BriefingTokenRoute = BriefingTokenRouteImport.update({
@@ -450,19 +430,9 @@ const AlcateiaPlaylistRoute = AlcateiaPlaylistRouteImport.update({
   path: '/alcateia/playlist',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClienteTrilhasIndexRoute = ClienteTrilhasIndexRouteImport.update({
-  id: '/cliente/trilhas/',
-  path: '/cliente/trilhas/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PAtaAtaIdRoute = PAtaAtaIdRouteImport.update({
   id: '/p/ata/$ataId',
   path: '/p/ata/$ataId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClienteTrilhasTrackIdRoute = ClienteTrilhasTrackIdRouteImport.update({
-  id: '/cliente/trilhas/$trackId',
-  path: '/cliente/trilhas/$trackId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicVisaoSubmissionsRoute =
@@ -518,10 +488,7 @@ export interface FileRoutesByFullPath {
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
-  '/cliente/agentes': typeof ClienteAgentesRoute
   '/cliente/formularios': typeof ClienteFormulariosRoute
-  '/cliente/glossario': typeof ClienteGlossarioRoute
-  '/cliente/metas': typeof ClienteMetasRoute
   '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
@@ -558,9 +525,7 @@ export interface FileRoutesByFullPath {
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
-  '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
-  '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -593,10 +558,7 @@ export interface FileRoutesByTo {
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
-  '/cliente/agentes': typeof ClienteAgentesRoute
   '/cliente/formularios': typeof ClienteFormulariosRoute
-  '/cliente/glossario': typeof ClienteGlossarioRoute
-  '/cliente/metas': typeof ClienteMetasRoute
   '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
@@ -633,9 +595,7 @@ export interface FileRoutesByTo {
   '/registrations': typeof RegistrationsIndexRoute
   '/somus-ia': typeof SomusIaIndexRoute
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
-  '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
-  '/cliente/trilhas': typeof ClienteTrilhasIndexRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -674,10 +634,7 @@ export interface FileRoutesById {
   '/alcateia/playlist': typeof AlcateiaPlaylistRoute
   '/atas/$ataId': typeof AtasAtaIdRoute
   '/briefing/$token': typeof BriefingTokenRoute
-  '/cliente/agentes': typeof ClienteAgentesRoute
   '/cliente/formularios': typeof ClienteFormulariosRoute
-  '/cliente/glossario': typeof ClienteGlossarioRoute
-  '/cliente/metas': typeof ClienteMetasRoute
   '/cliente/painel': typeof ClientePainelRoute
   '/clients/$clientId': typeof ClientsClientIdRoute
   '/comercial/funil': typeof ComercialFunilRoute
@@ -714,9 +671,7 @@ export interface FileRoutesById {
   '/registrations/': typeof RegistrationsIndexRoute
   '/somus-ia/': typeof SomusIaIndexRoute
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
-  '/cliente/trilhas/$trackId': typeof ClienteTrilhasTrackIdRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
-  '/cliente/trilhas/': typeof ClienteTrilhasIndexRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -756,10 +711,7 @@ export interface FileRouteTypes {
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
-    | '/cliente/agentes'
     | '/cliente/formularios'
-    | '/cliente/glossario'
-    | '/cliente/metas'
     | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
@@ -796,9 +748,7 @@ export interface FileRouteTypes {
     | '/registrations/'
     | '/somus-ia/'
     | '/api/public/visao-submissions'
-    | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
-    | '/cliente/trilhas/'
     | '/clientes/$clienteId/projetos/$projetoId'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesByTo: FileRoutesByTo
@@ -831,10 +781,7 @@ export interface FileRouteTypes {
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
-    | '/cliente/agentes'
     | '/cliente/formularios'
-    | '/cliente/glossario'
-    | '/cliente/metas'
     | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
@@ -871,9 +818,7 @@ export interface FileRouteTypes {
     | '/registrations'
     | '/somus-ia'
     | '/api/public/visao-submissions'
-    | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
-    | '/cliente/trilhas'
     | '/clientes/$clienteId/projetos/$projetoId'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   id:
@@ -911,10 +856,7 @@ export interface FileRouteTypes {
     | '/alcateia/playlist'
     | '/atas/$ataId'
     | '/briefing/$token'
-    | '/cliente/agentes'
     | '/cliente/formularios'
-    | '/cliente/glossario'
-    | '/cliente/metas'
     | '/cliente/painel'
     | '/clients/$clientId'
     | '/comercial/funil'
@@ -951,9 +893,7 @@ export interface FileRouteTypes {
     | '/registrations/'
     | '/somus-ia/'
     | '/api/public/visao-submissions'
-    | '/cliente/trilhas/$trackId'
     | '/p/ata/$ataId'
-    | '/cliente/trilhas/'
     | '/clientes/$clienteId/projetos/$projetoId'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesById: FileRoutesById
@@ -992,10 +932,7 @@ export interface RootRouteChildren {
   AlcateiaPlaylistRoute: typeof AlcateiaPlaylistRoute
   AtasAtaIdRoute: typeof AtasAtaIdRoute
   BriefingTokenRoute: typeof BriefingTokenRoute
-  ClienteAgentesRoute: typeof ClienteAgentesRoute
   ClienteFormulariosRoute: typeof ClienteFormulariosRoute
-  ClienteGlossarioRoute: typeof ClienteGlossarioRoute
-  ClienteMetasRoute: typeof ClienteMetasRoute
   ClientePainelRoute: typeof ClientePainelRoute
   ContratoTokenRoute: typeof ContratoTokenRoute
   CronogramaTokenRoute: typeof CronogramaTokenRoute
@@ -1005,9 +942,7 @@ export interface RootRouteChildren {
   VfTokenRoute: typeof VfTokenRoute
   AlcateiaIndexRoute: typeof AlcateiaIndexRoute
   ApiPublicVisaoSubmissionsRoute: typeof ApiPublicVisaoSubmissionsRoute
-  ClienteTrilhasTrackIdRoute: typeof ClienteTrilhasTrackIdRoute
   PAtaAtaIdRoute: typeof PAtaAtaIdRoute
-  ClienteTrilhasIndexRoute: typeof ClienteTrilhasIndexRoute
   ClientesClienteIdProjetosProjetoIdRoute: typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
 }
 
@@ -1468,32 +1403,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientePainelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cliente/metas': {
-      id: '/cliente/metas'
-      path: '/cliente/metas'
-      fullPath: '/cliente/metas'
-      preLoaderRoute: typeof ClienteMetasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cliente/glossario': {
-      id: '/cliente/glossario'
-      path: '/cliente/glossario'
-      fullPath: '/cliente/glossario'
-      preLoaderRoute: typeof ClienteGlossarioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cliente/formularios': {
       id: '/cliente/formularios'
       path: '/cliente/formularios'
       fullPath: '/cliente/formularios'
       preLoaderRoute: typeof ClienteFormulariosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cliente/agentes': {
-      id: '/cliente/agentes'
-      path: '/cliente/agentes'
-      fullPath: '/cliente/agentes'
-      preLoaderRoute: typeof ClienteAgentesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/briefing/$token': {
@@ -1517,25 +1431,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlcateiaPlaylistRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cliente/trilhas/': {
-      id: '/cliente/trilhas/'
-      path: '/cliente/trilhas'
-      fullPath: '/cliente/trilhas/'
-      preLoaderRoute: typeof ClienteTrilhasIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/p/ata/$ataId': {
       id: '/p/ata/$ataId'
       path: '/p/ata/$ataId'
       fullPath: '/p/ata/$ataId'
       preLoaderRoute: typeof PAtaAtaIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cliente/trilhas/$trackId': {
-      id: '/cliente/trilhas/$trackId'
-      path: '/cliente/trilhas/$trackId'
-      fullPath: '/cliente/trilhas/$trackId'
-      preLoaderRoute: typeof ClienteTrilhasTrackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/visao-submissions': {
@@ -1733,10 +1633,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlcateiaPlaylistRoute: AlcateiaPlaylistRoute,
   AtasAtaIdRoute: AtasAtaIdRoute,
   BriefingTokenRoute: BriefingTokenRoute,
-  ClienteAgentesRoute: ClienteAgentesRoute,
   ClienteFormulariosRoute: ClienteFormulariosRoute,
-  ClienteGlossarioRoute: ClienteGlossarioRoute,
-  ClienteMetasRoute: ClienteMetasRoute,
   ClientePainelRoute: ClientePainelRoute,
   ContratoTokenRoute: ContratoTokenRoute,
   CronogramaTokenRoute: CronogramaTokenRoute,
@@ -1746,12 +1643,20 @@ const rootRouteChildren: RootRouteChildren = {
   VfTokenRoute: VfTokenRoute,
   AlcateiaIndexRoute: AlcateiaIndexRoute,
   ApiPublicVisaoSubmissionsRoute: ApiPublicVisaoSubmissionsRoute,
-  ClienteTrilhasTrackIdRoute: ClienteTrilhasTrackIdRoute,
   PAtaAtaIdRoute: PAtaAtaIdRoute,
-  ClienteTrilhasIndexRoute: ClienteTrilhasIndexRoute,
   ClientesClienteIdProjetosProjetoIdRoute:
     ClientesClienteIdProjetosProjetoIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

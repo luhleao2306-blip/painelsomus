@@ -115,9 +115,8 @@ const navigationSections: NavSection[] = [
       { title: 'Meu Painel', icon: LayoutDashboard, href: '/cliente/painel', roles: ['client'] },
       { title: 'Atas de Reunião', icon: UsersRound, href: '/meetings', roles: ['client'] },
       { title: 'Documentos', icon: FileText, href: '/documents', roles: ['client'] },
-      { title: 'Trilha de Aprendizagem', icon: BookOpenCheck, href: '/cliente/trilhas', roles: ['client'] },
-      { title: 'Metas Estratégicas', icon: Target, href: '/cliente/metas', roles: ['client'] },
-      { title: 'Glossário de Gestão', icon: BookOpen, href: '/cliente/glossario', roles: ['client'] },
+      { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
+
       { title: 'Meus Formulários', icon: FileText, href: '/cliente/formularios', roles: ['client'] },
 
 
