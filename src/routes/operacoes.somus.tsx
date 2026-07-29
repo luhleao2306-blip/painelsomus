@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import {
-  Building2, Plus, Trash2, CalendarDays, Flag, User2, Sparkles,
+  Building2, Plus, Trash2, CalendarDays, Flag, User2, Sparkles, Search, EyeOff,
   CheckCircle2, Clock, AlertTriangle, ListChecks, X,
 } from 'lucide-react';
 import { OpPageHeader } from '@/components/operacoes/OpPageHeader';
@@ -124,41 +124,26 @@ function ProjetoSomusPage() {
       {projects.length === 0 ? (
         <EmptyState onCreate={() => setCreating(true)} />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           {/* Lista de projetos */}
           <aside className="space-y-2">
-            <div className="px-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Iniciativas
+            <div className="flex items-center justify-between px-1">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Iniciativas
+              </span>
+              <span className="font-mono text-[10px] text-muted-foreground">{projects.length}</span>
             </div>
-            {projects.map(p => {
-              const ts = tasksOfProject(p.id);
-              const done = ts.filter(t => t.status === 'concluido').length;
-              const pct = ts.length ? Math.round((done / ts.length) * 100) : 0;
-              const isActive = active?.id === p.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedId(p.id)}
-                  className={cn(
-                    'group w-full rounded-xl border p-3 text-left transition-all',
-                    isActive
-                      ? 'border-foreground/40 bg-muted/50 shadow-sm'
-                      : 'border-border/60 bg-card hover:border-foreground/25 hover:bg-muted/30',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[13.5px] font-medium leading-snug">{p.name}</span>
-                    <span className="shrink-0 font-mono text-[10px] text-muted-foreground">{pct}%</span>
-                  </div>
-                  <Progress value={pct} className="mt-2 h-1" />
-                  <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
-                    <span>{ts.length} demandas</span>
-                    <span>·</span>
-                    <span>{done} concluídas</span>
-                  </div>
-                </button>
-              );
-            })}
+            {projects.map(p => (
+              <ProjectItem
+                key={p.id}
+                name={p.name}
+                tasks={tasksOfProject(p.id)}
+                users={store.users}
+                active={active?.id === p.id}
+                onSelect={() => setSelectedId(p.id)}
+                onRename={(n) => opStore.renameProject(p.id, n)}
+              />
+            ))}
           </aside>
 
           {/* Board */}
@@ -169,16 +154,115 @@ function ProjetoSomusPage() {
   );
 }
 
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(0, 2).map(p => p[0]?.toUpperCase() ?? '').join('');
+}
+
+function ProjectItem({
+  name, tasks, users, active, onSelect, onRename,
+}: {
+  name: string;
+  tasks: OpTask[];
+  users: { id: string; name: string }[];
+  active: boolean;
+  onSelect: () => void;
+  onRename: (name: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+
+  const done = tasks.filter(t => t.status === 'concluido').length;
+  const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  const late = tasks.filter(t => t.status !== 'concluido' && t.status !== 'aprovacao_cliente' && isBeforeToday(t.dueDate)).length;
+  const crew = Array.from(new Set(tasks.map(t => t.assigneeId).filter(Boolean) as string[]))
+    .map(id => users.find(u => u.id === id)).filter(Boolean).slice(0, 4) as { id: string; name: string }[];
+
+  return (
+    <div
+      onClick={onSelect}
+      className={cn(
+        'group w-full cursor-pointer rounded-xl border p-3 text-left transition-all',
+        active
+          ? 'border-foreground/40 bg-muted/50 shadow-sm'
+          : 'border-border/60 bg-card hover:border-foreground/25 hover:bg-muted/30',
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        {editing ? (
+          <Input
+            autoFocus
+            value={draft}
+            onClick={e => e.stopPropagation()}
+            onChange={e => setDraft(e.target.value)}
+            onBlur={() => { if (draft.trim()) onRename(draft.trim()); setEditing(false); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { if (draft.trim()) onRename(draft.trim()); setEditing(false); }
+              if (e.key === 'Escape') { setDraft(name); setEditing(false); }
+            }}
+            className="h-7 px-1 text-[13.5px]"
+          />
+        ) : (
+          <span
+            className="text-[13.5px] font-medium leading-snug"
+            onDoubleClick={e => { e.stopPropagation(); setDraft(name); setEditing(true); }}
+            title="Duplo clique para renomear"
+          >
+            {name}
+          </span>
+        )}
+        <span className="shrink-0 font-mono text-[10px] text-muted-foreground">{pct}%</span>
+      </div>
+
+      <Progress value={pct} className="mt-2 h-1" />
+
+      <div className="mt-2 flex items-center gap-2">
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <span>{tasks.length} demandas</span>
+          {late > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-700 dark:text-red-300">
+              <AlertTriangle className="h-2.5 w-2.5" />{late}
+            </span>
+          )}
+        </div>
+        <div className="ml-auto flex -space-x-1.5">
+          {crew.map(u => (
+            <span
+              key={u.id}
+              title={u.name}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-background bg-muted text-[9px] font-semibold text-muted-foreground"
+            >
+              {initials(u.name)}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProjectBoard({ projectId, projectName }: { projectId: string; projectName: string }) {
   const store = useOpStore();
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStatus, setOverStatus] = useState<OpStatus | null>(null);
   const [adding, setAdding] = useState<OpStatus | null>(null);
   const [draft, setDraft] = useState('');
+  const [query, setQuery] = useState('');
+  const [assigneeFilter, setAssigneeFilter] = useState<string | 'all'>('all');
+  const [hideDone, setHideDone] = useState(false);
 
   const sections = store.sections.filter(s => s.projectId === projectId);
   const sectionId = sections[0]?.id;
-  const tasks = store.tasks.filter(t => sections.some(s => s.id === t.sectionId));
+  const allTasks = store.tasks.filter(t => sections.some(s => s.id === t.sectionId));
+
+  const q = query.trim().toLowerCase();
+  const tasks = allTasks.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q)) return false;
+    if (assigneeFilter !== 'all' && t.assigneeId !== assigneeFilter) return false;
+    return true;
+  });
+
+  const crew = Array.from(new Set(allTasks.map(t => t.assigneeId).filter(Boolean) as string[]))
+    .map(id => store.users.find(u => u.id === id)).filter(Boolean) as { id: string; name: string }[];
 
   const ensureSection = () => sectionId ?? opStore.addSection(projectId, 'Geral');
 
@@ -197,14 +281,61 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
     setOverStatus(null);
   };
 
+  const visibleStatuses = hideDone ? BOARD_STATUSES.filter(s => s !== 'concluido') : BOARD_STATUSES;
+  const doneCount = allTasks.filter(t => t.status === 'concluido').length;
+  const pct = allTasks.length ? Math.round((doneCount / allTasks.length) * 100) : 0;
+
   return (
     <section className="min-w-0">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="font-display text-[19px] font-semibold tracking-tight">{projectName}</h2>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            {tasks.length} demandas
-          </span>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-display text-[19px] font-semibold tracking-tight">{projectName}</h2>
+          <div className="mt-1 flex items-center gap-2">
+            <div className="h-1 w-28 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-foreground transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {doneCount}/{allTasks.length} concluídas
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Buscar demanda"
+              className="h-8 w-48 pl-8 text-[12.5px]"
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline" className="h-8 gap-1.5 text-[12px]">
+                <User2 className="h-3.5 w-3.5" />
+                {assigneeFilter === 'all' ? 'Todos' : (store.users.find(u => u.id === assigneeFilter)?.name ?? 'Todos')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="max-h-64 overflow-y-auto">
+              <DropdownMenuLabel className="text-[11px]">Filtrar por responsável</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAssigneeFilter('all')}>Todos</DropdownMenuItem>
+              {crew.map(u => (
+                <DropdownMenuItem key={u.id} onClick={() => setAssigneeFilter(u.id)}>{u.name}</DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            size="sm"
+            variant={hideDone ? 'default' : 'outline'}
+            className="h-8 gap-1.5 text-[12px]"
+            onClick={() => setHideDone(v => !v)}
+          >
+            <EyeOff className="h-3.5 w-3.5" /> Ocultar concluídas
+          </Button>
+
           <Button
             size="sm"
             variant="outline"
@@ -215,13 +346,13 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               }
             }}
           >
-            <Trash2 className="h-3.5 w-3.5" /> Excluir
+            <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-3">
-        {BOARD_STATUSES.map(status => {
+        {visibleStatuses.map(status => {
           const meta = STATUS_META[status];
           const items = tasks
             .filter(t => t.status === status)
@@ -231,6 +362,7 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               if (r !== 0) return r;
               return (a.dueDate ?? '9999').localeCompare(b.dueDate ?? '9999');
             });
+          const lateHere = items.filter(t => status !== 'concluido' && status !== 'aprovacao_cliente' && isBeforeToday(t.dueDate)).length;
           return (
             <div
               key={status}
@@ -239,16 +371,27 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
               onDrop={() => drop(status)}
               className={cn(
                 'flex w-[280px] shrink-0 flex-col rounded-2xl border bg-muted/20 p-2.5 transition-colors',
-                overStatus === status ? 'border-foreground/40 bg-muted/50' : 'border-border/60',
+                overStatus === status ? 'border-foreground/40 bg-muted/50 ring-2 ring-foreground/10' : 'border-border/60',
               )}
             >
               <div className="mb-2 flex items-center gap-2 px-1">
                 <span className={cn('h-2 w-2 rounded-full', meta.dot)} />
                 <span className="text-[11.5px] font-semibold uppercase tracking-[0.12em]">{meta.label}</span>
+                {lateHere > 0 && (
+                  <span className="rounded-full bg-red-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-red-700 dark:text-red-300">
+                    {lateHere} atrasada{lateHere > 1 ? 's' : ''}
+                  </span>
+                )}
                 <span className="ml-auto font-mono text-[10px] text-muted-foreground">{items.length}</span>
               </div>
 
+
               <div className="flex flex-col gap-2">
+                {items.length === 0 && adding !== status && (
+                  <div className="rounded-xl border border-dashed border-border/50 px-2.5 py-4 text-center text-[11px] text-muted-foreground">
+                    {overStatus === status ? 'Solte aqui' : 'Nada por aqui'}
+                  </div>
+                )}
                 {items.map(task => (
                   <TaskCard
                     key={task.id}
@@ -258,6 +401,7 @@ function ProjectBoard({ projectId, projectName }: { projectId: string; projectNa
                     onDragEnd={() => setDragId(null)}
                   />
                 ))}
+
 
                 {adding === status ? (
                   <div className="rounded-xl border border-dashed border-foreground/30 bg-card p-2">
