@@ -66,7 +66,7 @@ function TvDashboard() {
     return store.tasks.filter(t => t.assigneeId === assigneeFilter);
   }, [store.tasks, assigneeFilter]);
 
-  const { buckets, kpis, completed } = useMemo(() => {
+  const { buckets, kpis, completed, aprovacao } = useMemo(() => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
     const in7 = new Date(today); in7.setDate(today.getDate() + 7);
@@ -81,6 +81,7 @@ function TvDashboard() {
     const doneWeek: OpTask[] = [];
     const doneMonth: OpTask[] = [];
     let done = 0;
+    const aprovacao: OpTask[] = [];
 
     for (const t of filteredTasks) {
       if (t.status === 'concluido') {
@@ -93,7 +94,10 @@ function TvDashboard() {
         }
         continue;
       }
-      if (t.status === 'aprovacao_cliente') continue; // aguardando cliente: não conta como atraso
+      if (t.status === 'aprovacao_cliente') {
+        aprovacao.push(t); // aguardando cliente: seção própria, não conta como atraso
+        continue;
+      }
       if (!t.dueDate) continue;
       const d = parseLocalDate(t.dueDate); if (!d) continue;
       const bucketPush =
@@ -113,7 +117,7 @@ function TvDashboard() {
       const db = b.dueDate ?? '9999-12-31';
       return da.localeCompare(db);
     };
-    [overdue, doHoje, doAmanha, doSemana].forEach(arr => arr.sort(sortByDate));
+    [overdue, doHoje, doAmanha, doSemana, aprovacao].forEach(arr => arr.sort(sortByDate));
     const sortByUpdated = (a: OpTask, b: OpTask) =>
       (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '');
     [doneToday, doneWeek, doneMonth].forEach(arr => arr.sort(sortByUpdated));
@@ -126,6 +130,7 @@ function TvDashboard() {
     ];
     return {
       buckets,
+      aprovacao,
       kpis: { total: filteredTasks.length, done, overdue: overdue.length, hoje: doHoje.length },
       completed: { today: doneToday, week: doneWeek, month: doneMonth },
     };
@@ -270,6 +275,52 @@ function TvDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Aprovação do Cliente — faixa horizontal, não conta como atraso */}
+      <div className="px-10 pt-6">
+        <div className="rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 bg-purple-50">
+            <div className="flex items-center gap-2.5 text-purple-700">
+              <Users className="h-5 w-5" />
+              <span className="text-sm uppercase tracking-[0.25em] font-semibold">Aprovação do Cliente</span>
+              <span className="text-[11px] normal-case tracking-normal text-purple-600/80 italic font-serif">aguardando retorno — não conta como atraso</span>
+            </div>
+            <span className="font-serif text-3xl tabular-nums text-purple-600">{aprovacao.length}</span>
+          </div>
+          <div className="p-3">
+            {aprovacao.length === 0 ? (
+              <div className="py-6 text-center text-muted-foreground text-sm italic font-serif">
+                Nenhuma demanda aguardando cliente.
+              </div>
+            ) : (
+              <div className="flex gap-2.5 overflow-x-auto pb-1">
+                {aprovacao.map(t => {
+                  const assignee = store.users.find(u => u.id === t.assigneeId);
+                  const client = getTaskClientName(store, t);
+                  const d = t.dueDate ? parseLocalDate(t.dueDate) : null;
+                  return (
+                    <div key={t.id} className="shrink-0 w-[280px] rounded-lg bg-background border border-purple-100 px-3.5 py-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="text-[14px] font-medium leading-snug line-clamp-2 text-foreground">{t.name}</div>
+                        {d && (
+                          <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
+                            {d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+                        <span className="truncate">{client}</span>
+                        {assignee && (<><span className="opacity-40">•</span><span className="truncate">{assignee.name}</span></>)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
 
       {/* Concluídas + Performance */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 px-10 pt-6 pb-10">
