@@ -508,8 +508,7 @@ function MeetingsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </MainLayout>
-
+    </>
   );
 }
 
