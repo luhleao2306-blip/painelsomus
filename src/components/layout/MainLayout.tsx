@@ -302,6 +302,14 @@ function CollapsibleNavSection({
                     <Link to={item.href as any} className="flex items-center gap-2.5">
                       <item.icon className="h-[18px] w-[18px] shrink-0 opacity-80" />
                       <span className="truncate">{item.title}</span>
+                      {item.wip && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto shrink-0 border-amber-500/40 bg-amber-500/10 px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide text-amber-600 group-data-[collapsible=icon]:hidden dark:text-amber-400"
+                        >
+                          Em construção
+                        </Badge>
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
