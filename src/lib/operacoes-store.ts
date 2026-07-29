@@ -630,14 +630,16 @@ export const opStore = {
   // Folders
   addFolder(name: string) {
     const id = uid();
-    const previous = state.folders;
     pendingFolderIds.add(id);
     setState({ folders: [...state.folders, { id, name }] });
     bg(() => supabase.from('op_folders').upsert({ id, name }), {
       pending: [{ set: pendingFolderIds, ids: [id] }],
-      rollback: () => setState({ folders: previous }),
+      // remove só a pasta que falhou (não descarta o que outros criaram no meio-tempo)
+      rollback: () => setState({ folders: state.folders.filter(f => f.id !== id) }),
     });
+    return id;
   },
+
   renameFolder(id: string, name: string) {
     const previous = state.folders;
     pendingFolderIds.add(id);
