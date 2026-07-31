@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useEffect, type FormEvent } from 'react';
@@ -307,14 +307,16 @@ function LoginPage() {
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
-              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-medium text-black transition-all hover:bg-gray-100"
               disabled={loading}
+              style={{ backgroundColor: '#ffffff', color: '#050505' }}
+              className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-xl text-sm font-medium shadow-[0_10px_30px_-12px_rgba(0,0,0,0.8)] transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {loading ? 'Processando...' : mode === 'signin' ? 'Entrar no Portal' : 'Criar Conta'}
               {!loading && <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />}
-            </Button>
+            </button>
+
 
             <div className="flex items-center gap-4 pt-1">
               <span className="h-px flex-1 bg-white/15" />
