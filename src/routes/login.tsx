@@ -37,6 +37,34 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSending, setResetSending] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleResetRequest = async (e: FormEvent) => {
+    e.preventDefault();
+    const target = resetEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
+      toast.error('Informe um e-mail válido.');
+      return;
+    }
+    setResetSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(target, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetSending(false);
+    if (error) {
+      if (/rate limit|too many/i.test(error.message)) {
+        toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+    setResetSent(true);
+    toast.success('Link de redefinição enviado.');
+  };
 
   useEffect(() => {
     if (!authReady || profileLoading || loading || hasRedirected) return;
