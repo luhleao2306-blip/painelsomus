@@ -17,23 +17,58 @@ function ResetPasswordPage() {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [invalid, setInvalid] = useState<string | null>(null);
 
   useEffect(() => {
-    // Supabase puts the recovery token in the URL hash; the client picks it up
-    // automatically and emits a PASSWORD_RECOVERY event. We wait for it so the
-    // user can set a new password instead of being redirected as "logged in".
+    let active = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
-        setReady(true);
+        if (active) { setReady(true); setInvalid(null); }
       }
     });
 
-    // If the user already has a session (e.g. refreshed the page), allow reset too.
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
+    (async () => {
+      const url = new URL(window.location.href);
+      const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
+      const errorDesc = hash.get('error_description') || url.searchParams.get('error_description');
 
-    return () => subscription.unsubscribe();
+      // 1) Tokens no hash (fluxo implícito padrão do link de recuperação)
+      const accessToken = hash.get('access_token');
+      const refreshToken = hash.get('refresh_token');
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (active) { error ? setInvalid(error.message) : setReady(true); }
+        window.history.replaceState({}, '', url.pathname);
+        return;
+      }
+
+      // 2) token_hash + type=recovery
+      const tokenHash = url.searchParams.get('token_hash') || hash.get('token_hash');
+      if (tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
+        if (active) { error ? setInvalid(error.message) : setReady(true); }
+        window.history.replaceState({}, '', url.pathname);
+        return;
+      }
+
+      // 3) code (PKCE)
+      const code = url.searchParams.get('code');
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (active) { error ? setInvalid(error.message) : setReady(true); }
+        window.history.replaceState({}, '', url.pathname);
+        return;
+      }
+
+      // 4) Sessão já existente
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      if (data.session) setReady(true);
+      else setInvalid(errorDesc || 'Link inválido ou expirado. Solicite um novo link de redefinição.');
+    })();
+
+    return () => { active = false; subscription.unsubscribe(); };
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -84,11 +119,23 @@ function ResetPasswordPage() {
             Redefinir <span className="italic font-extralight">senha.</span>
           </h2>
           <p className="text-sm text-muted-foreground mt-3">
-            {ready
-              ? 'Escolha uma nova senha para acessar o Somus Hub.'
-              : 'Validando seu link de redefinição...'}
+            {invalid
+              ? invalid
+              : ready
+                ? 'Escolha uma nova senha para acessar o Somus Hub.'
+                : 'Validando seu link de redefinição...'}
           </p>
+          {invalid && (
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => navigate({ to: '/login' })}
+            >
+              Voltar ao login
+            </Button>
+          )}
         </div>
+
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-2">

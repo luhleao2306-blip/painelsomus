@@ -37,6 +37,34 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSending, setResetSending] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleResetRequest = async (e: FormEvent) => {
+    e.preventDefault();
+    const target = resetEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
+      toast.error('Informe um e-mail válido.');
+      return;
+    }
+    setResetSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(target, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetSending(false);
+    if (error) {
+      if (/rate limit|too many/i.test(error.message)) {
+        toast.error('Muitas tentativas. Aguarde alguns minutos e tente novamente.');
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
+    setResetSent(true);
+    toast.success('Link de redefinição enviado.');
+  };
 
   useEffect(() => {
     if (!authReady || profileLoading || loading || hasRedirected) return;
@@ -266,19 +294,10 @@ function LoginPage() {
                   type="button"
                   disabled={loading}
                   className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55 transition-colors hover:text-white"
-                  onClick={async () => {
-                    const target = email.trim().toLowerCase();
-                    if (!target) {
-                      toast.error('Informe seu e-mail acima para receber o link de redefinição.');
-                      return;
-                    }
-                    setLoading(true);
-                    const { error } = await supabase.auth.resetPasswordForEmail(target, {
-                      redirectTo: `${window.location.origin}/reset-password`,
-                    });
-                    setLoading(false);
-                    if (error) toast.error(error.message);
-                    else toast.success('Enviamos um link de redefinição para o seu e-mail.');
+                  onClick={() => {
+                    setResetEmail(email.trim().toLowerCase());
+                    setResetSent(false);
+                    setResetOpen(true);
                   }}
                 >
                   Esqueceu?
@@ -346,6 +365,71 @@ function LoginPage() {
         <span>&copy; 2026 Somus Group</span>
         <span>v3.0 &middot; Acesso restrito</span>
       </footer>
+
+      {resetOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-[400px] rounded-2xl border border-white/12 bg-[#0b0b0b] p-6 shadow-2xl">
+            {resetSent ? (
+              <div className="text-center">
+                <h2 className="text-xl text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                  Verifique seu e-mail
+                </h2>
+                <p className="mt-3 text-sm text-white/65">
+                  Enviamos um link de redefinição para <span className="text-white">{resetEmail}</span>. O link expira em
+                  1 hora — confira também a caixa de spam.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setResetOpen(false)}
+                  style={{ backgroundColor: '#ffffff', color: '#050505' }}
+                  className="mt-6 h-[46px] w-full rounded-xl text-sm font-medium transition-opacity hover:opacity-90"
+                >
+                  Voltar ao login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleResetRequest}>
+                <h2 className="text-xl text-white" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                  Redefinir senha
+                </h2>
+                <p className="mt-2 text-sm text-white/60">
+                  Informe o e-mail da sua conta e enviaremos um link seguro para criar uma nova senha.
+                </p>
+                <div className="relative mt-5">
+                  <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                  <Input
+                    type="email"
+                    autoFocus
+                    placeholder="nome@empresa.com.br"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    disabled={resetSending}
+                    className="h-[52px] w-full rounded-xl border-white/15 bg-white/[0.05] pl-11 pr-4 text-sm text-white placeholder:text-white/35 focus-visible:border-white/40 focus-visible:ring-0"
+                  />
+                </div>
+                <div className="mt-5 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setResetOpen(false)}
+                    disabled={resetSending}
+                    className="h-[46px] flex-1 rounded-xl border border-white/15 text-sm text-white/75 transition-colors hover:bg-white/[0.06]"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetSending}
+                    style={{ backgroundColor: '#ffffff', color: '#050505' }}
+                    className="h-[46px] flex-1 rounded-xl text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-60"
+                  >
+                    {resetSending ? 'Enviando...' : 'Enviar link'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
