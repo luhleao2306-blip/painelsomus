@@ -266,19 +266,10 @@ function LoginPage() {
                   type="button"
                   disabled={loading}
                   className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/55 transition-colors hover:text-white"
-                  onClick={async () => {
-                    const target = email.trim().toLowerCase();
-                    if (!target) {
-                      toast.error('Informe seu e-mail acima para receber o link de redefinição.');
-                      return;
-                    }
-                    setLoading(true);
-                    const { error } = await supabase.auth.resetPasswordForEmail(target, {
-                      redirectTo: `${window.location.origin}/reset-password`,
-                    });
-                    setLoading(false);
-                    if (error) toast.error(error.message);
-                    else toast.success('Enviamos um link de redefinição para o seu e-mail.');
+                  onClick={() => {
+                    setResetEmail(email.trim().toLowerCase());
+                    setResetSent(false);
+                    setResetOpen(true);
                   }}
                 >
                   Esqueceu?
