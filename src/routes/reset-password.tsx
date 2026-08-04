@@ -119,11 +119,23 @@ function ResetPasswordPage() {
             Redefinir <span className="italic font-extralight">senha.</span>
           </h2>
           <p className="text-sm text-muted-foreground mt-3">
-            {ready
-              ? 'Escolha uma nova senha para acessar o Somus Hub.'
-              : 'Validando seu link de redefinição...'}
+            {invalid
+              ? invalid
+              : ready
+                ? 'Escolha uma nova senha para acessar o Somus Hub.'
+                : 'Validando seu link de redefinição...'}
           </p>
+          {invalid && (
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => navigate({ to: '/login' })}
+            >
+              Voltar ao login
+            </Button>
+          )}
         </div>
+
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-2">
