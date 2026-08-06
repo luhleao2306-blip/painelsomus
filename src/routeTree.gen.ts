@@ -81,6 +81,8 @@ import { Route as AlcateiaPlaylistRouteImport } from './routes/alcateia.playlist
 import { Route as PAtaAtaIdRouteImport } from './routes/p.ata.$ataId'
 import { Route as ApiPublicVisaoSubmissionsRouteImport } from './routes/api/public/visao-submissions'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ClientesClienteIdProjetosProjetoIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId'
 import { Route as ClientesClienteIdProjetosProjetoIdAtasAtaIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId.atas.$ataId'
 
@@ -448,6 +450,16 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClientesClienteIdProjetosProjetoIdRoute =
   ClientesClienteIdProjetosProjetoIdRouteImport.update({
     id: '/clientes/$clienteId/projetos/$projetoId',
@@ -534,6 +546,8 @@ export interface FileRoutesByFullPath {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -605,6 +619,8 @@ export interface FileRoutesByTo {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -682,6 +698,8 @@ export interface FileRoutesById {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
@@ -760,6 +778,8 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesByTo: FileRoutesByTo
@@ -831,6 +851,8 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   id:
@@ -907,6 +929,8 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesById: FileRoutesById
@@ -957,6 +981,8 @@ export interface RootRouteChildren {
   ApiPublicVisaoSubmissionsRoute: typeof ApiPublicVisaoSubmissionsRoute
   PAtaAtaIdRoute: typeof PAtaAtaIdRoute
   ClientesClienteIdProjetosProjetoIdRoute: typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -1466,6 +1492,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clientes/$clienteId/projetos/$projetoId': {
       id: '/clientes/$clienteId/projetos/$projetoId'
       path: '/clientes/$clienteId/projetos/$projetoId'
@@ -1667,6 +1707,8 @@ const rootRouteChildren: RootRouteChildren = {
   PAtaAtaIdRoute: PAtaAtaIdRoute,
   ClientesClienteIdProjetosProjetoIdRoute:
     ClientesClienteIdProjetosProjetoIdRouteWithChildren,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
