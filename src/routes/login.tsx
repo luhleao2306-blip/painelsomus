@@ -240,7 +240,7 @@ function LoginPage() {
             <span className="italic font-light">Hub.</span>
           </h1>
           <p className="mt-4 text-base font-light text-white/75 sm:text-lg">
-            Sua operação, <span className="italic">centralizada.</span>
+            mande um email teste , para ver como ficou o email agora
           </p>
 
 
