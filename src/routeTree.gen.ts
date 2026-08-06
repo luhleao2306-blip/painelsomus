@@ -80,6 +80,7 @@ import { Route as AtasAtaIdRouteImport } from './routes/atas.$ataId'
 import { Route as AlcateiaPlaylistRouteImport } from './routes/alcateia.playlist'
 import { Route as PAtaAtaIdRouteImport } from './routes/p.ata.$ataId'
 import { Route as ApiPublicVisaoSubmissionsRouteImport } from './routes/api/public/visao-submissions'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ClientesClienteIdProjetosProjetoIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId'
 import { Route as ClientesClienteIdProjetosProjetoIdAtasAtaIdRouteImport } from './routes/clientes.$clienteId.projetos.$projetoId.atas.$ataId'
 
@@ -441,6 +442,12 @@ const ApiPublicVisaoSubmissionsRoute =
     path: '/api/public/visao-submissions',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ClientesClienteIdProjetosProjetoIdRoute =
   ClientesClienteIdProjetosProjetoIdRouteImport.update({
     id: '/clientes/$clienteId/projetos/$projetoId',
@@ -527,6 +534,7 @@ export interface FileRoutesByFullPath {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
 export interface FileRoutesByTo {
@@ -597,6 +605,7 @@ export interface FileRoutesByTo {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
 export interface FileRoutesById {
@@ -673,6 +682,7 @@ export interface FileRoutesById {
   '/api/public/visao-submissions': typeof ApiPublicVisaoSubmissionsRoute
   '/p/ata/$ataId': typeof PAtaAtaIdRoute
   '/clientes/$clienteId/projetos/$projetoId': typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/clientes/$clienteId/projetos/$projetoId/atas/$ataId': typeof ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute
 }
 export interface FileRouteTypes {
@@ -750,6 +760,7 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -820,6 +831,7 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   id:
     | '__root__'
@@ -895,6 +907,7 @@ export interface FileRouteTypes {
     | '/api/public/visao-submissions'
     | '/p/ata/$ataId'
     | '/clientes/$clienteId/projetos/$projetoId'
+    | '/lovable/email/queue/process'
     | '/clientes/$clienteId/projetos/$projetoId/atas/$ataId'
   fileRoutesById: FileRoutesById
 }
@@ -944,6 +957,7 @@ export interface RootRouteChildren {
   ApiPublicVisaoSubmissionsRoute: typeof ApiPublicVisaoSubmissionsRoute
   PAtaAtaIdRoute: typeof PAtaAtaIdRoute
   ClientesClienteIdProjetosProjetoIdRoute: typeof ClientesClienteIdProjetosProjetoIdRouteWithChildren
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1445,6 +1459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVisaoSubmissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clientes/$clienteId/projetos/$projetoId': {
       id: '/clientes/$clienteId/projetos/$projetoId'
       path: '/clientes/$clienteId/projetos/$projetoId'
@@ -1646,6 +1667,7 @@ const rootRouteChildren: RootRouteChildren = {
   PAtaAtaIdRoute: PAtaAtaIdRoute,
   ClientesClienteIdProjetosProjetoIdRoute:
     ClientesClienteIdProjetosProjetoIdRouteWithChildren,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
