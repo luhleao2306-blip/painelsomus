@@ -89,7 +89,7 @@ function OperacoesFormularios() {
         supabase.from('op_form_answers').select('*').order('created_at', { ascending: false }),
       ]);
       setShares((sh ?? []) as any);
-      const allSubmissions = [...(sub ?? [])];
+      const allSubmissions: SubmissionRow[] = [...((sub as any) ?? [])];
       
       // Adapt form answers to the submission view format if they don't have a token
       if (ans) {
@@ -102,13 +102,17 @@ function OperacoesFormularios() {
               form_name: store.forms.find(f => f.id === a.form_id)?.name || 'Formulário',
               form_snapshot: { fields: store.forms.find(f => f.id === a.form_id)?.fields || [] },
               answers: a.values || {},
-              submitted_at: a.created_at
+              submitted_at: a.created_at,
+              client_id: null,
+              client_name: null,
+              contact_name: null,
+              contact_email: null
             });
           }
         });
       }
       
-      setSubmissions(allSubmissions.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()) as any);
+      setSubmissions(allSubmissions.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()));
     } catch (err) {
       console.error('Erro ao carregar resultados:', err);
       toast.error('Erro ao carregar os resultados.');
