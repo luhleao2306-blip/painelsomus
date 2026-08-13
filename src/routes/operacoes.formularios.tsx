@@ -81,12 +81,18 @@ function OperacoesFormularios() {
   const loadShares = useCallback(async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
-    const [{ data: sh }, { data: sub }] = await Promise.all([
-      supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
-      supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
-    ]);
-    setShares((sh ?? []) as any);
-    setSubmissions((sub ?? []) as any);
+    
+    try {
+      const [{ data: sh }, { data: sub }] = await Promise.all([
+        supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
+        supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
+      ]);
+      setShares((sh ?? []) as any);
+      setSubmissions((sub ?? []) as any);
+    } catch (err) {
+      console.error('Erro ao carregar resultados:', err);
+      toast.error('Erro ao carregar os resultados.');
+    }
   }, []);
 
   useEffect(() => { loadShares(); }, [loadShares]);
