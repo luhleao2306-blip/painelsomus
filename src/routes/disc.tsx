@@ -125,7 +125,7 @@ function DiscTestPage() {
       
       // Navigate to results
       setTimeout(() => {
-        navigate({ to: '/disc-resultado' as any });
+        navigate({ to: '/disc-resultado' });
       }, 500);
 
     } catch (err) {
