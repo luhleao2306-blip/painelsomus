@@ -40,6 +40,7 @@ import { Route as CollaboratorsRouteImport } from './routes/collaborators'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as BriefingsRouteImport } from './routes/briefings'
 import { Route as AgendaRouteImport } from './routes/agenda'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
@@ -241,6 +242,11 @@ const BriefingsRoute = BriefingsRouteImport.update({
 const AgendaRoute = AgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -487,6 +493,7 @@ const ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
@@ -567,6 +574,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
@@ -643,6 +651,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
@@ -725,6 +734,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
@@ -805,6 +815,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
@@ -880,6 +891,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
@@ -961,6 +973,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AgendaRoute: typeof AgendaRoute
   BriefingsRoute: typeof BriefingsRoute
   ClientsRoute: typeof ClientsRouteWithChildren
@@ -1229,6 +1242,13 @@ declare module '@tanstack/react-router' {
       path: '/agenda'
       fullPath: '/agenda'
       preLoaderRoute: typeof AgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -1702,6 +1722,7 @@ const ClientesClienteIdProjetosProjetoIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AgendaRoute: AgendaRoute,
   BriefingsRoute: BriefingsRoute,
   ClientsRoute: ClientsRouteWithChildren,

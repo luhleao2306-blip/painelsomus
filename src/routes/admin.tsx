@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 export const Route = createFileRoute('/admin')({
   component: AdminLeadsPage,
   head: () => ({
-    title: 'Leads DISC | Somus Admin',
+    meta: [{ title: 'Leads DISC | Somus Admin' }]
   })
 });
 
