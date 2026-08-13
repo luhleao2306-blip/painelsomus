@@ -32,15 +32,12 @@ import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
 import { Route as FormulariosRouteImport } from './routes/formularios'
 import { Route as DocumentsRouteImport } from './routes/documents'
-import { Route as DiscResultadoRouteImport } from './routes/disc-resultado'
-import { Route as DiscRouteImport } from './routes/disc'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComercialRouteImport } from './routes/comercial'
 import { Route as CollaboratorsRouteImport } from './routes/collaborators'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as BriefingsRouteImport } from './routes/briefings'
 import { Route as AgendaRouteImport } from './routes/agenda'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SomusIaIndexRouteImport } from './routes/somus-ia.index'
 import { Route as RegistrationsIndexRouteImport } from './routes/registrations.index'
@@ -204,16 +201,6 @@ const DocumentsRoute = DocumentsRouteImport.update({
   path: '/documents',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DiscResultadoRoute = DiscResultadoRouteImport.update({
-  id: '/disc-resultado',
-  path: '/disc-resultado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscRoute = DiscRouteImport.update({
-  id: '/disc',
-  path: '/disc',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -242,11 +229,6 @@ const BriefingsRoute = BriefingsRouteImport.update({
 const AgendaRoute = AgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -493,15 +475,12 @@ const ClientesClienteIdProjetosProjetoIdAtasAtaIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/disc': typeof DiscRoute
-  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -574,14 +553,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
   '/dashboard': typeof DashboardRoute
-  '/disc': typeof DiscRoute
-  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/info-center': typeof InfoCenterRoute
@@ -651,15 +627,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agenda': typeof AgendaRoute
   '/briefings': typeof BriefingsRoute
   '/clients': typeof ClientsRouteWithChildren
   '/collaborators': typeof CollaboratorsRoute
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/disc': typeof DiscRoute
-  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -734,15 +707,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
     | '/collaborators'
     | '/comercial'
     | '/dashboard'
-    | '/disc'
-    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/gamificacao'
@@ -815,14 +785,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
     | '/collaborators'
     | '/dashboard'
-    | '/disc'
-    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/info-center'
@@ -891,15 +858,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/agenda'
     | '/briefings'
     | '/clients'
     | '/collaborators'
     | '/comercial'
     | '/dashboard'
-    | '/disc'
-    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/gamificacao'
@@ -973,15 +937,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
   AgendaRoute: typeof AgendaRoute
   BriefingsRoute: typeof BriefingsRoute
   ClientsRoute: typeof ClientsRouteWithChildren
   CollaboratorsRoute: typeof CollaboratorsRoute
   ComercialRoute: typeof ComercialRouteWithChildren
   DashboardRoute: typeof DashboardRoute
-  DiscRoute: typeof DiscRoute
-  DiscResultadoRoute: typeof DiscResultadoRoute
   DocumentsRoute: typeof DocumentsRoute
   FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
@@ -1188,20 +1149,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocumentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/disc-resultado': {
-      id: '/disc-resultado'
-      path: '/disc-resultado'
-      fullPath: '/disc-resultado'
-      preLoaderRoute: typeof DiscResultadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disc': {
-      id: '/disc'
-      path: '/disc'
-      fullPath: '/disc'
-      preLoaderRoute: typeof DiscRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -1242,13 +1189,6 @@ declare module '@tanstack/react-router' {
       path: '/agenda'
       fullPath: '/agenda'
       preLoaderRoute: typeof AgendaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -1722,15 +1662,12 @@ const ClientesClienteIdProjetosProjetoIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
   AgendaRoute: AgendaRoute,
   BriefingsRoute: BriefingsRoute,
   ClientsRoute: ClientsRouteWithChildren,
   CollaboratorsRoute: CollaboratorsRoute,
   ComercialRoute: ComercialRouteWithChildren,
   DashboardRoute: DashboardRoute,
-  DiscRoute: DiscRoute,
-  DiscResultadoRoute: DiscResultadoRoute,
   DocumentsRoute: DocumentsRoute,
   FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,
