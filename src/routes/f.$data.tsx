@@ -50,21 +50,39 @@ const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
 const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
 
 const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   return (
     <Input
-      value={value}
-      onChange={e => onChange(e.target.value)}
+      value={localValue}
+      onChange={e => {
+        setLocalValue(e.target.value);
+        onChange(e.target.value);
+      }}
       className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
   );
 });
 
 const MemoizedTextarea = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   return (
     <Textarea
       rows={4}
-      value={value}
-      onChange={e => onChange(e.target.value)}
+      value={localValue}
+      onChange={e => {
+        setLocalValue(e.target.value);
+        onChange(e.target.value);
+      }}
       className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
   );
@@ -115,7 +133,6 @@ function PublicFormPage() {
         if (error) throw error;
         
         // Ensure the submission is also mirrored as a form answer in the store if a project context is found
-        // For public forms, we check if the share had a client/project context
         const { data: shareData } = await (supabase as any)
           .from('public_form_shares')
           .select('project_id, client_id')
@@ -123,6 +140,8 @@ function PublicFormPage() {
           .maybeSingle();
 
         if (shareData?.project_id) {
+          // Use a direct RPC or verify RLS allows this. 
+          // We mirror the data so it appears in the internal panel.
           await (supabase as any).from('op_form_answers').insert({
             form_id: form.id,
             project_id: shareData.project_id,
@@ -130,7 +149,11 @@ function PublicFormPage() {
           });
         }
       } else {
-        console.log('Legacy form submitted local-only');
+        // Legacy support
+        await (supabase as any).from('op_form_answers').insert({
+          form_id: form.id,
+          values: values
+        });
       }
       setSubmitted(true);
     } catch (e) {
