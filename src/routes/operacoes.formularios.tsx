@@ -84,7 +84,7 @@ function OperacoesFormularios() {
     
     try {
       const [{ data: sh }, { data: sub }, { data: ans }] = await Promise.all([
-        supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
+        supabase.from('public_form_shares').select('token, form, created_at').order('created_at', { ascending: false }),
         supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
         supabase.from('op_form_answers').select('*').order('created_at', { ascending: false }),
       ]);
