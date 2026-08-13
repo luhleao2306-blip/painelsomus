@@ -201,10 +201,12 @@ function OperacoesFormularios() {
         </div>
 
         {/* New section for internal/unlinked submissions */}
-        {submissions.filter(s => s.token === 'internal').length > 0 && (
+        {submissions.length > 0 && (
           <div className="mb-6 space-y-2">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">Respostas Diretas</h3>
-            {submissions.filter(s => s.token === 'internal').map(sub => (
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Respostas recebidas ({submissions.length})
+            </h3>
+            {submissions.map(sub => (
               <div key={sub.id} className="rounded-lg border border-border/60 bg-card p-3 transition-all hover:border-primary/30">
                 <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold uppercase text-primary">
