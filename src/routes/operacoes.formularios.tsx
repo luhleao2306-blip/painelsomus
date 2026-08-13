@@ -61,6 +61,10 @@ type SubmissionRow = {
   form_snapshot: any;
   answers: Record<string, any>;
   submitted_at: string;
+  client_id?: string | null;
+  client_name?: string | null;
+  contact_name?: string | null;
+  contact_email?: string | null;
 };
 
 function OperacoesFormularios() {
@@ -154,14 +158,25 @@ function OperacoesFormularios() {
               const subs = submissionsByToken(sh.token);
               const answered = subs.length > 0;
               const latest = subs[0];
+              const respondent = latest?.contact_name || latest?.answers?.nome || latest?.answers?.name || '';
+              
               return (
-                <div key={sh.token} className="rounded-lg border border-border/60 bg-card p-3">
+                <div key={sh.token} className="rounded-lg border border-border/60 bg-card p-3 transition-all hover:border-primary/30">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-[10px] font-bold uppercase text-muted-foreground">
+                      {sh.form?.name?.slice(0, 2) || 'FO'}
+                    </div>
                     <div className="flex-1 min-w-[200px]">
-                      <p className="text-[12.5px] font-medium">{sh.form?.name ?? 'Formulário'}</p>
-                      <p className="text-[10.5px] text-muted-foreground font-mono">
-                        /f/{sh.token} · enviado em {new Date(sh.created_at).toLocaleDateString('pt-BR')}
+                      <div className="flex items-center gap-2">
+                        <p className="text-[12.5px] font-medium">{sh.form?.name ?? 'Formulário'}</p>
+                        {respondent && (
+                          <span className="text-[10px] text-primary/70 font-medium px-1.5 py-0.5 rounded bg-primary/5 border border-primary/10">
+                            {respondent}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10.5px] text-muted-foreground">
+                        Link: /f/{sh.token} · enviado em {new Date(sh.created_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                     {answered ? (
@@ -230,13 +245,14 @@ function exportSubmissionPDF(sub: SubmissionRow) {
   const pageH = doc.internal.pageSize.getHeight();
   let y = 60;
 
+  // Header
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.text('SOMUS', marginX, y);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(120);
-  doc.text('Formulário respondido', pageW - marginX, y, { align: 'right' });
+  doc.text('Relatório de Respostas', pageW - marginX, y, { align: 'right' });
   doc.setTextColor(0);
 
   y += 26;
@@ -247,23 +263,36 @@ function exportSubmissionPDF(sub: SubmissionRow) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text(sub.form_name ?? 'Formulário', marginX, y);
+  
   y += 16;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(120);
-  doc.text(`Recebido em ${new Date(sub.submitted_at).toLocaleString('pt-BR')}`, marginX, y);
+  const respondent = sub.contact_name || sub.answers?.nome || sub.answers?.name || 'Cliente';
+  doc.text(`Respondido por: ${respondent}`, marginX, y);
+  y += 12;
+  doc.text(`Data: ${new Date(sub.submitted_at).toLocaleString('pt-BR')}`, marginX, y);
   doc.setTextColor(0);
-  y += 24;
+  y += 30;
 
   const fields: { id: string; label: string }[] = (sub.form_snapshot?.fields ?? []) as any;
-  fields.forEach((f, i) => {
+  
+  // Se não houver campos no snapshot, tenta pegar das chaves das respostas
+  const fieldsToRender = fields.length > 0 
+    ? fields 
+    : Object.keys(sub.answers || {}).map(k => ({ id: k, label: k }));
+
+  fieldsToRender.forEach((f, i) => {
     const val = formatAnswer(sub.answers?.[f.id]);
     const label = `${String(i + 1).padStart(2, '0')}. ${f.label}`;
+    
     if (y > pageH - 80) { doc.addPage(); y = 60; }
+    
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text(label, marginX, y);
     y += 14;
+    
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     const lines = doc.splitTextToSize(val, pageW - marginX * 2);
@@ -272,14 +301,15 @@ function exportSubmissionPDF(sub: SubmissionRow) {
       doc.text(ln, marginX, y);
       y += 14;
     });
-    y += 10;
+    y += 12;
   });
 
+  // Footer
   doc.setFontSize(8);
   doc.setTextColor(150);
-  doc.text('Enviado com Somus · painelsomus.com', pageW / 2, pageH - 24, { align: 'center' });
+  doc.text('Somus Group · painelsomus.com', pageW / 2, pageH - 24, { align: 'center' });
 
-  doc.save(`${(sub.form_name ?? 'formulario').replace(/\s+/g, '_')}_${sub.id.slice(0, 6)}.pdf`);
+  doc.save(`Resposta_${(sub.form_name ?? 'formulario').replace(/\s+/g, '_')}_${sub.id.slice(0, 6)}.pdf`);
 }
 
 function SubmissionViewDialog({ submission, onClose }: { submission: SubmissionRow | null; onClose: () => void }) {
