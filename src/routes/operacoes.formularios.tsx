@@ -119,7 +119,10 @@ function OperacoesFormularios() {
         icon={<ClipboardList className="h-4 w-4" />}
         actions={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={loadShares}>
+            <Button size="sm" variant="outline" onClick={() => {
+              loadShares();
+              document.getElementById('links-enviados')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               <Inbox className="mr-1 h-3.5 w-3.5" /> Ver Resultados
             </Button>
             <Button size="sm" onClick={() => {
