@@ -81,12 +81,18 @@ function OperacoesFormularios() {
   const loadShares = useCallback(async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
-    const [{ data: sh }, { data: sub }] = await Promise.all([
-      supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
-      supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
-    ]);
-    setShares((sh ?? []) as any);
-    setSubmissions((sub ?? []) as any);
+    
+    try {
+      const [{ data: sh }, { data: sub }] = await Promise.all([
+        supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
+        supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
+      ]);
+      setShares((sh ?? []) as any);
+      setSubmissions((sub ?? []) as any);
+    } catch (err) {
+      console.error('Erro ao carregar resultados:', err);
+      toast.error('Erro ao carregar os resultados.');
+    }
   }, []);
 
   useEffect(() => { loadShares(); }, [loadShares]);
@@ -113,7 +119,10 @@ function OperacoesFormularios() {
         icon={<ClipboardList className="h-4 w-4" />}
         actions={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={loadShares}>
+            <Button size="sm" variant="outline" onClick={() => {
+              loadShares();
+              document.getElementById('links-enviados')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
               <Inbox className="mr-1 h-3.5 w-3.5" /> Ver Resultados
             </Button>
             <Button size="sm" onClick={() => {
@@ -159,7 +168,7 @@ function OperacoesFormularios() {
       </div>
 
       <div className="mt-10">
-        <div className="mb-3 flex items-center justify-between">
+        <div id="links-enviados" className="mb-3 flex items-center justify-between scroll-mt-20">
           <div>
             <h2 className="font-display text-base font-semibold flex items-center gap-2"><Inbox className="h-4 w-4" /> Links enviados</h2>
             <p className="text-[11px] text-muted-foreground">Acompanhe o status de cada link compartilhado com clientes.</p>

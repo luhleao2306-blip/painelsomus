@@ -159,7 +159,8 @@ function PublicFormPage() {
         // Legacy support
         await (supabase as any).from('op_form_answers').insert({
           form_id: form.id,
-          values: values
+          values: values,
+          created_at: new Date().toISOString()
         });
       }
       setSubmitted(true);
