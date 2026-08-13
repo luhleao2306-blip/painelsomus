@@ -1,33 +1,33 @@
-# Plan - Fix and Enhance Operations Forms
+# Plano - Corrigir e Aprimorar Formulários de Operações
 
-The user reported that "this forms part is not working." Based on investigation, there are two distinct form systems: "Visão de Clientes" (managed via `src/routes/formularios.tsx`) and the "Operações Formulários" (managed via `src/routes/operacoes.formularios.tsx`). The latter allows creating custom forms but lacks a robust submission mechanism and real-time syncing of submissions.
+O usuário relatou que "esta parte dos formulários não está funcionando". Com base na investigação, existem dois sistemas de formulários distintos: "Visão de Clientes" (gerenciado via `src/routes/formularios.tsx`) e os "Formulários de Operações" (gerenciados via `src/routes/operacoes.formularios.tsx`). Este último permite criar formulários personalizados, mas carecia de um mecanismo de submissão robusto e sincronização em tempo real das respostas.
 
-## User Review Required
+## Revisão do Usuário Necessária
 
 > [!IMPORTANT]
-> I found two separate form areas in your system. Which one exactly is not working for you?
-> 1. The **"Visão de Clientes"** (Strategic forms sent to clients)?
-> 2. The **"Formulários de Operações"** (Custom forms you create yourself)?
+> Encontrei duas áreas de formulário separadas no seu sistema. Qual delas exatamente não está funcionando para você?
+> 1. A **"Visão de Clientes"** (Formulários estratégicos enviados aos clientes)?
+> 2. Os **"Formulários de Operações"** (Formulários personalizados que você mesmo cria)?
 >
-> I will proceed with fixing the custom forms in Operations as they appear to be missing the real-time submission link to the database.
+> Vou prosseguir com a correção dos formulários personalizados em Operações, pois eles parecem não ter o link de submissão em tempo real com o banco de dados.
 
-## Proposed Changes
+## Mudanças Propostas
 
-### Database & Backend
-- Add `client_id`, `contact_name`, and `contact_email` to `public_form_submissions` table if missing (verified in RPC, but need to check table schema).
-- Ensure `public_form_shares` can store custom form definitions.
+### Banco de Dados e Backend
+- Adicionar `client_id`, `contact_name` e `contact_email` na tabela `public_form_submissions` se estiverem faltando (verificado no RPC, mas precisamos checar o esquema da tabela).
+- Garantir que `public_form_shares` possa armazenar definições de formulários personalizados.
 
-### Frontend - Operations Forms (`src/routes/operacoes.formularios.tsx`)
-- Fix the `ShareLinkDialog` to correctly generate and store public share links in the database.
-- Update the submission list to pull from `public_form_submissions` in real-time.
-- Standardize the UI to match the "Somus" premium dark/noir aesthetic.
+### Frontend - Formulários de Operações (`src/routes/operacoes.formularios.tsx`)
+- Corrigir o `ShareLinkDialog` para gerar e armazenar corretamente os links públicos de compartilhamento no banco de dados.
+- Atualizar a lista de submissões para buscar de `public_form_submissions` em tempo real.
+- Padronizar a interface para combinar com a estética premium dark/noir da "Somus".
 
-### Frontend - Public Form Page (`src/routes/f.$data.tsx`)
-- Ensure it handles both legacy (Base64) and token-based (Database) forms correctly.
-- Fix the submission logic to use the `submit_public_form` RPC properly.
+### Frontend - Página de Formulário Público (`src/routes/f.$data.tsx`)
+- Garantir que a página lide corretamente com formulários legados (Base64) e baseados em token (Banco de Dados).
+- Corrigir a lógica de submissão para usar o RPC `submit_public_form` adequadamente.
 
-## Technical Details
+## Detalhes Técnicos
 
-- **RPC Fix**: Ensure `submit_public_form` handles all fields required by the Operations forms.
-- **Store Sync**: Ensure `opStore` in `src/lib/operacoes-store.ts` correctly handles `formAnswers` and triggers re-renders when new submissions arrive.
-- **Permissions**: Verify that `anon` users can indeed execute the submission RPC and that RLS allows the `authenticated` users to read those submissions.
+- **Correção de RPC**: Garantir que `submit_public_form` lide com todos os campos exigidos pelos formulários de Operações.
+- **Sincronização da Store**: Garantir que a `opStore` em `src/lib/operacoes-store.ts` lide corretamente com `formAnswers` e acione a renderização quando novas submissões chegarem.
+- **Permissões**: Verificar se usuários `anon` podem realmente executar o RPC de submissão e se o RLS permite que os usuários `authenticated` leiam essas submissões.
