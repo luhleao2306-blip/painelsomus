@@ -95,19 +95,35 @@ function OperacoesFormularios() {
 
   return (
     <div className="py-8">
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="rounded-xl border border-border/60 bg-card p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Total de Respostas</p>
+          <p className="mt-1 text-2xl font-bold">{store.formAnswers.length}</p>
+        </div>
+        <div className="rounded-xl border border-border/60 bg-card p-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Formulários Ativos</p>
+          <p className="mt-1 text-2xl font-bold">{store.forms.length}</p>
+        </div>
+      </div>
+
       <OpPageHeader
         eyebrow="Coleta de campo"
         title="Formulários"
         description="Construa briefings, entradas de tráfego e checklists — cada resposta amarra num projeto."
         icon={<ClipboardList className="h-4 w-4" />}
         actions={
-          <Button size="sm" onClick={() => {
-            const name = prompt('Nome do formulário:');
-            if (name?.trim()) {
-              const id = opStore.addForm(name.trim());
-              setEditingId(id);
-            }
-          }}><Plus className="mr-1 h-3.5 w-3.5" /> Novo formulário</Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={loadShares}>
+              <Inbox className="mr-1 h-3.5 w-3.5" /> Ver Resultados
+            </Button>
+            <Button size="sm" onClick={() => {
+              const name = prompt('Nome do formulário:');
+              if (name?.trim()) {
+                const id = opStore.addForm(name.trim());
+                setEditingId(id);
+              }
+            }}><Plus className="mr-1 h-3.5 w-3.5" /> Novo formulário</Button>
+          </div>
         }
       />
 
