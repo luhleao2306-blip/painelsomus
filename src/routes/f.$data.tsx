@@ -168,7 +168,19 @@ function PublicFormPage() {
   };
 
 
-  const Shell = ({ children }: { children: React.ReactNode }) => (
+  return (
+    <Shell>
+      {renderBody()}
+    </Shell>
+  );
+
+  function renderBody() {
+    return <></>;
+  }
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
     <div
       className="min-h-screen w-full"
       style={{
