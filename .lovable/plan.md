@@ -9,7 +9,7 @@ O usuário relatou que "esta parte dos formulários não está funcionando". Com
 > 1. A **"Visão de Clientes"** (Formulários estratégicos enviados aos clientes)?
 > 2. Os **"Formulários de Operações"** (Formulários personalizados que você mesmo cria)?
 >
-> Vou prosseguir com a correção dos formulários personalizados em Operações, pois eles parecem não ter o link de submissão em tempo real com o banco de dados.
+> Vou prosseguir com a correção dos formulários personalizados em Operações, garantindo que as submissões funcionem em tempo real, os links enviados fiquem visíveis e a exportação em PDF esteja operacional.
 
 ## Mudanças Propostas
 
