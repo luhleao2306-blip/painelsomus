@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useForceLight } from '@/hooks/use-force-light';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { Check, Loader2, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,27 @@ function decodeLegacyBase64(raw: string): OpForm | null {
 
 const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
 const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
+
+const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
+  return (
+    <Input
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+    />
+  );
+});
+
+const MemoizedTextarea = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
+  return (
+    <Textarea
+      rows={4}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+    />
+  );
+});
 
 function PublicFormPage() {
   useForceLight();
@@ -225,18 +246,17 @@ function PublicFormPage() {
                 </label>
                 <div>
                   {f.type === 'texto_curto' && (
-                    <Input
+                    <MemoizedInput
+                      id={f.id}
                       value={values[f.id] ?? ''}
-                      onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))}
-                      className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+                      onChange={val => setValues(v => ({ ...v, [f.id]: val }))}
                     />
                   )}
                   {f.type === 'texto_longo' && (
-                    <Textarea
-                      rows={4}
+                    <MemoizedTextarea
+                      id={f.id}
                       value={values[f.id] ?? ''}
-                      onChange={e => setValues(v => ({ ...v, [f.id]: e.target.value }))}
-                      className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
+                      onChange={val => setValues(v => ({ ...v, [f.id]: val }))}
                     />
                   )}
                   {f.type === 'data' && (
