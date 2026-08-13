@@ -3468,30 +3468,51 @@ export type Database = {
       }
       public_form_shares: {
         Row: {
+          client_id: string | null
           created_at: string
           created_by: string | null
           form: Json
           id: string
+          project_id: string | null
           token: string
           updated_at: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           form: Json
           id?: string
+          project_id?: string | null
           token: string
           updated_at?: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           created_by?: string | null
           form?: Json
           id?: string
+          project_id?: string | null
           token?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_form_shares_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "op_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_form_shares_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "op_projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       public_form_submissions: {
         Row: {
