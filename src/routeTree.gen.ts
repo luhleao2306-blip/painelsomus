@@ -32,6 +32,7 @@ import { Route as InfoCenterRouteImport } from './routes/info-center'
 import { Route as GamificacaoRouteImport } from './routes/gamificacao'
 import { Route as FormulariosRouteImport } from './routes/formularios'
 import { Route as DocumentsRouteImport } from './routes/documents'
+import { Route as DiscResultadoRouteImport } from './routes/disc-resultado'
 import { Route as DiscRouteImport } from './routes/disc'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComercialRouteImport } from './routes/comercial'
@@ -200,6 +201,11 @@ const FormulariosRoute = FormulariosRouteImport.update({
 const DocumentsRoute = DocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscResultadoRoute = DiscResultadoRouteImport.update({
+  id: '/disc-resultado',
+  path: '/disc-resultado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscRoute = DiscRouteImport.update({
@@ -488,6 +494,7 @@ export interface FileRoutesByFullPath {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/disc': typeof DiscRoute
+  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -566,6 +573,7 @@ export interface FileRoutesByTo {
   '/collaborators': typeof CollaboratorsRoute
   '/dashboard': typeof DashboardRoute
   '/disc': typeof DiscRoute
+  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/info-center': typeof InfoCenterRoute
@@ -642,6 +650,7 @@ export interface FileRoutesById {
   '/comercial': typeof ComercialRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/disc': typeof DiscRoute
+  '/disc-resultado': typeof DiscResultadoRoute
   '/documents': typeof DocumentsRoute
   '/formularios': typeof FormulariosRoute
   '/gamificacao': typeof GamificacaoRouteWithChildren
@@ -723,6 +732,7 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/disc'
+    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/gamificacao'
@@ -801,6 +811,7 @@ export interface FileRouteTypes {
     | '/collaborators'
     | '/dashboard'
     | '/disc'
+    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/info-center'
@@ -876,6 +887,7 @@ export interface FileRouteTypes {
     | '/comercial'
     | '/dashboard'
     | '/disc'
+    | '/disc-resultado'
     | '/documents'
     | '/formularios'
     | '/gamificacao'
@@ -956,6 +968,7 @@ export interface RootRouteChildren {
   ComercialRoute: typeof ComercialRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   DiscRoute: typeof DiscRoute
+  DiscResultadoRoute: typeof DiscResultadoRoute
   DocumentsRoute: typeof DocumentsRoute
   FormulariosRoute: typeof FormulariosRoute
   GamificacaoRoute: typeof GamificacaoRouteWithChildren
@@ -1160,6 +1173,13 @@ declare module '@tanstack/react-router' {
       path: '/documents'
       fullPath: '/documents'
       preLoaderRoute: typeof DocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disc-resultado': {
+      id: '/disc-resultado'
+      path: '/disc-resultado'
+      fullPath: '/disc-resultado'
+      preLoaderRoute: typeof DiscResultadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disc': {
@@ -1689,6 +1709,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComercialRoute: ComercialRouteWithChildren,
   DashboardRoute: DashboardRoute,
   DiscRoute: DiscRoute,
+  DiscResultadoRoute: DiscResultadoRoute,
   DocumentsRoute: DocumentsRoute,
   FormulariosRoute: FormulariosRoute,
   GamificacaoRoute: GamificacaoRouteWithChildren,

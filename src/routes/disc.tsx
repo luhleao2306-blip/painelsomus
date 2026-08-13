@@ -1,8 +1,8 @@
 
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronLeft, Send, CheckCircle2, User, Mail, Phone, Building2, Loader2 } from 'lucide-react';
+import { ArrowRight, ChevronLeft, User, Mail, Phone, Building2, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
@@ -97,12 +97,12 @@ function DiscTestPage() {
         C: Math.round((counts.C / total) * 100),
       };
 
-      // Ensure they sum to 100 (handling rounding artifacts)
+      // Ensure they sum to 100
       const sum = percentages.D + percentages.I + percentages.S + percentages.C;
       if (sum !== 100) {
         const diff = 100 - sum;
-        // Add diff to the largest dimension
-        const maxDim = (Object.keys(percentages) as DISCValue[]).reduce((a, b) => percentages[a] > percentages[b] ? a : b);
+        const keys = Object.keys(percentages) as DISCValue[];
+        const maxDim = keys.reduce((a, b) => percentages[a] > percentages[b] ? a : b);
         percentages[maxDim] += diff;
       }
 
@@ -118,15 +118,15 @@ function DiscTestPage() {
       existing.push(result);
       localStorage.setItem('somus-disc-leads', JSON.stringify(existing));
       
-      // Store current result separately for immediate access in /resultado
+      // Store current result
       localStorage.setItem('somus-disc-current-result', JSON.stringify(result));
 
       toast.success('Resultado processado com sucesso!');
       
-      // Wait a bit for the effect
+      // Navigate to results
       setTimeout(() => {
-        navigate({ to: '/disc-resultado' });
-      }, 800);
+        navigate({ to: '/disc-resultado' as any });
+      }, 500);
 
     } catch (err) {
       toast.error('Erro ao salvar resultado.');
@@ -225,7 +225,6 @@ function DiscTestPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
-      {/* Header */}
       <header className="p-6 flex items-center justify-between border-b border-white/5 bg-black/20 backdrop-blur-sm">
         <img src={somusLogo} alt="Somus" className="h-6 brightness-0 invert" />
         <div className="flex items-center gap-4">
@@ -239,7 +238,6 @@ function DiscTestPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 max-w-4xl mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
@@ -282,7 +280,6 @@ function DiscTestPage() {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
       <footer className="p-6 border-t border-white/5 bg-black/20 flex items-center justify-between">
         <Button 
           variant="ghost" 
@@ -292,12 +289,10 @@ function DiscTestPage() {
         >
           <ChevronLeft className="mr-2 h-4 w-4" /> Anterior
         </Button>
-        
         <div className="sm:hidden text-center flex-1 px-4">
            <Progress value={progress} className="h-1 bg-white/10 w-full" />
            <p className="text-[10px] text-zinc-500 mt-2">{currentIdx + 1} de {questions.length}</p>
         </div>
-
         <div className="flex items-center gap-2 text-zinc-600 text-[10px] uppercase tracking-widest hidden sm:flex">
           <CheckCircle2 className="h-3 w-3" /> Escolha uma opção para avançar
         </div>
