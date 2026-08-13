@@ -83,12 +83,32 @@ function OperacoesFormularios() {
     if (!userData.user) return;
     
     try {
-      const [{ data: sh }, { data: sub }] = await Promise.all([
+      const [{ data: sh }, { data: sub }, { data: ans }] = await Promise.all([
         supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
         supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
+        supabase.from('op_form_answers').select('*').order('created_at', { ascending: false }),
       ]);
       setShares((sh ?? []) as any);
-      setSubmissions((sub ?? []) as any);
+      const allSubmissions = [...(sub ?? [])];
+      
+      // Adapt form answers to the submission view format if they don't have a token
+      if (ans) {
+        ans.forEach((a: any) => {
+          if (!allSubmissions.find(s => s.id === a.id)) {
+            allSubmissions.push({
+              id: a.id,
+              token: 'internal',
+              form_id: a.form_id,
+              form_name: store.forms.find(f => f.id === a.form_id)?.name || 'Formulário',
+              form_snapshot: { fields: store.forms.find(f => f.id === a.form_id)?.fields || [] },
+              answers: a.values || {},
+              submitted_at: a.created_at
+            });
+          }
+        });
+      }
+      
+      setSubmissions(allSubmissions.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()) as any);
     } catch (err) {
       console.error('Erro ao carregar resultados:', err);
       toast.error('Erro ao carregar os resultados.');
