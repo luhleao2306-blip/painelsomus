@@ -26,13 +26,15 @@ function shortToken(len = 8): string {
   return Array.from(arr, b => chars[b % chars.length]).join('');
 }
 
-async function buildShareLink(form: OpForm): Promise<string> {
+async function buildShareLink(form: OpForm, projectId?: string, clientId?: string): Promise<string> {
   const { data: userData } = await supabase.auth.getUser();
   const token = shortToken(8);
   const { error } = await supabase.from('public_form_shares').insert({
     token,
     form: { id: form.id, name: form.name, fields: form.fields, type: 'op_form' } as any,
     created_by: userData.user?.id ?? null,
+    project_id: projectId ?? null,
+    client_id: clientId ?? null,
   });
   if (error) throw error;
   return `${window.location.origin}/f/${token}`;
@@ -353,15 +355,19 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
   const store = useOpStore();
   const form = store.forms.find(f => f.id === formId);
   const [url, setUrl] = useState<string>('');
+  const [projectId, setProjectId] = useState<string>('__none');
 
   useEffect(() => {
     if (!form) return;
     setUrl('');
-    buildShareLink(form)
+    const selectedProject = projectId === '__none' ? undefined : projectId;
+    const project = store.projects.find(p => p.id === selectedProject);
+    
+    buildShareLink(form, selectedProject, project?.folderId)
       .then(u => setUrl(u))
       .catch(err => { toast.error('Não foi possível gerar o link.'); console.error(err); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formId]);
+  }, [formId, projectId]);
 
   if (!form) return null;
   const copy = async () => {
@@ -379,9 +385,30 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
             Envie este link para o cliente preencher. Ele abrirá uma página pública com os campos do formulário "{form.name}".
           </DialogDescription>
         </DialogHeader>
-        <div className="flex gap-2">
-          <Input readOnly value={url || 'Gerando link…'} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
-          <Button onClick={copy} disabled={!url}><Copy className="h-3.5 w-3.5" /></Button>
+        
+        <div className="space-y-4 py-2">
+          <div>
+            <label className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Projeto vinculado (opcional)</label>
+            <Select value={projectId} onValueChange={setProjectId}>
+              <SelectTrigger className="text-[12px] h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">Sem projeto específico</SelectItem>
+                {store.projects.map(p => (
+                  <SelectItem key={p.id} value={p.id} className="text-[12px]">{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Se selecionar um projeto, as respostas aparecerão automaticamente na aba do projeto.
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <Input readOnly value={url || 'Gerando link…'} onFocus={e => e.currentTarget.select()} className="text-[12px]" />
+            <Button onClick={copy} disabled={!url}><Copy className="h-3.5 w-3.5" /></Button>
+          </div>
         </div>
         <p className="text-[11px] text-muted-foreground">
           O cliente preencherá o formulário online e as respostas aparecerão automaticamente na aba "Links enviados" abaixo.

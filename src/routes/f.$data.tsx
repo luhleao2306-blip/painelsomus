@@ -114,12 +114,21 @@ function PublicFormPage() {
         });
         if (error) throw error;
         
-        // After successful public submission, we also record it in opStore formAnswers 
-        // if it matches a project so it's visible in the "Projetos" tab.
-        // We do this by hitting the API or we can just rely on the store sync.
-        // For now, the store syncs from public_form_submissions into op_form_answers? 
-        // Wait, public_form_submissions is a separate table. 
-        // The user says "doesn't fall anywhere". I should make sure it shows up in the store.
+        // Ensure the submission is also mirrored as a form answer in the store if a project context is found
+        // For public forms, we check if the share had a client/project context
+        const { data: shareData } = await (supabase as any)
+          .from('public_form_shares')
+          .select('project_id, client_id')
+          .eq('token', token)
+          .maybeSingle();
+
+        if (shareData?.project_id) {
+          await (supabase as any).from('op_form_answers').insert({
+            form_id: form.id,
+            project_id: shareData.project_id,
+            values: values
+          });
+        }
       } else {
         console.log('Legacy form submitted local-only');
       }
