@@ -88,6 +88,36 @@ const MemoizedTextarea = memo(({ id, value, onChange }: { id: string; value: str
   );
 });
 
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="min-h-screen w-full"
+      style={{
+        fontFamily: FONT_STACK,
+        background: '#000',
+        color: '#fff',
+        backgroundImage:
+          'radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.06), transparent 60%)',
+      }}
+    >
+      <header className="border-b border-white/10">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
+          <img src={somusLogo} alt="SOMUS" className="h-6 w-auto brightness-0 invert" />
+          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/60">
+            Formulário
+          </span>
+        </div>
+      </header>
+      {children}
+      <footer className="mx-auto max-w-3xl px-6 pb-10 pt-4">
+        <p className="text-center text-[11px] tracking-wide text-white/40">
+          Enviado com <span style={{ fontFamily: SERIF_STACK, fontStyle: 'italic' }}>Somus</span> · painelsomus.com
+        </p>
+      </footer>
+    </div>
+  );
+}
+
 function PublicFormPage() {
   useForceLight();
   const { data } = Route.useParams();
@@ -168,35 +198,6 @@ function PublicFormPage() {
   };
 
 
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div
-      className="min-h-screen w-full"
-      style={{
-        fontFamily: FONT_STACK,
-        background: '#000',
-        color: '#fff',
-        backgroundImage:
-          'radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.06), transparent 60%)',
-      }}
-    >
-      <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
-          <img src={somusLogo} alt="SOMUS" className="h-6 w-auto brightness-0 invert" />
-          <span
-            className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/60"
-          >
-            Formulário
-          </span>
-        </div>
-      </header>
-      {children}
-      <footer className="mx-auto max-w-3xl px-6 pb-10 pt-4">
-        <p className="text-center text-[11px] tracking-wide text-white/40">
-          Enviado com <span style={{ fontFamily: SERIF_STACK, fontStyle: 'italic' }}>Somus</span> · painelsomus.com
-        </p>
-      </footer>
-    </div>
-  );
 
   if (form === undefined) {
     return (
