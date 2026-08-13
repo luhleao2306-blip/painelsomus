@@ -165,7 +165,7 @@ function OperacoesFormularios() {
       </div>
 
       <div className="mt-10">
-        <div className="mb-3 flex items-center justify-between">
+        <div id="links-enviados" className="mb-3 flex items-center justify-between scroll-mt-20">
           <div>
             <h2 className="font-display text-base font-semibold flex items-center gap-2"><Inbox className="h-4 w-4" /> Links enviados</h2>
             <p className="text-[11px] text-muted-foreground">Acompanhe o status de cada link compartilhado com clientes.</p>
