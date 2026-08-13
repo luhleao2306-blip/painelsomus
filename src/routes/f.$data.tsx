@@ -50,18 +50,25 @@ const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
 const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
 
 const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
-  const [localValue, setLocalValue] = useState(value);
+  // Use uncontrolled input with a ref to avoid re-renders on every keystroke
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
+  // Sync ref value if prop value changes externally (rare for this form)
   useEffect(() => {
-    setLocalValue(value);
+    if (inputRef.current && inputRef.current.value !== value) {
+      inputRef.current.value = value;
+    }
   }, [value]);
 
   return (
     <Input
-      value={localValue}
-      onChange={e => {
-        setLocalValue(e.target.value);
-        onChange(e.target.value);
+      ref={inputRef}
+      defaultValue={value}
+      onBlur={e => onChange(e.target.value)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          onChange((e.target as HTMLInputElement).value);
+        }
       }}
       className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
@@ -69,20 +76,20 @@ const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string
 });
 
 const MemoizedTextarea = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
-  const [localValue, setLocalValue] = useState(value);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setLocalValue(value);
+    if (textareaRef.current && textareaRef.current.value !== value) {
+      textareaRef.current.value = value;
+    }
   }, [value]);
 
   return (
     <Textarea
+      ref={textareaRef}
       rows={4}
-      value={localValue}
-      onChange={e => {
-        setLocalValue(e.target.value);
-        onChange(e.target.value);
-      }}
+      defaultValue={value}
+      onBlur={e => onChange(e.target.value)}
       className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
   );
