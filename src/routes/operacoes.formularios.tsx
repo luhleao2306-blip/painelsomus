@@ -83,12 +83,36 @@ function OperacoesFormularios() {
     if (!userData.user) return;
     
     try {
-      const [{ data: sh }, { data: sub }] = await Promise.all([
+      const [{ data: sh }, { data: sub }, { data: ans }] = await Promise.all([
         supabase.from('public_form_shares').select('token, form, created_at').eq('created_by', userData.user.id).order('created_at', { ascending: false }),
         supabase.from('public_form_submissions').select('*').order('submitted_at', { ascending: false }),
+        supabase.from('op_form_answers').select('*').order('created_at', { ascending: false }),
       ]);
       setShares((sh ?? []) as any);
-      setSubmissions((sub ?? []) as any);
+      const allSubmissions: SubmissionRow[] = [...((sub as any) ?? [])];
+      
+      // Adapt form answers to the submission view format if they don't have a token
+      if (ans) {
+        ans.forEach((a: any) => {
+          if (!allSubmissions.find(s => s.id === a.id)) {
+            allSubmissions.push({
+              id: a.id,
+              token: 'internal',
+              form_id: a.form_id,
+              form_name: store.forms.find(f => f.id === a.form_id)?.name || 'Formulário',
+              form_snapshot: { fields: store.forms.find(f => f.id === a.form_id)?.fields || [] },
+              answers: a.values || {},
+              submitted_at: a.created_at,
+              client_id: null,
+              client_name: null,
+              contact_name: null,
+              contact_email: null
+            });
+          }
+        });
+      }
+      
+      setSubmissions(allSubmissions.sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()));
     } catch (err) {
       console.error('Erro ao carregar resultados:', err);
       toast.error('Erro ao carregar os resultados.');
@@ -170,17 +194,52 @@ function OperacoesFormularios() {
       <div className="mt-10">
         <div id="links-enviados" className="mb-3 flex items-center justify-between scroll-mt-20">
           <div>
-            <h2 className="font-display text-base font-semibold flex items-center gap-2"><Inbox className="h-4 w-4" /> Links enviados</h2>
-            <p className="text-[11px] text-muted-foreground">Acompanhe o status de cada link compartilhado com clientes.</p>
+            <h2 className="font-display text-base font-semibold flex items-center gap-2"><Inbox className="h-4 w-4" /> Resultados e Links</h2>
+            <p className="text-[11px] text-muted-foreground">Acompanhe as respostas e links compartilhados com clientes.</p>
           </div>
           <Button size="sm" variant="ghost" onClick={loadShares}>Atualizar</Button>
         </div>
+
+        {/* New section for internal/unlinked submissions */}
+        {submissions.filter(s => s.token === 'internal').length > 0 && (
+          <div className="mb-6 space-y-2">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">Respostas Diretas</h3>
+            {submissions.filter(s => s.token === 'internal').map(sub => (
+              <div key={sub.id} className="rounded-lg border border-border/60 bg-card p-3 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold uppercase text-primary">
+                    {sub.form_name?.slice(0, 2) || 'FO'}
+                  </div>
+                  <div className="flex-1 min-w-[200px]">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[12.5px] font-medium">{sub.form_name ?? 'Formulário'}</p>
+                      <span className="text-[10px] text-primary/70 font-medium px-1.5 py-0.5 rounded bg-primary/5 border border-primary/10">
+                        Interno
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] text-muted-foreground">
+                      Recebido em {new Date(sub.submitted_at).toLocaleString('pt-BR')}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => setViewing(sub)}>
+                    <Eye className="mr-1 h-3.5 w-3.5" /> Ver
+                  </Button>
+                  <Button size="sm" onClick={() => exportSubmissionPDF(sub)}>
+                    <Download className="mr-1 h-3.5 w-3.5" /> PDF
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {shares.length === 0 ? (
           <p className="rounded-lg border border-dashed border-border/60 p-6 text-center text-[12px] text-muted-foreground">
             Nenhum link enviado ainda. Clique em "Link" no formulário para gerar um.
           </p>
         ) : (
           <div className="space-y-2">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">Links Compartilhados</h3>
             {shares.map(sh => {
               const subs = submissionsByToken(sh.token);
               const answered = subs.length > 0;

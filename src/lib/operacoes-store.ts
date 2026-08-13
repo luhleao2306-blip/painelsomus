@@ -109,7 +109,7 @@ type Store = {
 
 const LEGACY_KEY = 'somus-operacoes-v2';
 const MIGRATED_FLAG = 'somus-operacoes-migrated-cloud';
-const uid = () => {
+export const uid = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }

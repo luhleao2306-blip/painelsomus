@@ -50,25 +50,18 @@ const FONT_STACK = "'Inter', system-ui, -apple-system, sans-serif";
 const SERIF_STACK = "'Instrument Serif', 'Times New Roman', serif";
 
 const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
-  // Use uncontrolled input with a ref to avoid re-renders on every keystroke
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [localValue, setLocalValue] = useState(value);
 
-  // Sync ref value if prop value changes externally (rare for this form)
   useEffect(() => {
-    if (inputRef.current && inputRef.current.value !== value) {
-      inputRef.current.value = value;
-    }
+    setLocalValue(value);
   }, [value]);
 
   return (
     <Input
-      ref={inputRef}
-      defaultValue={value}
-      onBlur={e => onChange(e.target.value)}
-      onKeyDown={e => {
-        if (e.key === 'Enter') {
-          onChange((e.target as HTMLInputElement).value);
-        }
+      value={localValue}
+      onChange={e => {
+        setLocalValue(e.target.value);
+        onChange(e.target.value);
       }}
       className="h-11 rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
@@ -76,20 +69,20 @@ const MemoizedInput = memo(({ id, value, onChange }: { id: string; value: string
 });
 
 const MemoizedTextarea = memo(({ id, value, onChange }: { id: string; value: string; onChange: (v: string) => void }) => {
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
-    if (textareaRef.current && textareaRef.current.value !== value) {
-      textareaRef.current.value = value;
-    }
+    setLocalValue(value);
   }, [value]);
 
   return (
     <Textarea
-      ref={textareaRef}
       rows={4}
-      defaultValue={value}
-      onBlur={e => onChange(e.target.value)}
+      value={localValue}
+      onChange={e => {
+        setLocalValue(e.target.value);
+        onChange(e.target.value);
+      }}
       className="rounded-lg border-white/15 bg-black/40 text-white placeholder:text-white/30 focus-visible:border-white/40 focus-visible:ring-0"
     />
   );
@@ -150,6 +143,7 @@ function PublicFormPage() {
           // Use a direct RPC or verify RLS allows this. 
           // We mirror the data so it appears in the internal panel.
           await (supabase as any).from('op_form_answers').insert({
+            id: crypto.randomUUID(),
             form_id: form.id,
             project_id: shareData.project_id,
             values: values
@@ -158,6 +152,7 @@ function PublicFormPage() {
       } else {
         // Legacy support
         await (supabase as any).from('op_form_answers').insert({
+          id: crypto.randomUUID(),
           form_id: form.id,
           values: values,
           created_at: new Date().toISOString()
