@@ -216,7 +216,7 @@ function OperacoesFormularios() {
                     <div className="flex items-center gap-2">
                       <p className="text-[12.5px] font-medium">{sub.form_name ?? 'Formulário'}</p>
                       <span className="text-[10px] text-primary/70 font-medium px-1.5 py-0.5 rounded bg-primary/5 border border-primary/10">
-                        Interno
+                        {sub.token === 'internal' ? 'Interno' : (sub.contact_name || sub.client_name || `/f/${sub.token}`)}
                       </span>
                     </div>
                     <p className="text-[10.5px] text-muted-foreground">
