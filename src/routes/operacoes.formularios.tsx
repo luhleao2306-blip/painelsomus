@@ -31,7 +31,7 @@ async function buildShareLink(form: OpForm): Promise<string> {
   const token = shortToken(8);
   const { error } = await supabase.from('public_form_shares').insert({
     token,
-    form: { id: form.id, name: form.name, fields: form.fields } as any,
+    form: { id: form.id, name: form.name, fields: form.fields, type: 'op_form' } as any,
     created_by: userData.user?.id ?? null,
   });
   if (error) throw error;
@@ -125,7 +125,7 @@ function OperacoesFormularios() {
               <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => setSharingId(f.id)}>
                 <LinkIcon className="mr-1 h-3.5 w-3.5" /> Link
               </Button>
-              <Button size="sm" className="flex-1 min-w-[90px]" onClick={() => setFillingId(f.id)}>Preencher</Button>
+              <Button size="sm" className="flex-1 min-w-[90px] bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setFillingId(f.id)}>Preencher</Button>
             </div>
           </div>
         ))}
@@ -354,7 +354,7 @@ function ShareLinkDialog({ formId, onClose }: { formId: string | null; onClose: 
           <Button onClick={copy} disabled={!url}><Copy className="h-3.5 w-3.5" /></Button>
         </div>
         <p className="text-[11px] text-muted-foreground">
-          Após preencher, o cliente copia as respostas e devolve pelo canal habitual (WhatsApp/e-mail).
+          O cliente preencherá o formulário online e as respostas aparecerão automaticamente na aba "Links enviados" abaixo.
         </p>
         <DialogFooter className="gap-2 sm:gap-2">
           <Button variant="outline" asChild disabled={!url}>
