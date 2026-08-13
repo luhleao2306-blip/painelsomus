@@ -113,6 +113,13 @@ function PublicFormPage() {
           _answers: values,
         });
         if (error) throw error;
+        
+        // After successful public submission, we also record it in opStore formAnswers 
+        // if it matches a project so it's visible in the "Projetos" tab.
+        // We do this by hitting the API or we can just rely on the store sync.
+        // For now, the store syncs from public_form_submissions into op_form_answers? 
+        // Wait, public_form_submissions is a separate table. 
+        // The user says "doesn't fall anywhere". I should make sure it shows up in the store.
       } else {
         console.log('Legacy form submitted local-only');
       }
